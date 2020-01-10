@@ -1,8 +1,8 @@
 /**
- * Sprite creation info for TLN.CreateSpriteset()
- * @type TLN_SpriteData
+ * Frame description for TLN.CreateSpriteset()
+ * @type TLN_SpritesetFrameDescription
  */
-class TLN_SpriteData {
+class TLN_SpritesetFrameDescription {
     name;
     x;
     y;
@@ -49,14 +49,104 @@ class TLN_Sprite {
 
     /**
      * 
-     * @type TLN_Spriteset
+     * @type TLN_SpritePicture
      */
-    spriteset;
     picture;
     scale;
     angle;
     enabled = false;
+    /**
+     * 
+     * @type TLN_SpriteAnimation
+     */
+    animation;
+    /**
+     * 
+     * @type TLN_AnimationMode
+     */
+    animationMode;
+    /**
+     * 
+     * @type TLN_AnimationState
+     */
+    animationState;
+    animationCurrentFrameIndex;
+    animationCurrentTime;
 }
+
+/**
+ * 
+ * @type TLN_SpriteAnimationFrameDescription
+ */
+class TLN_SpriteAnimationFrameDescription {
+    /**
+     * Picture name in spriteset
+     * @type string
+     */
+    name;
+
+    /**
+     * Delay in ms
+     * @type number
+     */
+    delay;
+}
+
+/**
+ * 
+ * @type TLN_SpriteAnimationFrame
+ */
+class TLN_SpriteAnimationFrame {
+    /**
+     * 
+     * @type TLN_SpritePicture
+     */
+    picture;
+
+    /**
+     * End of frame time
+     * @type number
+     */
+    endTime;
+}
+
+/**
+ * 
+ * @type TLN_SpriteAnimation
+ */
+class TLN_SpriteAnimation {
+
+    /**
+     * 
+     * @type TLN_SpriteAnimationFrame[]
+     */
+    frames = [];
+
+    /**
+     * Sum of frame delays
+     * @type number
+     */
+    totalDuration;
+}
+
+/**
+ * Enum for animation play mode.
+ * @readonly
+ * @enum {number}
+ */
+const TLN_AnimationMode = {
+    ONCE: 1,
+    LOOP: 2
+};
+
+/**
+ * 
+ * @type TLN_AnimationState
+ */
+const TLN_AnimationState = {
+    STARTED: 1,
+    STOPPED: 2
+};
 
 class TLN_Tile {
     imageBitmap;
@@ -68,13 +158,17 @@ class TLN_Tileset {
 
 class TLN_Engine {
 
-    spriteSets = new Map();
-
     /**
      * 
      * @type TLN_Sprite[]
      */
     sprites = [];
+
+    /**
+     * Time elapsed since last frame for animation control
+     * @type number 
+     */
+    frameDuration = 1000 / 60;
 
     /**
      * 
@@ -87,7 +181,8 @@ class TLN_Engine {
      * @param {number} numsprites Max number of sprite
      * @returns {TLN}
      */
-    constructor(numsprites) {
+    constructor(numsprites)
+    {
         for (let s = 0; s < numsprites; ++s) {
             this.sprites.push(new TLN_Sprite());
         }
@@ -106,15 +201,15 @@ class TLN_Engine {
     /**
      * Creates a new spriteset.
      * @param {ImageBitmap} bitmap
-     * @param {TLN_SpriteData[]} spriteDatas
+     * @param {TLN_SpritesetFrameDescription[]} frames
      * @returns {TLN_Spriteset}
      */
-    async CreateSpriteset(bitmap, spriteDatas) {
+    async CreateSpriteset(bitmap, frames) {
         let spriteset = new TLN_Spriteset();
-        for (let spriteData of spriteDatas) {
+        for (let frame of frames) {
             let spritePicture = new TLN_SpritePicture();
-            spritePicture.name = spriteData.name;
-            spritePicture.bitmap = await createImageBitmap(bitmap, spriteData.x, spriteData.y, spriteData.w, spriteData.h);
+            spritePicture.name = frame.name;
+            spritePicture.bitmap = await createImageBitmap(bitmap, frame.x, frame.y, frame.w, frame.h);
             spriteset.pictures.push(spritePicture);
         }
         return spriteset;
@@ -134,87 +229,107 @@ class TLN_Engine {
      * Find a picture entry by name in spriteset
      * @param {TLN_Spriteset} spriteset
      * @param {string} name
-     * @return {number} Index of the actual picture inside the spriteset
+     * @return {TLN_SpritePicture} Index of the actual picture inside the spriteset
      */
-    FindPictureEntryByName(spriteset, name) {
-        return spriteset.pictures.findIndex(p => p.name === name);
+    FindPictureByName(spriteset, name) {
+        return spriteset.pictures.find(p => p.name === name);
     }
 
     /**
      * 
-     * @param {number} nsprite Id of the sprite [0, num_sprites - 1]
-     * @param {TLN_Spriteset} spriteset Reference of the spriteset containing the graphics to set
+     * @param {TLN_Spriteset} spriteset
+     * @param {TLN_SpriteAnimationFrameDescription} frames
+     * @returns {TLN_SpriteAnimation}
      */
-    SetSpriteSet(nsprite, spriteset) {
-        this.sprites[nsprite].spriteset = spriteset;
+    CreateAnimation(spriteset, frames) {
+        let animation = new TLN_SpriteAnimation();
+        let time = 0;
+        for (let frameDescription of frames) {
+            let frame = new TLN_SpriteAnimationFrame();
+            frame.picture = this.FindPictureByName(spriteset, frameDescription.name);
+            time += frameDescription.delay;
+            frame.endTime = time;
+            animation.frames.push(frame);
+        }
+        animation.totalDuration = time;
+        return animation;
+    }
+
+    /**
+     * Set sprite picture
+     * @param {TLN_Sprite} sprite
+     * @param {TLN_SpritePicture} picture
+     */
+    SetSpritePicture(sprite, picture) {
+        sprite.picture = picture;
+    }
+
+    /**
+     *  Set sprite animation
+     * @param {TLN_Sprite} sprite
+     * @param {TLN_SpriteAnimation} animation
+     * @param {TLN_AnimationMode} mode play mode
+     */
+    SetSpriteAnimation(sprite, animation, mode = TLN_AnimationMode.LOOP) {
+        sprite.animation = animation;
+        sprite.animationMode = mode;
+        sprite.animationCurrentFrameIndex = 0;
+        sprite.animationCurrentTime = 0;
+        sprite.picture = sprite.animation.frames[0].picture;
     }
 
     /**
      * 
-     * @param {number} nsprite nsprite Id of the sprite [0, num_sprites - 1]
-     * @param {number} entry Index of the actual picture inside the spriteset to assign (0 <= entry < num_spriteset_pictures)
-     */
-    SetSpritePicture(nsprite, entry) {
-        let sprite = this.sprites[nsprite];
-        sprite.picture = sprite.spriteset.pictures[entry];
-    }
-
-    /**
-     * 
-     * @param {number} nsprite nsprite Id of the sprite [0, num_sprites - 1]
+     * @param {TLN_Sprite} sprite
      * @param {number} x Horizontal position (0 = left margin)
      * @param {number} y Vertical position (0 = top margin)
      */
-    SetSpritePosition(nsprite, x, y) {
-        let sprite = this.sprites[nsprite];
+    SetSpritePosition(sprite, x, y) {
         sprite.x = x;
         sprite.y = y;
     }
 
     /**
      * Apply rotozoom effect on sprite
-     * @param {number} nsprite nsprite Id of the sprite [0, num_sprites - 1]
+     * @param {TLN_Sprite} sprite
      * @param {number} scale size factor
      * @param {number} angle rotation angle in radians
      */
-    SetSpriteRotozoom(nsprite, scale, angle) {
-        let sprite = this.sprites[nsprite];
+    SetSpriteRotozoom(sprite, scale, angle) {
         sprite.scale = scale;
         sprite.angle = angle;
     }
 
     /**
      * Disable rotozoom effect on sprite
-     * @param {number} nsprite nsprite Id of the sprite [0, num_sprites - 1]
+     * @param {TLN_Sprite} sprite
      */
-    DisableSpriteRotozoom(nsprite) {
-        this.SetSpriteRotozoom(nsprite, null, null);
+    DisableSpriteRotozoom(sprite) {
+        this.SetSpriteRotozoom(sprite, null, null);
     }
 
     /**
      * Finds an available (unused) sprite. 
-     * @returns {number} Id of the sprite [0, num_sprites - 1]
+     * @returns {TLN_Sprite} sprite
      */
     GetAvailableSprite() {
-        return this.sprites.findIndex(sprite => !sprite.enabled);
+        return this.sprites.find(sprite => !sprite.enabled);
     }
 
     /**
      * Enable the sprite so it is drawn. 
-     * @param {number} nsprite nsprite Id of the sprite [0, num_sprites - 1]
+     * @param {TLN_Sprite} sprite
      */
-    EnableSprite(nsprite) {
-        let sprite = this.sprites[nsprite];
+    EnableSprite(sprite) {
         sprite.enabled = true;
     }
 
     /**
      * Disables the sprite so it is not drawn. 
      * Disabled sprites are returned by the function GetAvailableSprite as available 
-     * @param {number} nsprite nsprite Id of the sprite [0, num_sprites - 1]
+     * @param {TLN_Sprite} sprite
      */
-    DisableSprite(nsprite) {
-        let sprite = this.sprites[nsprite];
+    DisableSprite(sprite) {
         sprite.enabled = false;
     }
 
@@ -228,13 +343,63 @@ class TLN_Engine {
     }
 
     /**
-     * Draws the frame to the previously specified render target.
-     * @param {number} time timestamp for animation control
+     * @param {number} frameDuration time elapsed since last frame for animation control
      */
-    DrawFrame(time) {
+    SetFrameDuration(frameDuration) {
+        this.frameDuration = frameDuration;
+    }
+
+    /**
+     * Draws the frame to the previously specified render target.
+     * @param {number} elapsedTime time elapsed since last frame for animation control
+     */
+    DrawFrame(elapsedTime) {
+        this._UpdateSprites(elapsedTime);
         if (this.ctx) {
             this._DrawSprites();
         }
+    }
+
+    _UpdateSprites() {
+        this.sprites.forEach(sprite => sprite.enabled && this._UpdateSprite(sprite));
+    }
+
+    /**
+     * 
+     * @param {TLN_Sprite} sprite
+     */
+    _UpdateSprite(sprite) {
+        if (sprite.animation) {
+            this._UpdateSpriteAnimation(sprite);
+        }
+    }
+
+    /**
+     * 
+     * @param {TLN_Sprite} sprite
+     */
+    _UpdateSpriteAnimation(sprite) {
+        if (sprite.animationState === TLN_AnimationState.STOPPED) {
+            return;
+        }
+        let frames = sprite.animation.frames;
+        sprite.animationCurrentTime += this.frameDuration;
+        if (sprite.animationCurrentTime >= sprite.animation.totalDuration) {
+            switch (sprite.animationMode) {
+                case TLN_AnimationMode.ONCE:
+                    sprite.animationCurrentFrameIndex = frames.length - 1;
+                    sprite.animationState = TLN_AnimationState.STOPPED;
+                    return;
+                case TLN_AnimationMode.LOOP:
+                    sprite.animationCurrentFrameIndex = 0;
+                    sprite.animationCurrentTime %= sprite.animation.totalDuration;
+                    break;
+            }
+        }
+        while (sprite.animationCurrentTime > frames[sprite.animationCurrentFrameIndex].endTime) {
+            ++sprite.animationCurrentFrameIndex;
+        }
+        sprite.picture = sprite.animation.frames[sprite.animationCurrentFrameIndex].picture;
     }
 
     _DrawSprites() {
@@ -264,5 +429,37 @@ class TLN_Engine {
         if (hasRotozoom) {
             this.ctx.restore();
         }
+    }
+}
+
+/**
+ * Use this with requestAnimationFrame to limit frame per second
+ * @type FPS_Limiter
+ */
+class FPS_Limiter {
+    fps;
+    now;
+    then;
+    interval;
+    delta;
+
+    constructor(fps = 60) {
+        this.fps = fps;
+        this.then = performance.now();
+        this.interval = 1000 / fps;
+    }
+
+    /**
+     * 
+     * @returns {boolean}
+     */
+    ShouldDraw() {
+        this.now = performance.now();
+        this.delta = this.now - this.then;
+        if (this.delta > this.interval) {
+            this.then = this.now - (this.delta % this.interval);
+            return true;
+        }
+        return false;
     }
 }
