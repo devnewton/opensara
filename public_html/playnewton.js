@@ -1,8 +1,8 @@
 /**
  * Frame description for TLN.CreateSpriteset()
- * @type TLN_SpritesetFrameDescription
+ * @type GPU_SpritesetFrameDescription
  */
-class TLN_SpritesetFrameDescription {
+class GPU_SpritesetFrameDescription {
     name;
     x;
     y;
@@ -12,9 +12,9 @@ class TLN_SpritesetFrameDescription {
 
 /**
  * 
- * @type TLN_SpritePicture
+ * @type GPU_SpritePicture
  */
-class TLN_SpritePicture {
+class GPU_SpritePicture {
 
     /**
      * 
@@ -31,25 +31,25 @@ class TLN_SpritePicture {
 
 /**
  * 
- * @type TLN_Spriteset
+ * @type GPU_Spriteset
  */
-class TLN_Spriteset {
+class GPU_Spriteset {
     /**
      * 
-     * @type TLN_SpritePicture[]
+     * @type GPU_SpritePicture[]
      */
     pictures = [];
 }
 
 /**
  * 
- * @type TLN_Sprite
+ * @type GPU_Sprite
  */
-class TLN_Sprite {
+class GPU_Sprite {
 
     /**
      * 
-     * @type TLN_SpritePicture
+     * @type GPU_SpritePicture
      */
     picture;
     scale;
@@ -57,17 +57,17 @@ class TLN_Sprite {
     enabled = false;
     /**
      * 
-     * @type TLN_SpriteAnimation
+     * @type GPU_SpriteAnimation
      */
     animation;
     /**
      * 
-     * @type TLN_AnimationMode
+     * @type GPU_AnimationMode
      */
     animationMode;
     /**
      * 
-     * @type TLN_AnimationState
+     * @type GPU_AnimationState
      */
     animationState;
     animationCurrentFrameIndex;
@@ -76,9 +76,9 @@ class TLN_Sprite {
 
 /**
  * 
- * @type TLN_SpriteAnimationFrameDescription
+ * @type GPU_SpriteAnimationFrameDescription
  */
-class TLN_SpriteAnimationFrameDescription {
+class GPU_SpriteAnimationFrameDescription {
     /**
      * Picture name in spriteset
      * @type string
@@ -94,12 +94,12 @@ class TLN_SpriteAnimationFrameDescription {
 
 /**
  * 
- * @type TLN_SpriteAnimationFrame
+ * @type GPU_SpriteAnimationFrame
  */
-class TLN_SpriteAnimationFrame {
+class GPU_SpriteAnimationFrame {
     /**
      * 
-     * @type TLN_SpritePicture
+     * @type GPU_SpritePicture
      */
     picture;
 
@@ -112,13 +112,13 @@ class TLN_SpriteAnimationFrame {
 
 /**
  * 
- * @type TLN_SpriteAnimation
+ * @type GPU_SpriteAnimation
  */
-class TLN_SpriteAnimation {
+class GPU_SpriteAnimation {
 
     /**
      * 
-     * @type TLN_SpriteAnimationFrame[]
+     * @type GPU_SpriteAnimationFrame[]
      */
     frames = [];
 
@@ -134,309 +134,33 @@ class TLN_SpriteAnimation {
  * @readonly
  * @enum {number}
  */
-const TLN_AnimationMode = {
+const GPU_AnimationMode = {
     ONCE: 1,
     LOOP: 2
 };
 
 /**
  * 
- * @type TLN_AnimationState
+ * @type GPU_AnimationState
  */
-const TLN_AnimationState = {
+const GPU_AnimationState = {
     STARTED: 1,
     STOPPED: 2
 };
 
-class TLN_Tile {
+class GPU_Tile {
     imageBitmap;
 }
 
-class TLN_Tileset {
+class GPU_Tileset {
     name;
-}
-
-class TLN_Engine {
-
-    /**
-     * 
-     * @type TLN_Sprite[]
-     */
-    sprites = [];
-
-    /**
-     * Time elapsed since last frame for animation control
-     * @type number 
-     */
-    frameDuration = 1000 / 60;
-
-    /**
-     * 
-     * @type CanvasRenderingContext2D
-     */
-    ctx;
-
-    /**
-     * 
-     * @param {number} numsprites Max number of sprite
-     * @returns {TLN}
-     */
-    constructor(numsprites)
-    {
-        for (let s = 0; s < numsprites; ++s) {
-            this.sprites.push(new TLN_Sprite());
-        }
-    }
-
-    /**
-     * Loads a spriteset from a png/json file pair.
-     * @param {string} baseURL Base url for png/json files
-     * @return ImageBitmap
-     * 
-     */
-    async LoadBitmap(baseURL) {
-        return await createImageBitmap(await (await fetch(baseURL)).blob());
-    }
-
-    /**
-     * Creates a new spriteset.
-     * @param {ImageBitmap} bitmap
-     * @param {TLN_SpritesetFrameDescription[]} frames
-     * @returns {TLN_Spriteset}
-     */
-    async CreateSpriteset(bitmap, frames) {
-        let spriteset = new TLN_Spriteset();
-        for (let frame of frames) {
-            let spritePicture = new TLN_SpritePicture();
-            spritePicture.name = frame.name;
-            spritePicture.bitmap = await createImageBitmap(bitmap, frame.x, frame.y, frame.w, frame.h);
-            spriteset.pictures.push(spritePicture);
-        }
-        return spriteset;
-    }
-
-    /**
-     * Deletes the specified spriteset and frees memory
-     * @param {TLN_Spriteset} spriteset
-     */
-    DeleteSpriteset(spriteset) {
-        for (let bitmap of spriteset.pictures) {
-            bitmap.close();
-        }
-    }
-
-    /**
-     * Find a picture entry by name in spriteset
-     * @param {TLN_Spriteset} spriteset
-     * @param {string} name
-     * @return {TLN_SpritePicture} Index of the actual picture inside the spriteset
-     */
-    FindPictureByName(spriteset, name) {
-        return spriteset.pictures.find(p => p.name === name);
-    }
-
-    /**
-     * 
-     * @param {TLN_Spriteset} spriteset
-     * @param {TLN_SpriteAnimationFrameDescription} frames
-     * @returns {TLN_SpriteAnimation}
-     */
-    CreateAnimation(spriteset, frames) {
-        let animation = new TLN_SpriteAnimation();
-        let time = 0;
-        for (let frameDescription of frames) {
-            let frame = new TLN_SpriteAnimationFrame();
-            frame.picture = this.FindPictureByName(spriteset, frameDescription.name);
-            time += frameDescription.delay;
-            frame.endTime = time;
-            animation.frames.push(frame);
-        }
-        animation.totalDuration = time;
-        return animation;
-    }
-
-    /**
-     * Set sprite picture
-     * @param {TLN_Sprite} sprite
-     * @param {TLN_SpritePicture} picture
-     */
-    SetSpritePicture(sprite, picture) {
-        sprite.picture = picture;
-    }
-
-    /**
-     *  Set sprite animation
-     * @param {TLN_Sprite} sprite
-     * @param {TLN_SpriteAnimation} animation
-     * @param {TLN_AnimationMode} mode play mode
-     */
-    SetSpriteAnimation(sprite, animation, mode = TLN_AnimationMode.LOOP) {
-        sprite.animation = animation;
-        sprite.animationMode = mode;
-        sprite.animationCurrentFrameIndex = 0;
-        sprite.animationCurrentTime = 0;
-        sprite.picture = sprite.animation.frames[0].picture;
-    }
-
-    /**
-     * 
-     * @param {TLN_Sprite} sprite
-     * @param {number} x Horizontal position (0 = left margin)
-     * @param {number} y Vertical position (0 = top margin)
-     */
-    SetSpritePosition(sprite, x, y) {
-        sprite.x = x;
-        sprite.y = y;
-    }
-
-    /**
-     * Apply rotozoom effect on sprite
-     * @param {TLN_Sprite} sprite
-     * @param {number} scale size factor
-     * @param {number} angle rotation angle in radians
-     */
-    SetSpriteRotozoom(sprite, scale, angle) {
-        sprite.scale = scale;
-        sprite.angle = angle;
-    }
-
-    /**
-     * Disable rotozoom effect on sprite
-     * @param {TLN_Sprite} sprite
-     */
-    DisableSpriteRotozoom(sprite) {
-        this.SetSpriteRotozoom(sprite, null, null);
-    }
-
-    /**
-     * Finds an available (unused) sprite. 
-     * @returns {TLN_Sprite} sprite
-     */
-    GetAvailableSprite() {
-        return this.sprites.find(sprite => !sprite.enabled);
-    }
-
-    /**
-     * Enable the sprite so it is drawn. 
-     * @param {TLN_Sprite} sprite
-     */
-    EnableSprite(sprite) {
-        sprite.enabled = true;
-    }
-
-    /**
-     * Disables the sprite so it is not drawn. 
-     * Disabled sprites are returned by the function GetAvailableSprite as available 
-     * @param {TLN_Sprite} sprite
-     */
-    DisableSprite(sprite) {
-        sprite.enabled = false;
-    }
-
-    /**
-     * 
-     * @param {CanvasRenderingContext2D} ctx
-     * @returns {undefined}
-     */
-    SetRenderTarget(ctx) {
-        this.ctx = ctx;
-    }
-
-    /**
-     * @param {number} frameDuration time elapsed since last frame for animation control
-     */
-    SetFrameDuration(frameDuration) {
-        this.frameDuration = frameDuration;
-    }
-
-    /**
-     * Draws the frame to the previously specified render target.
-     * @param {number} elapsedTime time elapsed since last frame for animation control
-     */
-    DrawFrame(elapsedTime) {
-        this._UpdateSprites(elapsedTime);
-        if (this.ctx) {
-            this._DrawSprites();
-        }
-    }
-
-    _UpdateSprites() {
-        this.sprites.forEach(sprite => sprite.enabled && this._UpdateSprite(sprite));
-    }
-
-    /**
-     * 
-     * @param {TLN_Sprite} sprite
-     */
-    _UpdateSprite(sprite) {
-        if (sprite.animation) {
-            this._UpdateSpriteAnimation(sprite);
-        }
-    }
-
-    /**
-     * 
-     * @param {TLN_Sprite} sprite
-     */
-    _UpdateSpriteAnimation(sprite) {
-        if (sprite.animationState === TLN_AnimationState.STOPPED) {
-            return;
-        }
-        let frames = sprite.animation.frames;
-        sprite.animationCurrentTime += this.frameDuration;
-        if (sprite.animationCurrentTime >= sprite.animation.totalDuration) {
-            switch (sprite.animationMode) {
-                case TLN_AnimationMode.ONCE:
-                    sprite.animationCurrentFrameIndex = frames.length - 1;
-                    sprite.animationState = TLN_AnimationState.STOPPED;
-                    return;
-                case TLN_AnimationMode.LOOP:
-                    sprite.animationCurrentFrameIndex = 0;
-                    sprite.animationCurrentTime %= sprite.animation.totalDuration;
-                    break;
-            }
-        }
-        while (sprite.animationCurrentTime > frames[sprite.animationCurrentFrameIndex].endTime) {
-            ++sprite.animationCurrentFrameIndex;
-        }
-        sprite.picture = sprite.animation.frames[sprite.animationCurrentFrameIndex].picture;
-    }
-
-    _DrawSprites() {
-        this.sprites.forEach(sprite => this._IsSpriteVisible(sprite) && this._DrawSprite(sprite));
-    }
-    /**
-     * 
-     * @param {TLN_Sprite} sprite
-     * @returns {boolean} 
-     */
-    _IsSpriteVisible(sprite) {
-        return sprite.enabled && sprite.picture;
-    }
-    /**
-     * 
-     * @param {TLN_Sprite} sprite
-     */
-    _DrawSprite(sprite) {
-        let hasRotozoom = sprite.scale || sprite.angle;
-        if (hasRotozoom) {
-            this.ctx.save();
-            this.ctx.rotate(sprite.angle);
-            this.ctx.scale(sprite.scale);
-        }
-        this.ctx.drawImage(sprite.picture.bitmap, sprite.x, sprite.y);
-
-        if (hasRotozoom) {
-            this.ctx.restore();
-        }
-    }
 }
 
 /**
  * Use this with requestAnimationFrame to limit frame per second
- * @type FPS_Limiter
+ * @type GPU_FpsLimiter
  */
-class FPS_Limiter {
+class GPU_FpsLimiter {
     fps;
     now;
     then;
@@ -461,5 +185,297 @@ class FPS_Limiter {
             return true;
         }
         return false;
+    }
+}
+
+class Playnewton_GPU {
+
+    /**
+     * 
+     * @type GPU_Sprite[]
+     */
+    sprites = [];
+
+    /**
+     * Time elapsed since last frame for animation control
+     * @type number 
+     */
+    frameDuration = 1000 / 60;
+
+    /**
+     * 
+     * @type GPU_FpsLimiter
+     */
+    fpsLimiter;
+    
+    /**
+     * 
+     * @type HTMLCanvasElement
+     */
+    canvas;
+
+    /**
+     * 
+     * @type CanvasRenderingContext2D
+     */
+    ctx;
+
+    /**
+     * 
+     * @param {number} numsprites Max number of sprite
+     * @returns {TLN}
+     */
+    constructor(numsprites)
+    {
+        for (let s = 0; s < numsprites; ++s) {
+            this.sprites.push(new GPU_Sprite());
+        }
+        this.fpsLimiter = new GPU_FpsLimiter();
+    }
+
+    /**
+     * Loads a spriteset from a png/json file pair.
+     * @param {string} baseURL Base url for png/json files
+     * @return ImageBitmap
+     * 
+     */
+    async LoadBitmap(baseURL) {
+        return await createImageBitmap(await (await fetch(baseURL)).blob());
+    }
+
+    /**
+     * Creates a new spriteset.
+     * @param {ImageBitmap} bitmap
+     * @param {GPU_SpritesetFrameDescription[]} frames
+     * @returns {GPU_Spriteset}
+     */
+    async CreateSpriteset(bitmap, frames) {
+        let spriteset = new GPU_Spriteset();
+        for (let frame of frames) {
+            let spritePicture = new GPU_SpritePicture();
+            spritePicture.name = frame.name;
+            spritePicture.bitmap = await createImageBitmap(bitmap, frame.x, frame.y, frame.w, frame.h);
+            spriteset.pictures.push(spritePicture);
+        }
+        return spriteset;
+    }
+
+    /**
+     * Deletes the specified spriteset and frees memory
+     * @param {GPU_Spriteset} spriteset
+     */
+    DeleteSpriteset(spriteset) {
+        for (let bitmap of spriteset.pictures) {
+            bitmap.close();
+        }
+    }
+
+    /**
+     * Find a picture entry by name in spriteset
+     * @param {GPU_Spriteset} spriteset
+     * @param {string} name
+     * @return {GPU_SpritePicture} Index of the actual picture inside the spriteset
+     */
+    FindPictureByName(spriteset, name) {
+        return spriteset.pictures.find(p => p.name === name);
+    }
+
+    /**
+     * 
+     * @param {GPU_Spriteset} spriteset
+     * @param {GPU_SpriteAnimationFrameDescription} frames
+     * @returns {GPU_SpriteAnimation}
+     */
+    CreateAnimation(spriteset, frames) {
+        let animation = new GPU_SpriteAnimation();
+        let time = 0;
+        for (let frameDescription of frames) {
+            let frame = new GPU_SpriteAnimationFrame();
+            frame.picture = this.FindPictureByName(spriteset, frameDescription.name);
+            time += frameDescription.delay;
+            frame.endTime = time;
+            animation.frames.push(frame);
+        }
+        animation.totalDuration = time;
+        return animation;
+    }
+
+    /**
+     * Set sprite picture
+     * @param {GPU_Sprite} sprite
+     * @param {GPU_SpritePicture} picture
+     */
+    SetSpritePicture(sprite, picture) {
+        sprite.picture = picture;
+    }
+
+    /**
+     *  Set sprite animation
+     * @param {GPU_Sprite} sprite
+     * @param {GPU_SpriteAnimation} animation
+     * @param {GPU_AnimationMode} mode play mode
+     */
+    SetSpriteAnimation(sprite, animation, mode = GPU_AnimationMode.LOOP) {
+        sprite.animation = animation;
+        sprite.animationMode = mode;
+        sprite.animationCurrentFrameIndex = 0;
+        sprite.animationCurrentTime = 0;
+        sprite.picture = sprite.animation.frames[0].picture;
+    }
+
+    /**
+     * 
+     * @param {GPU_Sprite} sprite
+     * @param {number} x Horizontal position (0 = left margin)
+     * @param {number} y Vertical position (0 = top margin)
+     */
+    SetSpritePosition(sprite, x, y) {
+        sprite.x = x;
+        sprite.y = y;
+    }
+
+    /**
+     * Apply rotozoom effect on sprite
+     * @param {GPU_Sprite} sprite
+     * @param {number} scale size factor
+     * @param {number} angle rotation angle in radians
+     */
+    SetSpriteRotozoom(sprite, scale, angle) {
+        sprite.scale = scale;
+        sprite.angle = angle;
+    }
+
+    /**
+     * Disable rotozoom effect on sprite
+     * @param {GPU_Sprite} sprite
+     */
+    DisableSpriteRotozoom(sprite) {
+        this.SetSpriteRotozoom(sprite, null, null);
+    }
+
+    /**
+     * Finds an available (unused) sprite. 
+     * @returns {GPU_Sprite} sprite
+     */
+    GetAvailableSprite() {
+        return this.sprites.find(sprite => !sprite.enabled);
+    }
+
+    /**
+     * Enable the sprite so it is drawn. 
+     * @param {GPU_Sprite} sprite
+     */
+    EnableSprite(sprite) {
+        sprite.enabled = true;
+    }
+
+    /**
+     * Disables the sprite so it is not drawn. 
+     * Disabled sprites are returned by the function GetAvailableSprite as available 
+     * @param {GPU_Sprite} sprite
+     */
+    DisableSprite(sprite) {
+        sprite.enabled = false;
+    }
+
+    /**
+     * 
+     * @param {HTMLCanvasElement} canvas
+     */
+    SetVideoOutput(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
+    }
+
+    /**
+     * @param {number} frameDuration time elapsed since last frame for animation control
+     */
+    SetFrameDuration(frameDuration) {
+        this.frameDuration = frameDuration;
+    }
+
+    /**
+     * Draws the frame to the previously specified render target.
+     * @param {number} elapsedTime time elapsed since last frame for animation control
+     */
+    DrawFrame(elapsedTime) {
+        if (this.fpsLimiter.ShouldDraw()) {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this._UpdateSprites(elapsedTime);
+            if (this.ctx) {
+                this._DrawSprites();
+            }
+        }
+    }
+
+    _UpdateSprites() {
+        this.sprites.forEach(sprite => sprite.enabled && this._UpdateSprite(sprite));
+    }
+
+    /**
+     * 
+     * @param {GPU_Sprite} sprite
+     */
+    _UpdateSprite(sprite) {
+        if (sprite.animation) {
+            this._UpdateSpriteAnimation(sprite);
+        }
+    }
+
+    /**
+     * 
+     * @param {GPU_Sprite} sprite
+     */
+    _UpdateSpriteAnimation(sprite) {
+        if (sprite.animationState === GPU_AnimationState.STOPPED) {
+            return;
+        }
+        let frames = sprite.animation.frames;
+        sprite.animationCurrentTime += this.frameDuration;
+        if (sprite.animationCurrentTime >= sprite.animation.totalDuration) {
+            switch (sprite.animationMode) {
+                case GPU_AnimationMode.ONCE:
+                    sprite.animationCurrentFrameIndex = frames.length - 1;
+                    sprite.animationState = GPU_AnimationState.STOPPED;
+                    return;
+                case GPU_AnimationMode.LOOP:
+                    sprite.animationCurrentFrameIndex = 0;
+                    sprite.animationCurrentTime %= sprite.animation.totalDuration;
+                    break;
+            }
+        }
+        while (sprite.animationCurrentTime > frames[sprite.animationCurrentFrameIndex].endTime) {
+            ++sprite.animationCurrentFrameIndex;
+        }
+        sprite.picture = sprite.animation.frames[sprite.animationCurrentFrameIndex].picture;
+    }
+
+    _DrawSprites() {
+        this.sprites.forEach(sprite => this._IsSpriteVisible(sprite) && this._DrawSprite(sprite));
+    }
+    /**
+     * 
+     * @param {GPU_Sprite} sprite
+     * @returns {boolean} 
+     */
+    _IsSpriteVisible(sprite) {
+        return sprite.enabled && sprite.picture;
+    }
+    /**
+     * 
+     * @param {GPU_Sprite} sprite
+     */
+    _DrawSprite(sprite) {
+        let hasRotozoom = sprite.scale || sprite.angle;
+        if (hasRotozoom) {
+            this.ctx.save();
+            this.ctx.rotate(sprite.angle);
+            this.ctx.scale(sprite.scale);
+        }
+        this.ctx.drawImage(sprite.picture.bitmap, sprite.x, sprite.y);
+
+        if (hasRotozoom) {
+            this.ctx.restore();
+        }
     }
 }
