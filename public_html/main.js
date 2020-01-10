@@ -1,6 +1,6 @@
 async function main() {
-    let IO = new Playnewton_IO();
-    let bitmap = await IO.LoadBitmap("sprites/sara.png");
+    let DRIVE = new Playnewton_DRIVE();
+    let bitmap = await DRIVE.LoadBitmap("sprites/sara.png");
 
     let GPU = new Playnewton_GPU(100);
     let spriteset = GPU.CreateSpriteset(bitmap, [

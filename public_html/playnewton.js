@@ -212,7 +212,149 @@ class GPU_FpsLimiter {
     }
 }
 
-class Playnewton_IO {
+class CTRL_Gamepad {
+    /**
+     * 
+     * @type name
+     */
+    name;
+
+    /**
+     * Is the up button being pressed?
+     * @type boolean
+     */
+    up;
+
+    /**
+     * Is the down button being pressed?
+     * @type boolean
+     */
+    down;
+
+    /**
+     * Is the left button being pressed?
+     * @type boolean
+     */
+    left;
+
+    /**
+     * Is the right button being pressed?
+     * @type boolean
+     */
+    right;
+
+    /**
+     * Is the bottom button in the right button cluster being pressed?
+     * @type boolean
+     */
+    A;
+
+    /**
+     * Is the right button in the right button cluster being pressed?
+     * @type boolean
+     */
+    B;
+
+    /**
+     * Is the left button in the right button cluster being pressed?
+     * @type boolean
+     */
+    X;
+
+    /**
+     * Is the top button in the right button cluster being pressed?
+     * @type boolean
+     */
+    Y;
+
+    /**
+     * Is the left shoulder button being pressed?
+     * @type boolean
+     */
+    L;
+
+    /**
+     * Is the right shoulder button being pressed?
+     * @type boolean
+     */
+    R;
+
+    /**
+     * Is the start button being pressed?
+     * @type boolean
+     */
+    start;
+}
+
+class Playnewton_CTRL {
+    /**
+     * 
+     * @type CTRL_Gamepad[]
+     */
+    pads;
+
+    /**
+     * Number of player for the game
+     * @type number
+     */
+    nplayer;
+
+    /**
+     * 
+     * @param {number} nplayer Number of player for the game
+     * @returns {Playnewton_CTRL}
+     */
+    constructor(nplayer = 1) {
+        this.pads = [];
+        for (let i = 0; i < nplayer; ++i) {
+            this.pads[i] = new CTRL_Gamepad();
+        }
+        this.nplayer = nplayer;
+    }
+
+    Poll() {
+        let p = 0;
+        this._ResetPadsStates();
+        for (let webpad of navigator.getGamepads()) {
+            if(p>=this.pads.length) {
+                break;
+            }
+            if (webpad) {
+                let pad = this.pads[p];
+                pad.up = webpad.buttons[12].pressed;
+                pad.down = webpad.buttons[13].pressed;
+                pad.left = webpad.buttons[14].pressed;
+                pad.right = webpad.buttons[15].pressed;
+                pad.A = webpad.buttons[0].pressed;
+                pad.B = webpad.buttons[1].pressed;
+                pad.X = webpad.buttons[2].pressed;
+                pad.Y = webpad.buttons[3].pressed;
+                pad.L = webpad.buttons[4].pressed;
+                pad.R = webpad.buttons[5].pressed;
+                pad.start = webpad.buttons[9].pressed;
+                ++p;
+            }
+        }
+    }
+
+    _ResetPadsStates() {
+        for (let pad of this.pads) {
+            pad.up = false;
+            pad.down = false;
+            pad.left = false;
+            pad.right = false;
+            pad.A = false;
+            pad.B = false;
+            pad.X = false;
+            pad.Y = false;
+            pad.L = false;
+            pad.R = false;
+            pad.start = false;
+        }
+    }
+}
+
+class Playnewton_DRIVE {
     /**
      * Loads a spriteset from a png/json file pair.
      * @param {string} baseURL Base url for png/json files
@@ -502,7 +644,7 @@ class Playnewton_GPU {
             this.ctx.translate(sprite.x, sprite.y);
             this.ctx.rotate(sprite.angle);
             this.ctx.scale(sprite.scale, sprite.scale);
-            this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, -sprite.picture.w/2, -sprite.picture.h/2, sprite.picture.w, sprite.picture.h);
+            this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, -sprite.picture.w / 2, -sprite.picture.h / 2, sprite.picture.w, sprite.picture.h);
             this.ctx.restore();
 
         } else {
