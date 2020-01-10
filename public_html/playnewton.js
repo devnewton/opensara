@@ -27,25 +27,25 @@ class GPU_SpritePicture {
      * @type ImageBitmap
      */
     bitmap;
-    
+
     /**
      * 
      * @type number
      */
     x;
-    
+
     /**
      * 
      * @type number
      */
     y;
-    
+
     /**
      * 
      * @type number
      */
     w;
-    
+
     /**
      * 
      * @type number
@@ -499,12 +499,14 @@ class Playnewton_GPU {
         let hasRotozoom = sprite.scale || sprite.angle;
         if (hasRotozoom) {
             this.ctx.save();
+            this.ctx.translate(sprite.x, sprite.y);
             this.ctx.rotate(sprite.angle);
-            this.ctx.scale(sprite.scale);
-        }
-        this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, sprite.x, sprite.y, sprite.picture.w, sprite.picture.h);
-        if (hasRotozoom) {
+            this.ctx.scale(sprite.scale, sprite.scale);
+            this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, -sprite.picture.w/2, -sprite.picture.h/2, sprite.picture.w, sprite.picture.h);
             this.ctx.restore();
+
+        } else {
+            this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, sprite.x, sprite.y, sprite.picture.w, sprite.picture.h);
         }
     }
 }

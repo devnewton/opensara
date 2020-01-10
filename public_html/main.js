@@ -1,5 +1,4 @@
 async function main() {
-
     let IO = new Playnewton_IO();
     let bitmap = await IO.LoadBitmap("sprites/sara.png");
 
@@ -14,12 +13,25 @@ async function main() {
 
     let sara = GPU.GetAvailableSprite();
     GPU.SetSpriteAnimation(sara, walkAnimation);
-    GPU.SetSpritePosition(sara, 0, 0);
+    GPU.SetSpritePosition(sara, 640, 100);
     GPU.EnableSprite(sara);
 
     GPU.SetVideoOutput(document.getElementById('game'));
 
+    let scale = 1;
+    let scaleInc = 0.1;
+    let rotate = 0.01;
+    let rotateInc = 0.04;
     function redraw(timestamp) {
+        scale += scaleInc;
+        if(scale > 4) {
+            scaleInc = -0.1;
+        }
+        if(scale <= 0) {
+            scaleInc = 0.1;
+        }
+        rotate += rotateInc;
+        GPU.SetSpriteRotozoom(sara, scale, rotate);
         GPU.DrawFrame(timestamp);
         requestAnimationFrame(redraw);
     }
