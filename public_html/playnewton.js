@@ -27,6 +27,30 @@ class GPU_SpritePicture {
      * @type ImageBitmap
      */
     bitmap;
+    
+    /**
+     * 
+     * @type number
+     */
+    x;
+    
+    /**
+     * 
+     * @type number
+     */
+    y;
+    
+    /**
+     * 
+     * @type number
+     */
+    w;
+    
+    /**
+     * 
+     * @type number
+     */
+    h;
 }
 
 /**
@@ -188,6 +212,18 @@ class GPU_FpsLimiter {
     }
 }
 
+class Playnewton_IO {
+    /**
+     * Loads a spriteset from a png/json file pair.
+     * @param {string} baseURL Base url for png/json files
+     * @return ImageBitmap
+     * 
+     */
+    async LoadBitmap(baseURL) {
+        return await createImageBitmap(await (await fetch(baseURL)).blob());
+    }
+}
+
 class Playnewton_GPU {
 
     /**
@@ -207,7 +243,7 @@ class Playnewton_GPU {
      * @type GPU_FpsLimiter
      */
     fpsLimiter;
-    
+
     /**
      * 
      * @type HTMLCanvasElement
@@ -234,27 +270,21 @@ class Playnewton_GPU {
     }
 
     /**
-     * Loads a spriteset from a png/json file pair.
-     * @param {string} baseURL Base url for png/json files
-     * @return ImageBitmap
-     * 
-     */
-    async LoadBitmap(baseURL) {
-        return await createImageBitmap(await (await fetch(baseURL)).blob());
-    }
-
-    /**
      * Creates a new spriteset.
      * @param {ImageBitmap} bitmap
      * @param {GPU_SpritesetFrameDescription[]} frames
      * @returns {GPU_Spriteset}
      */
-    async CreateSpriteset(bitmap, frames) {
+    CreateSpriteset(bitmap, frames) {
         let spriteset = new GPU_Spriteset();
         for (let frame of frames) {
             let spritePicture = new GPU_SpritePicture();
             spritePicture.name = frame.name;
-            spritePicture.bitmap = await createImageBitmap(bitmap, frame.x, frame.y, frame.w, frame.h);
+            spritePicture.bitmap = bitmap;
+            spritePicture.x = frame.x;
+            spritePicture.y = frame.y;
+            spritePicture.w = frame.w;
+            spritePicture.h = frame.h;
             spriteset.pictures.push(spritePicture);
         }
         return spriteset;
@@ -472,8 +502,7 @@ class Playnewton_GPU {
             this.ctx.rotate(sprite.angle);
             this.ctx.scale(sprite.scale);
         }
-        this.ctx.drawImage(sprite.picture.bitmap, sprite.x, sprite.y);
-
+        this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, sprite.x, sprite.y, sprite.picture.w, sprite.picture.h);
         if (hasRotozoom) {
             this.ctx.restore();
         }
