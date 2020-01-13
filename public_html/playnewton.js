@@ -287,6 +287,13 @@ class CTRL_Gamepad {
 }
 
 class Playnewton_CTRL {
+
+    /**
+     * 
+     * @type CTRL_Gamepad
+     */
+    keyboardPad;
+
     /**
      * 
      * @type CTRL_Gamepad[]
@@ -305,18 +312,64 @@ class Playnewton_CTRL {
      * @returns {Playnewton_CTRL}
      */
     constructor(nplayer = 1) {
+        this.nplayer = nplayer;
+        this.keyboardPad = new CTRL_Gamepad();
         this.pads = [];
         for (let i = 0; i < nplayer; ++i) {
             this.pads[i] = new CTRL_Gamepad();
         }
-        this.nplayer = nplayer;
+
+        document.addEventListener("keydown", (event) => this._SetKeyboardPadButton(event,true));
+        document.addEventListener("keyup", (event) => this._SetKeyboardPadButton(event,false));
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} event
+     * @param {boolean} down
+     * @returns boolean
+     */
+    _SetKeyboardPadButton(event, down) {
+        switch (event.code) {
+            case "ArrowUp":
+                this.keyboardPad.up = down;
+                break;
+            case "ArrowDown":
+                this.keyboardPad.down = down;
+                break;
+            case "ArrowLeft":
+                this.keyboardPad.left = down;
+                break;
+            case "ArrowRight":
+                this.keyboardPad.right = down;
+                break;
+            case "KeyZ":
+                this.keyboardPad.A = down;
+                break;
+            case "KeyX":
+                this.keyboardPad.B = down;
+                break;
+            case "KeyA":
+                this.keyboardPad.X = down;
+                break;
+            case "KeyS":
+                this.keyboardPad.Y = down;
+                break;
+            case "KeyD":
+                this.keyboardPad.L = down;
+                break;
+            case "KeyC":
+                this.keyboardPad.L = down;
+                break;
+        }
+        return false;
     }
 
     Poll() {
         let p = 0;
         this._ResetPadsStates();
         for (let webpad of navigator.getGamepads()) {
-            if(p>=this.pads.length) {
+            if (p >= this.pads.length) {
                 break;
             }
             if (webpad) {
