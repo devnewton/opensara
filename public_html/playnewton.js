@@ -292,7 +292,7 @@ class Playnewton_CTRL {
      * 
      * @type CTRL_Gamepad
      */
-    keyboardPad;
+    keyboardVirtualPad;
 
     /**
      * 
@@ -301,26 +301,19 @@ class Playnewton_CTRL {
     pads;
 
     /**
-     * Number of player for the game
-     * @type number
-     */
-    nplayer;
-
-    /**
      * 
-     * @param {number} nplayer Number of player for the game
+     * @param {number} maxPlayer Max number of players for the game
      * @returns {Playnewton_CTRL}
      */
-    constructor(nplayer = 1) {
-        this.nplayer = nplayer;
-        this.keyboardPad = new CTRL_Gamepad();
+    constructor(maxPlayer = 1) {
+        this.keyboardVirtualPad = new CTRL_Gamepad();
         this.pads = [];
-        for (let i = 0; i < nplayer; ++i) {
+        for (let i = 0; i < maxPlayer; ++i) {
             this.pads[i] = new CTRL_Gamepad();
         }
 
-        document.addEventListener("keydown", (event) => this._SetKeyboardPadButton(event,true));
-        document.addEventListener("keyup", (event) => this._SetKeyboardPadButton(event,false));
+        document.addEventListener("keydown", (event) => this._SetKeyboardPadButton(event, true));
+        document.addEventListener("keyup", (event) => this._SetKeyboardPadButton(event, false));
     }
 
     /**
@@ -332,34 +325,34 @@ class Playnewton_CTRL {
     _SetKeyboardPadButton(event, down) {
         switch (event.code) {
             case "ArrowUp":
-                this.keyboardPad.up = down;
+                this.keyboardVirtualPad.up = down;
                 break;
             case "ArrowDown":
-                this.keyboardPad.down = down;
+                this.keyboardVirtualPad.down = down;
                 break;
             case "ArrowLeft":
-                this.keyboardPad.left = down;
+                this.keyboardVirtualPad.left = down;
                 break;
             case "ArrowRight":
-                this.keyboardPad.right = down;
+                this.keyboardVirtualPad.right = down;
                 break;
             case "KeyZ":
-                this.keyboardPad.A = down;
+                this.keyboardVirtualPad.A = down;
                 break;
             case "KeyX":
-                this.keyboardPad.B = down;
+                this.keyboardVirtualPad.B = down;
                 break;
             case "KeyA":
-                this.keyboardPad.X = down;
+                this.keyboardVirtualPad.X = down;
                 break;
             case "KeyS":
-                this.keyboardPad.Y = down;
+                this.keyboardVirtualPad.Y = down;
                 break;
             case "KeyD":
-                this.keyboardPad.L = down;
+                this.keyboardVirtualPad.L = down;
                 break;
             case "KeyC":
-                this.keyboardPad.L = down;
+                this.keyboardVirtualPad.L = down;
                 break;
         }
         return false;
@@ -388,6 +381,23 @@ class Playnewton_CTRL {
                 ++p;
             }
         }
+
+        if (p < this.pads.length) {
+            //use keyboard as a pad when there is less pads than players
+            this._MergePadsStates(this.pads[p], this.keyboardVirtualPad);
+        } else if (this.pads.length === 1) {
+            //use keyboard as an alternative pad when there is only one player
+            this._MergePadsStates(this.pads[0], this.keyboardVirtualPad);
+        }
+    }
+    
+    /**
+     * 
+     * @param {number} player Player index
+     * @returns {CTRL_Gamepad}
+     */
+    GetPad(player) {
+        return this.pads[player];
     }
 
     _ResetPadsStates() {
@@ -404,6 +414,25 @@ class Playnewton_CTRL {
             pad.R = false;
             pad.start = false;
         }
+    }
+
+    /**
+     * 
+     * @param {CTRL_Gamepad} dest
+     * @param {CTRL_Gamepad} src
+     */
+    _MergePadsStates(dest, src) {
+        dest.up = dest.up || src.up;
+        dest.down = dest.down || src.down;
+        dest.left = dest.left || src.left;
+        dest.right = dest.right || src.right;
+        dest.A = dest.A || src.A;
+        dest.B = dest.B || src.B;
+        dest.X = dest.X || src.X;
+        dest.Y = dest.Y || src.Y;
+        dest.L = dest.L || src.L;
+        dest.R = dest.R || src.R;
+        dest.start = dest.start || src.start;
     }
 }
 

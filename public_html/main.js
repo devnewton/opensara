@@ -18,18 +18,29 @@ async function main() {
 
     GPU.SetVideoOutput(document.getElementById('game'));
 
+    let CTRL = new Playnewton_CTRL();
+
     let scale = 1;
-    let scaleInc = 0.1;
     let rotate = 0.01;
-    let rotateInc = 0.04;
     function redraw(timestamp) {
-        scale += scaleInc;
-        if(scale > 4) {
-            scaleInc = -0.1;
+        CTRL.Poll();
+
+        let pad = CTRL.GetPad(0);
+        let rotateInc = 0;
+        if (pad.left) {
+            rotateInc = -0.04;
+        } else if (pad.right) {
+            rotateInc = 0.04;
         }
-        if(scale <= 0) {
+
+        let scaleInc = 0;
+        if (pad.down) {
+            scaleInc = -0.1;
+        } else if (pad.up) {
             scaleInc = 0.1;
         }
+
+        scale += scaleInc;
         rotate += rotateInc;
         GPU.SetSpriteRotozoom(sara, scale, rotate);
         GPU.DrawFrame(timestamp);
