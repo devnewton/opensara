@@ -21,31 +21,26 @@ class GPU_SpritePicture {
      * @type String
      */
     name;
-
     /**
      * 
      * @type ImageBitmap
      */
     bitmap;
-
     /**
      * 
      * @type number
      */
     x;
-
     /**
      * 
      * @type number
      */
     y;
-
     /**
      * 
      * @type number
      */
     w;
-
     /**
      * 
      * @type number
@@ -108,7 +103,6 @@ class GPU_SpriteAnimationFrameDescription {
      * @type string
      */
     name;
-
     /**
      * Delay in ms
      * @type number
@@ -126,7 +120,6 @@ class GPU_SpriteAnimationFrame {
      * @type GPU_SpritePicture
      */
     picture;
-
     /**
      * End of frame time
      * @type number
@@ -145,7 +138,6 @@ class GPU_SpriteAnimation {
      * @type GPU_SpriteAnimationFrame[]
      */
     frames = [];
-
     /**
      * Sum of frame delays
      * @type number
@@ -162,7 +154,6 @@ const GPU_AnimationMode = {
     ONCE: 1,
     LOOP: 2
 };
-
 /**
  * 
  * @type GPU_AnimationState
@@ -171,7 +162,6 @@ const GPU_AnimationState = {
     STARTED: 1,
     STOPPED: 2
 };
-
 class GPU_Tile {
     imageBitmap;
 }
@@ -190,7 +180,6 @@ class GPU_FpsLimiter {
     then;
     interval;
     delta;
-
     constructor(fps = 60) {
         this.fps = fps;
         this.then = performance.now();
@@ -218,67 +207,56 @@ class CTRL_Gamepad {
      * @type name
      */
     name;
-
     /**
      * Is the up button being pressed?
      * @type boolean
      */
     up;
-
     /**
      * Is the down button being pressed?
      * @type boolean
      */
     down;
-
     /**
      * Is the left button being pressed?
      * @type boolean
      */
     left;
-
     /**
      * Is the right button being pressed?
      * @type boolean
      */
     right;
-
     /**
      * Is the bottom button in the right button cluster being pressed?
      * @type boolean
      */
     A;
-
     /**
      * Is the right button in the right button cluster being pressed?
      * @type boolean
      */
     B;
-
     /**
      * Is the left button in the right button cluster being pressed?
      * @type boolean
      */
     X;
-
     /**
      * Is the top button in the right button cluster being pressed?
      * @type boolean
      */
     Y;
-
     /**
      * Is the left shoulder button being pressed?
      * @type boolean
      */
     L;
-
     /**
      * Is the right shoulder button being pressed?
      * @type boolean
      */
     R;
-
     /**
      * Is the start button being pressed?
      * @type boolean
@@ -293,13 +271,11 @@ class Playnewton_CTRL {
      * @type CTRL_Gamepad
      */
     keyboardVirtualPad;
-
     /**
      * 
      * @type CTRL_Gamepad[]
      */
     pads;
-
     /**
      * 
      * @param {number} maxPlayer Max number of players for the game
@@ -383,14 +359,14 @@ class Playnewton_CTRL {
         }
 
         if (p < this.pads.length) {
-            //use keyboard as a pad when there is less pads than players
+//use keyboard as a pad when there is less pads than players
             this._MergePadsStates(this.pads[p], this.keyboardVirtualPad);
         } else if (this.pads.length === 1) {
-            //use keyboard as an alternative pad when there is only one player
+//use keyboard as an alternative pad when there is only one player
             this._MergePadsStates(this.pads[0], this.keyboardVirtualPad);
         }
     }
-    
+
     /**
      * 
      * @param {number} player Player index
@@ -436,6 +412,195 @@ class Playnewton_CTRL {
     }
 }
 
+class TMX_TileAnimationFrame {
+    /**
+     * 
+     * @type number Local ID of a tile within the parent tileset
+     */
+    tileid;
+
+    /**
+     * How long (in milliseconds) this frame should be displayed before advancing to the next frame
+     * @type number
+     */
+    duration;
+}
+
+class TMX_TileAnimation {
+    /**
+     * 
+     * @type TMX_TileAnimationFrame[]
+     */
+    frames = [];
+}
+
+class TMX_Tile {
+    /**
+     * Local tile ID within its tileset.
+     * @type number
+     */
+    id;
+
+    /**
+     * The type of the tile. Refers to an object type and is used by tile objects.
+     * @type string
+     */
+    type;
+
+    /**
+     * 
+     * @type TMX_TileAnimation
+     */
+    animation;
+}
+
+class TMX_Tileset {
+
+    /**
+     * The first global tile ID of this tileset (this global ID maps to the first tile in this tileset)
+     * @type number
+     */
+    firstgid;
+
+    /**
+     * @type string
+     */
+    name;
+    /**
+     * Width of a tile
+     * @type number
+     */
+    tileWidth;
+    /**
+     * Height of a tile
+     * @type number
+     */
+    tileHeight;
+    /**
+     * Spacing in pixels between the tiles in this tileset (applies to the tileset image)
+     * @type number
+     */
+    spacing;
+    /**
+     * Margin around the tiles in this tileset (applies to the tileset image)
+     * @type number
+     */
+    margin;
+
+    /**
+     * 
+     * @type ImageBitmap
+     */
+    bitmap;
+
+    /**
+     * 
+     * @type TMX_Tile[]
+     */
+    tiles = [];
+}
+
+class TMX_Chunk {
+    /**
+     * X coordinate of the chunk in tiles.
+     * @type number
+     */
+    x;
+    /**
+     * Y coordinate of the chunk in tiles.
+     * @type number
+     */
+    y;
+    /**
+     * Width of the chunk in tiles.
+     * @type number
+     */
+    width;
+    /**
+     * Height: The height of the chunk in tiles.
+     * @type number
+     */
+    height;
+
+    /**
+     * 
+     * @type TMX_Tile[][]
+     */
+    tiles
+}
+
+class TMX_Layer {
+
+    /**
+     * Name of the layer
+     * @type string
+     */
+    name;
+
+    /**
+     * The x coordinate of the layer in tiles
+     * @type number
+     */
+    x;
+    /**
+     * The y coordinate of the layer in tiles
+     * @type number
+     */
+    y;
+
+    /**
+     * Width of the layer in tiles
+     * @type number
+     */
+    width;
+    /**
+     * Height of the layer in tiles
+     * @type number
+     */
+    height; //The h. Always the same as the map height for fixed-size maps.
+
+    /**
+     * 
+     * @type TMX_Chunk[]
+     */
+    chunks = [];
+}
+
+class TMX_Map {
+
+    /**
+     * Map width in tiles
+     * @type number
+     */
+    width;
+    /**
+     * Map height in tiles
+     * @type number
+     */
+    height;
+    /**
+     * Width of a tile
+     * @type number
+     */
+    tileWidth;
+    /**
+     * Height of a tile
+     * @type number
+     */
+    tileHeight;
+    /**
+     * 
+     * @type TMX_Tileset[]
+     */
+    tilesets = [];
+
+    /**
+     * 
+     * @type TMX_Layer[]
+     */
+    layers = [];
+}
+
 class Playnewton_DRIVE {
     /**
      * Loads a spriteset from a png/json file pair.
@@ -446,6 +611,180 @@ class Playnewton_DRIVE {
     async LoadBitmap(baseURL) {
         return await createImageBitmap(await (await fetch(baseURL)).blob());
     }
+
+    /**
+     * Load a [Tiled](https://www.mapeditor.org/) map
+     * @param {string} tmxUrl
+     * @returns {TMX_Map}
+     */
+    async LoadTmxMap(tmxUrl) {
+        let map = new TMX_Map();
+        let parser = new DOMParser();
+        let tmx = await (await fetch(tmxUrl)).text();
+        let doc = parser.parseFromString(tmx, "application/xml");
+        let mapElement = doc.getElementsByTagName("map")[0];
+        map.width = parseInt(mapElement.getAttribute("width"), 10);
+        map.height = parseInt(mapElement.getAttribute("height"), 10);
+        map.tileWidth = parseInt(mapElement.getAttribute("tilewidth"), 10);
+        map.tileHeight = parseInt(mapElement.getAttribute("tileheight"), 10);
+
+        let baseUrl = tmxUrl.slice(0, tmxUrl.lastIndexOf("/") + 1);
+        for (let tilesetElement of doc.getElementsByTagName("tileset")) {
+            let source = tilesetElement.getAttribute("source");
+            let tileset;
+            if (source) {
+                tileset = await this.LoadTileset(baseUrl + source);
+            } else {
+                tileset = await this._LoadTilesetElement(tilesetElement, baseUrl);
+            }
+            tileset.firstgid = tilesetElement.getAttribute("firstgid");
+            map.tilesets.push(tileset);
+        }
+
+        for (let layerElement of doc.getElementsByTagName("layer")) {
+            let layer = new TMX_Layer();
+            layer.name = layerElement.getAttribute("name");
+            layer.x = parseInt(layerElement.getAttribute("x"), 10) || 0;
+            layer.y = parseInt(layerElement.getAttribute("y"), 10) || 0;
+            layer.width = parseInt(layerElement.getAttribute("width"), 10);
+            layer.height = parseInt(layerElement.getAttribute("height"), 10);
+
+            let dataElement = layerElement.getElementsByTagName("data")[0];
+            if (dataElement) {
+                layer.chunks.push(this._LoadChunkElement(map, dataElement));
+                for (let chunkElement of dataElement.getElementsByTagName("chunk")) {
+                    layer.chunks.push(this._LoadChunkElement(map, chunkElement));
+                }
+            }
+            map.layers.push(layer);
+        }
+
+        return map;
+    }
+
+    async LoadTileset(tsxUrl) {
+        let tsx = await(await fetch(tsxUrl)).text();
+        let parser = new DOMParser();
+        let tilesetElement = parser.parseFromString(tsx, "application/xml").getElementsByTagName("tileset")[0];
+        let baseUrl = tsxUrl.slice(0, tsxUrl.lastIndexOf("/") + 1);
+        return await this._LoadTilesetElement(tilesetElement, baseUrl);
+    }
+
+    /**
+     * @param {Element} tilesetElement
+     * @param {string} baseUrl
+     * @returns {TMX_Tileset}
+     */
+    async _LoadTilesetElement(tilesetElement, baseUrl = "") {
+        let tileset = new TMX_Tileset();
+        tileset.name = tilesetElement.getAttribute("name");
+        tileset.firstgid = parseInt(tilesetElement.getAttribute("firstgid"), 10);
+        tileset.tileWidth = parseInt(tilesetElement.getAttribute("tilewidth"), 10);
+        tileset.tileHeight = parseInt(tilesetElement.getAttribute("tileheight"), 10);
+        tileset.spacing = parseInt(tilesetElement.getAttribute("spacing"), 10) || 0;
+        tileset.margin = parseInt(tilesetElement.getAttribute("margin"), 10) || 0;
+        tileset.bitmap = await this.LoadBitmap(baseUrl + tilesetElement.getElementsByTagName("image")[0].getAttribute("source"));
+
+        for (let tileElement of tilesetElement.getElementsByTagName("tile")) {
+            let tile = new TMX_Tile();
+            tile.id = parseInt(tileElement.getAttribute("id"), 10);
+            tile.type = tileElement.getAttribute("type");
+            let animationElement = tileElement.getElementsByTagName("animation")[0];
+            if (animationElement) {
+                tile.animation = this._LoadTileAnimation(animationElement);
+            }
+            tileset.tiles.push(tile);
+        }
+
+        return tileset;
+    }
+
+    /**
+     * 
+     * @param {Element} animationElement
+     * @returns {TMX_TileAnimation}
+     */
+    _LoadTileAnimation(animationElement) {
+        let animation = new TMX_TileAnimation();
+        for (let frameElement of animationElement.getElementsByTagName("frame")) {
+            let frame = new TMX_TileAnimationFrame();
+            frame.tileid = parseInt(frameElement.getAttribute("tileid"), 10);
+            frame.duration = frameElement.getAttribute("duration");
+            animation.frames.push(frame);
+        }
+        return animation;
+    }
+
+    /**
+     * 
+     * @param {TMX_Map} map
+     * @param {Element} dataOrChunkElement
+     * @returns {TMX_Chunk}
+     */
+    _LoadChunkElement(map, dataOrChunkElement) {
+        let chunk = new TMX_Chunk();
+
+        chunk.x = parseInt(dataOrChunkElement.getAttribute("x") || 0, 10);
+        chunk.y = parseInt(dataOrChunkElement.getAttribute("y") || 0, 10);
+        chunk.width = parseInt(dataOrChunkElement.getAttribute("width") || map.width, 10);
+        chunk.height = parseInt(dataOrChunkElement.getAttribute("height") || map.height, 10);
+        let data = _DecodeChunkData(dataOrChunkElement);
+        chunk.tiles = _ConvertDataToTiles(map, data);
+        return chunk;
+    }
+
+    /**
+     * 
+     * @param {Element} dataOrChunkElement
+     * @returns {Uint32Array}
+     */
+    _DecodeChunkData(dataOrChunkElement) {
+        switch (dataOrChunkElement.getAttribute("encoding")) {
+            case "base64":
+                return _DecodeBase64ChunkData(dataOrChunkElement);
+            case "csv":
+                return _DecodeCSVChunkData(dataOrChunkElement);
+            default:
+                return _DecodeXMLChunkData(dataOrChunkElement);
+        }
+    }
+
+    /**
+     * 
+     * @param {Element} dataOrChunkElement
+     * @returns {Uint32Array}
+     */
+    _DecodeBase64ChunkData(dataOrChunkElement) {
+        //TODO
+    }
+
+    /**
+     * 
+     * @param {Element} dataOrChunkElement
+     * @returns {Uint32Array}
+     */
+    _DecodeCSVChunkData(dataOrChunkElement) {
+        //TODO
+    }
+
+    /**
+     * 
+     * @param {Element} dataOrChunkElement
+     * @returns {Uint32Array}
+     */
+    _DecodeXMLChunkData(dataOrChunkElement) {
+        //TODO
+    }
+
+    /**
+     * 
+     * @param {TMX_Map} map
+     * @param {Uint32Array} data
+     * @returns {TMX_Tile[][]}
+     */
+    _ConvertDataToTiles(map, data) {
+        //TODO
+    }
 }
 
 class Playnewton_GPU {
@@ -455,31 +794,26 @@ class Playnewton_GPU {
      * @type GPU_Sprite[]
      */
     sprites = [];
-
     /**
      * Time elapsed since last frame for animation control
      * @type number 
      */
     frameDuration = 1000 / 60;
-
     /**
      * 
      * @type GPU_FpsLimiter
      */
     fpsLimiter;
-
     /**
      * 
      * @type HTMLCanvasElement
      */
     canvas;
-
     /**
      * 
      * @type CanvasRenderingContext2D
      */
     ctx;
-
     /**
      * 
      * @param {number} numsprites Max number of sprite
@@ -728,7 +1062,6 @@ class Playnewton_GPU {
             this.ctx.scale(sprite.scale, sprite.scale);
             this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, -sprite.picture.w / 2, -sprite.picture.h / 2, sprite.picture.w, sprite.picture.h);
             this.ctx.restore();
-
         } else {
             this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, sprite.x, sprite.y, sprite.picture.w, sprite.picture.h);
         }

@@ -1,6 +1,9 @@
 async function main() {
     let DRIVE = new Playnewton_DRIVE();
     let bitmap = await DRIVE.LoadBitmap("sprites/sara.png");
+    
+    let map = await DRIVE.LoadTmxMap("maps/TileKit/TileKitDemo.tmx");
+    console.log(map);
 
     let GPU = new Playnewton_GPU(100);
     let spriteset = GPU.CreateSpriteset(bitmap, [
