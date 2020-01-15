@@ -434,6 +434,36 @@ class TMX_TileAnimation {
     frames = [];
 }
 
+class TMX_TilePicture {
+
+    /**
+     * 
+     * @type ImageBitmap
+     */
+    bitmap;
+
+    /**
+     * 
+     * @type number
+     */
+    x;
+    /**
+     * 
+     * @type number
+     */
+    y;
+    /**
+     * 
+     * @type number
+     */
+    w;
+    /**
+     * 
+     * @type number
+     */
+    h;
+}
+
 class TMX_Tile {
     /**
      * Local tile ID within its tileset.
@@ -446,6 +476,12 @@ class TMX_Tile {
      * @type string
      */
     type;
+
+    /**
+     * 
+     * @type TMX_TilePicture
+     */
+    picture;
 
     /**
      * 
@@ -495,9 +531,9 @@ class TMX_Tileset {
 
     /**
      * 
-     * @type TMX_Tile[]
+     * @type Map<number, TMX_Tile>
      */
-    tiles = [];
+    tiles = new Map();
 }
 
 class TMX_Chunk {
@@ -693,7 +729,41 @@ class Playnewton_DRIVE {
             if (animationElement) {
                 tile.animation = this._LoadTileAnimation(animationElement);
             }
-            tileset.tiles.push(tile);
+            let imageElement = tileElement.getElementsByTagName("image")[0];
+            if (imageElement) {
+                tile.picture = new TMX_TilePicture();
+                tile.picture.bitmap = await this.LoadBitmap(baseUrl + imageElement.getAttribute("source"));
+                tile.picture.x = 0;
+                tile.picture.y = 0;
+                tile.picture.w = tile.picture.bitmap.width;
+                tile.picture.h = tile.picture.bitmap.height;
+                tileset.bitmap = await this.LoadBitmap(baseUrl + tilesetElement.getElementsByTagName("image")[0].getAttribute("source"));
+            }
+            tileset.tiles.set(tile.id, tile);
+        }
+        if (tileset.bitmap) {
+            let maxX = tileset.bitmap.width - tileset.margin;
+            let maxY = tileset.bitmap.height - tileset.margin;
+            let id = 0;
+            for (let y = tileset.margin; y < maxY; y += tileset.tileWidth + tileset.spacing) {
+                for (let x = tileset.margin; x < maxX; x += tileset.tileHeight + tileset.spacing) {
+                    let tile = tileset.tiles.get(id);
+                    if (!tile) {
+                        tile = new TmxTile();
+                        tile.id = id;
+                        tileset.tiles.put(id, tile);
+                    }
+                    if (!tile.picture) {
+                        tile.picture = new TMX_TilePicture();
+                        tile.picture.bitmap = tileset.bitmap;
+                        tile.picture.x = x;
+                        tile.picture.y = y;
+                        tile.picture.w = tileset.tileWidth;
+                        tile.picture.h = tileset.tileHeight;
+                    }
+                    ++id;
+                }
+            }
         }
 
         return tileset;
@@ -728,62 +798,142 @@ class Playnewton_DRIVE {
         chunk.y = parseInt(dataOrChunkElement.getAttribute("y") || 0, 10);
         chunk.width = parseInt(dataOrChunkElement.getAttribute("width") || map.width, 10);
         chunk.height = parseInt(dataOrChunkElement.getAttribute("height") || map.height, 10);
-        let data = _DecodeChunkData(dataOrChunkElement);
-        chunk.tiles = _ConvertDataToTiles(map, data);
+        let data = this._DecodeChunkData(dataOrChunkElement, chunk.width * chunk.height);
+        this._ConvertDataToTiles(map, chunk, data);
         return chunk;
     }
 
     /**
      * 
      * @param {Element} dataOrChunkElement
+     * @param {number} nbtiles
      * @returns {Uint32Array}
      */
-    _DecodeChunkData(dataOrChunkElement) {
+    _DecodeChunkData(dataOrChunkElement, nbtiles) {
         switch (dataOrChunkElement.getAttribute("encoding")) {
             case "base64":
-                return _DecodeBase64ChunkData(dataOrChunkElement);
+                return this._DecodeBase64ChunkData(dataOrChunkElement, nbtiles);
             case "csv":
-                return _DecodeCSVChunkData(dataOrChunkElement);
+                return this._DecodeCSVChunkData(dataOrChunkElement, nbtiles);
             default:
-                return _DecodeXMLChunkData(dataOrChunkElement);
+                return this._DecodeXMLChunkData(dataOrChunkElement, nbtiles);
         }
     }
 
     /**
      * 
      * @param {Element} dataOrChunkElement
+     * @param {number} nbtiles
      * @returns {Uint32Array}
      */
-    _DecodeBase64ChunkData(dataOrChunkElement) {
-        //TODO
+    _DecodeBase64ChunkData(dataOrChunkElement, nbtiles) {
+        let compression = dataOrChunkElement.getAttribute("compression");
+        switch (compression) {
+            case "zlib":
+            case "gzip":
+                throw "Tiled map compression is not supported";
+            default:
+        }
+        return this._DecodeBase64ToUint32Array(dataOrChunkElement.textContent, nbtiles);
+    }
+
+    /**
+     * 
+     * @param {string} base64Str
+     * @param {number} nbtiles
+     * @returns {Uint32Array}
+     */
+    _DecodeBase64ToUint32Array(base64Str, nbtiles)
+    {
+        let str = window.atob(base64Str);
+        let data = new Uint32Array(nbtiles);
+        for (let i = 0; i < str.length; i += 4)
+        {
+            data[i / 4] = (
+                    str.charCodeAt(i) |
+                    str.charCodeAt(i + 1) << 8 |
+                    str.charCodeAt(i + 2) << 16 |
+                    str.charCodeAt(i + 3) << 24
+                    ) >>> 0;
+        }
+        return data;
     }
 
     /**
      * 
      * @param {Element} dataOrChunkElement
+     * @param {number} nbtiles
      * @returns {Uint32Array}
      */
-    _DecodeCSVChunkData(dataOrChunkElement) {
-        //TODO
+    _DecodeCSVChunkData(dataOrChunkElement, nbtiles) {
+        let data = new Uint32Array(nbtiles);
+        let i = 0;
+        for (let m of dataOrChunkElement.textContent.matchAll(/\d+/g)) {
+            data[i++] = parseInt(m[0], 10);
+        }
+        return data;
     }
 
     /**
      * 
      * @param {Element} dataOrChunkElement
+     * @param {number} nbtiles
      * @returns {Uint32Array}
      */
-    _DecodeXMLChunkData(dataOrChunkElement) {
-        //TODO
+    _DecodeXMLChunkData(dataOrChunkElement, nbtiles) {
+        let data = new Uint32Array(nbtiles);
+        let tileElements = dataOrChunkElement.getElementsByTagName("tile");
+        let i = 0;
+        for (let tileElement of tileElements) {
+            data[i++] = parseInt(tileElement.getAttribute("gid"), 10);
+        }
+        return data;
     }
 
     /**
      * 
      * @param {TMX_Map} map
+     * @param {TMX_Chunk} chunk
      * @param {Uint32Array} data
      * @returns {TMX_Tile[][]}
      */
-    _ConvertDataToTiles(map, data) {
-        //TODO
+    _ConvertDataToTiles(map, chunk, data) {
+
+        // Bits on the far end of the 32-bit global tile ID are used for tile flags
+        const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+        const FLIPPED_VERTICALLY_FLAG = 0x40000000;
+        const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+        let tile_index = 0;
+
+        chunk.tiles = [];
+
+// Here you should check that the data has the right size
+// (map_width * map_height * 4)
+
+        for (let y = 0; y < chunk.height; ++y) {
+            chunk.tiles[y] = [];
+            for (let x = 0; x < chunk.width; ++x) {
+                let global_tile_id = data[tile_index++];
+
+                //TODO Read out the flags
+                //let flipped_horizontally = (global_tile_id & FLIPPED_HORIZONTALLY_FLAG);
+                //let flipped_vertically = (global_tile_id & FLIPPED_VERTICALLY_FLAG);
+                //let flipped_diagonally = (global_tile_id & FLIPPED_DIAGONALLY_FLAG);
+
+                // Clear the flags
+                global_tile_id &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+
+                // Resolve the tile
+                for (let i = map.tilesets.length - 1; i >= 0; --i) {
+                    let tileset = map.tilesets[i];
+
+                    if (tileset.firstgid <= global_tile_id) {
+                        chunk.tiles[y][x] = tileset.tiles.get(global_tile_id - tileset.firstgid);
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
 
