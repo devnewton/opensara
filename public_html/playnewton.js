@@ -749,9 +749,9 @@ class Playnewton_DRIVE {
                 for (let x = tileset.margin; x < maxX; x += tileset.tileHeight + tileset.spacing) {
                     let tile = tileset.tiles.get(id);
                     if (!tile) {
-                        tile = new TmxTile();
+                        tile = new TMX_Tile();
                         tile.id = id;
-                        tileset.tiles.put(id, tile);
+                        tileset.tiles.set(id, tile);
                     }
                     if (!tile.picture) {
                         tile.picture = new TMX_TilePicture();
@@ -940,7 +940,6 @@ class Playnewton_DRIVE {
 class Playnewton_GPU {
 
     /**
-     * 
      * @type GPU_Sprite[]
      */
     sprites = [];
@@ -967,7 +966,7 @@ class Playnewton_GPU {
     /**
      * 
      * @param {number} numsprites Max number of sprite
-     * @returns {TLN}
+     * @returns {Playnewton_GPU}
      */
     constructor(numsprites)
     {
