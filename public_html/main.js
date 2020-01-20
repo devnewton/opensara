@@ -5,7 +5,10 @@ async function main() {
     let map = await DRIVE.LoadTmxMap("maps/TileKit/TileKitDemo.tmx");
     console.log(map);
 
-    let GPU = new Playnewton_GPU(100);
+    let GPU = new Playnewton_GPU(100000);
+    
+    DRIVE.ConvertTmxMapToGPUSprites(GPU, map)
+    
     let spriteset = GPU.CreateSpriteset(bitmap, [
         {name: "stand", x: 1, y: 1, w: 32, h: 48},
         {name: "walk0", x: 35, y: 1, w: 32, h: 48},

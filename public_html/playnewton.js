@@ -162,13 +162,6 @@ const GPU_AnimationState = {
     STARTED: 1,
     STOPPED: 2
 };
-class GPU_Tile {
-    imageBitmap;
-}
-
-class GPU_Tileset {
-    name;
-}
 
 /**
  * Use this with requestAnimationFrame to limit frame per second
@@ -359,10 +352,10 @@ class Playnewton_CTRL {
         }
 
         if (p < this.pads.length) {
-//use keyboard as a pad when there is less pads than players
+            //use keyboard as a pad when there is less pads than players
             this._MergePadsStates(this.pads[p], this.keyboardVirtualPad);
         } else if (this.pads.length === 1) {
-//use keyboard as an alternative pad when there is only one player
+            //use keyboard as an alternative pad when there is only one player
             this._MergePadsStates(this.pads[0], this.keyboardVirtualPad);
         }
     }
@@ -434,36 +427,6 @@ class TMX_TileAnimation {
     frames = [];
 }
 
-class TMX_TilePicture {
-
-    /**
-     * 
-     * @type ImageBitmap
-     */
-    bitmap;
-
-    /**
-     * 
-     * @type number
-     */
-    x;
-    /**
-     * 
-     * @type number
-     */
-    y;
-    /**
-     * 
-     * @type number
-     */
-    w;
-    /**
-     * 
-     * @type number
-     */
-    h;
-}
-
 class TMX_Tile {
     /**
      * Local tile ID within its tileset.
@@ -479,9 +442,33 @@ class TMX_Tile {
 
     /**
      * 
-     * @type TMX_TilePicture
+     * @type ImageBitmap
      */
-    picture;
+    bitmap;
+
+    /**
+     * X coordinate in source bitmap
+     * @type number
+     */
+    sx;
+
+    /**
+     * Y coordinate in source bitmap
+     * @type number
+     */
+    sy;
+
+    /**
+     * Tile width
+     * @type number
+     */
+    w;
+
+    /**
+     * Tile height
+     * @type number
+     */
+    h;
 
     /**
      * 
@@ -565,6 +552,10 @@ class TMX_Chunk {
     tiles
 }
 
+/**
+ * 
+ * @type TMX_Layer
+ */
 class TMX_Layer {
 
     /**
@@ -698,8 +689,78 @@ class Playnewton_DRIVE {
         return map;
     }
 
+    /**
+     * Convert map tiles to GPU sprites
+     * @param {Playnewton_GPU} GPU
+     * @param {TMX_Map} map
+     * @param {number} mapX
+     * @param {number} mapY
+     */
+    ConvertTmxMapToGPUSprites(GPU, map, mapX = 0, mapY = 0) {
+        /**
+         * @type Map<TMX_Tile, GPU_SpritePicture>
+         */
+        let picturesByTile = new Map();
+        /**
+         * @type Map<TMX_Tile, GPU_SpriteAnimation>
+         */
+        let animationsByTile = new Map();
+        for(let tileset of map.tilesets) {
+            for(let tile of tileset.tiles.values()) {
+                if(!tile.animation) {
+                    let picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
+                    picturesByTile.set(tile, picture);
+                }
+            }
+            for(let tile of tileset.tiles.values()) {
+                if(tile.animation) {
+                    let animation = new GPU_SpriteAnimation();
+                    let time = 0;
+                    for (let tileFrame of tile.animation.frames) {
+                        let frame = new GPU_SpriteAnimationFrame();
+                        frame.picture = picturesByTile.get(tileset.tiles.get(tileFrame.tileid));
+                        time += tileFrame.delay;
+                        frame.endTime = time;
+                        animation.frames.push(frame);
+                    }
+                    animation.totalDuration = time;
+                    animationsByTile.set(animation);
+                }
+            }
+        }
+        for (let layer of map.layers) {
+            for (let chunk of layer.chunks) {
+                for (let y = 0; y < chunk.height; ++y) {
+                    for (let x = 0; x < chunk.width; ++x) {
+                        let tile = chunk.tiles[y][x];
+                        if (tile) {
+                            let sprite = GPU.GetAvailableSprite();
+                            if (sprite) {
+                                let picture = picturesByTile.get(tile);
+                                if(picture) {
+                                    picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
+                                    GPU.SetSpritePicture(sprite, picture);
+                                }
+                                let animation = animationsByTile.get(tile);
+                                if(animation) {
+                                    GPU.SetSpriteAnimation(sprite, animation);                         
+                                }
+                                if(animation || picture) {
+                                    GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight);
+                                    GPU.EnableSprite(sprite);
+                                }
+                            } else {
+                                console.log("No available sprite");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     async LoadTileset(tsxUrl) {
-        let tsx = await(await fetch(tsxUrl)).text();
+        let tsx = await (await fetch(tsxUrl)).text();
         let parser = new DOMParser();
         let tilesetElement = parser.parseFromString(tsx, "application/xml").getElementsByTagName("tileset")[0];
         let baseUrl = tsxUrl.slice(0, tsxUrl.lastIndexOf("/") + 1);
@@ -731,13 +792,11 @@ class Playnewton_DRIVE {
             }
             let imageElement = tileElement.getElementsByTagName("image")[0];
             if (imageElement) {
-                tile.picture = new TMX_TilePicture();
-                tile.picture.bitmap = await this.LoadBitmap(baseUrl + imageElement.getAttribute("source"));
-                tile.picture.x = 0;
-                tile.picture.y = 0;
-                tile.picture.w = tile.picture.bitmap.width;
-                tile.picture.h = tile.picture.bitmap.height;
-                tileset.bitmap = await this.LoadBitmap(baseUrl + tilesetElement.getElementsByTagName("image")[0].getAttribute("source"));
+                tile.bitmap = await this.LoadBitmap(baseUrl + imageElement.getAttribute("source"));
+                tile.sx = 0;
+                tile.sy = 0;
+                tile.w = tile.bitmap.width;
+                tile.h = tile.bitmap.height;
             }
             tileset.tiles.set(tile.id, tile);
         }
@@ -751,15 +810,12 @@ class Playnewton_DRIVE {
                     if (!tile) {
                         tile = new TMX_Tile();
                         tile.id = id;
+                        tile.bitmap = tileset.bitmap;
+                        tile.sx = x;
+                        tile.sy = y;
+                        tile.w = tileset.tileWidth;
+                        tile.h = tileset.tileHeight;
                         tileset.tiles.set(id, tile);
-                    }
-                    if (!tile.picture) {
-                        tile.picture = new TMX_TilePicture();
-                        tile.picture.bitmap = tileset.bitmap;
-                        tile.picture.x = x;
-                        tile.picture.y = y;
-                        tile.picture.w = tileset.tileWidth;
-                        tile.picture.h = tileset.tileHeight;
                     }
                     ++id;
                 }
@@ -843,18 +899,16 @@ class Playnewton_DRIVE {
      * @param {number} nbtiles
      * @returns {Uint32Array}
      */
-    _DecodeBase64ToUint32Array(base64Str, nbtiles)
-    {
+    _DecodeBase64ToUint32Array(base64Str, nbtiles) {
         let str = window.atob(base64Str);
         let data = new Uint32Array(nbtiles);
-        for (let i = 0; i < str.length; i += 4)
-        {
+        for (let i = 0; i < str.length; i += 4) {
             data[i / 4] = (
-                    str.charCodeAt(i) |
-                    str.charCodeAt(i + 1) << 8 |
-                    str.charCodeAt(i + 2) << 16 |
-                    str.charCodeAt(i + 3) << 24
-                    ) >>> 0;
+                str.charCodeAt(i) |
+                str.charCodeAt(i + 1) << 8 |
+                str.charCodeAt(i + 2) << 16 |
+                str.charCodeAt(i + 3) << 24
+            ) >>> 0;
         }
         return data;
     }
@@ -907,8 +961,8 @@ class Playnewton_DRIVE {
 
         chunk.tiles = [];
 
-// Here you should check that the data has the right size
-// (map_width * map_height * 4)
+        // Here you should check that the data has the right size
+        // (map_width * map_height * 4)
 
         for (let y = 0; y < chunk.height; ++y) {
             chunk.tiles[y] = [];
@@ -968,8 +1022,7 @@ class Playnewton_GPU {
      * @param {number} numsprites Max number of sprite
      * @returns {Playnewton_GPU}
      */
-    constructor(numsprites)
-    {
+    constructor(numsprites) {
         for (let s = 0; s < numsprites; ++s) {
             this.sprites.push(new GPU_Sprite());
         }
@@ -996,6 +1049,26 @@ class Playnewton_GPU {
         }
         return spriteset;
     }
+
+    /**
+     * Creates a picture.
+     * @param {ImageBitmap} bitmap
+     * @param {number} x
+     * @param {number} y
+     * @param {number} w
+     * @param {number} h
+     * @returns {GPU_Spriteset}
+     */
+    CreatePicture(bitmap, x=0, y=0, w=undefined, h=undefined) {
+        let spritePicture = new GPU_SpritePicture();
+        spritePicture.bitmap = bitmap;
+        spritePicture.x = x;
+        spritePicture.y = y;
+        spritePicture.w = w || bitmap.width;
+        spritePicture.h = h || bitmap.height;
+        return spritePicture;
+    }
+
 
     /**
      * Deletes the specified spriteset and frees memory
