@@ -71,7 +71,7 @@ class GPU_Sprite {
      * @type number
      */
     x;
-    
+
     /**
      * 
      * @type number
@@ -722,15 +722,15 @@ class Playnewton_DRIVE {
          * @type Map<TMX_Tile, GPU_SpriteAnimation>
          */
         let animationsByTile = new Map();
-        for(let tileset of map.tilesets) {
-            for(let tile of tileset.tiles.values()) {
-                if(!tile.animation) {
+        for (let tileset of map.tilesets) {
+            for (let tile of tileset.tiles.values()) {
+                if (!tile.animation) {
                     let picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
                     picturesByTile.set(tile, picture);
                 }
             }
-            for(let tile of tileset.tiles.values()) {
-                if(tile.animation) {
+            for (let tile of tileset.tiles.values()) {
+                if (tile.animation) {
                     let animation = new GPU_SpriteAnimation();
                     let time = 0;
                     for (let tileFrame of tile.animation.frames) {
@@ -756,15 +756,15 @@ class Playnewton_DRIVE {
                             let sprite = GPU.GetAvailableSprite();
                             if (sprite) {
                                 let picture = picturesByTile.get(tile);
-                                if(picture) {
+                                if (picture) {
                                     picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
                                     GPU.SetSpritePicture(sprite, picture);
                                 }
                                 let animation = animationsByTile.get(tile);
-                                if(animation) {
-                                    GPU.SetSpriteAnimation(sprite, animation);                         
+                                if (animation) {
+                                    GPU.SetSpriteAnimation(sprite, animation);
                                 }
-                                if(animation || picture) {
+                                if (animation || picture) {
                                     GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight, mapZ + z);
                                     GPU.EnableSprite(sprite);
                                 }
@@ -775,7 +775,7 @@ class Playnewton_DRIVE {
                     }
                 }
             }
-        }
+    }
     }
 
     async LoadTileset(tsxUrl) {
@@ -923,11 +923,11 @@ class Playnewton_DRIVE {
         let data = new Uint32Array(nbtiles);
         for (let i = 0; i < str.length; i += 4) {
             data[i / 4] = (
-                str.charCodeAt(i) |
-                str.charCodeAt(i + 1) << 8 |
-                str.charCodeAt(i + 2) << 16 |
-                str.charCodeAt(i + 3) << 24
-            ) >>> 0;
+                    str.charCodeAt(i) |
+                    str.charCodeAt(i + 1) << 8 |
+                    str.charCodeAt(i + 2) << 16 |
+                    str.charCodeAt(i + 3) << 24
+                    ) >>> 0;
         }
         return data;
     }
@@ -1010,12 +1010,54 @@ class Playnewton_DRIVE {
     }
 }
 
+/**
+ * 
+ * @type GPU_FX
+ */
+class GPU_FX {
+    /**
+     * 
+     * @type number
+     */
+    scale = 1;
+    /**
+     * 
+     * @type number
+     */
+    rotate = 0;
+    /**
+     * 
+     * @type number
+     */
+    alpha = 1;
+    /**
+     * 
+     * @type number
+     */
+    zmin = -9999;
+    /**
+     * 
+     * @type number
+     */
+    zmax = 9999;
+    /**
+     * 
+     * @type boolean
+     */
+    enabled = false;
+}
+
 class Playnewton_GPU {
 
     /**
      * @type GPU_Sprite[]
      */
     sprites = [];
+    /**
+     * 
+     * @type GPU_FX[]
+     */
+    fx = [];
     /**
      * Time elapsed since last frame for animation control
      * @type number 
@@ -1039,11 +1081,15 @@ class Playnewton_GPU {
     /**
      * 
      * @param {number} numsprites Max number of sprite
+     * @param {number} numfx Max number of fx
      * @returns {Playnewton_GPU}
      */
-    constructor(numsprites) {
+    constructor(numsprites, numfx = 16) {
         for (let s = 0; s < numsprites; ++s) {
             this.sprites.push(new GPU_Sprite());
+        }
+        for (let f = 0; f < numfx; ++f) {
+            this.fx.push(new GPU_FX());
         }
         this.fpsLimiter = new GPU_FpsLimiter();
     }
@@ -1078,7 +1124,7 @@ class Playnewton_GPU {
      * @param {number} h
      * @returns {GPU_Spriteset}
      */
-    CreatePicture(bitmap, x=0, y=0, w=undefined, h=undefined) {
+    CreatePicture(bitmap, x = 0, y = 0, w = undefined, h = undefined) {
         let spritePicture = new GPU_SpritePicture();
         spritePicture.bitmap = bitmap;
         spritePicture.x = x;
@@ -1087,7 +1133,6 @@ class Playnewton_GPU {
         spritePicture.h = h || bitmap.height;
         return spritePicture;
     }
-
 
     /**
      * Deletes the specified spriteset and frees memory
@@ -1159,7 +1204,7 @@ class Playnewton_GPU {
      * @param {number} y Vertical position (0 = top margin)
      * @param {number} z order (greater = in front)
      */
-    SetSpritePosition(sprite, x, y, z=0) {
+    SetSpritePosition(sprite, x, y, z = 0) {
         sprite.x = x;
         sprite.y = y;
         sprite.z = z;
@@ -1174,6 +1219,55 @@ class Playnewton_GPU {
     SetSpriteRotozoom(sprite, scale, angle) {
         sprite.scale = scale;
         sprite.angle = angle;
+    }
+
+    /**
+     * @returns {GPU_FX}
+     */
+    GetAvailableFX() {
+        return this.fx.find((fx) => !fx.enabled);
+    }
+
+    /**
+     * @param {GPU_FX} fx
+     */
+    EnableFx(fx) {
+        fx.enabled = true;
+    }
+
+    /**
+     * @param {GPU_FX} fx
+     */
+    DisableFX(fx) {
+        fx.enabled = false;
+    }
+
+    /**
+     * @param {GPU_FX} fx
+     * @param {number} scale size factor
+     * @param {number} angle rotation angle in radians
+     */
+    SetFXRotozoom(fx, scale = 1, angle = 0) {
+        fx.scale = scale;
+        fx.angle = angle;
+    }
+
+    /**
+     * @param {GPU_FX} fx
+     * @param {number} alpha opacity
+     */
+    SetFXOpacity(fx, alpha = 1) {
+        fx.alpha = alpha;
+    }
+
+    /**
+     * @param {GPU_FX} fx
+     * @param {number} zmin Effect apply only to sprite with zmin <= z
+     * @param {number} zmax Effect apply only to sprite with z <= zmax
+     */
+    SetFXZRange(fx, zmin = 9999, zmax = 9999) {
+        fx.zmin = zmin;
+        fx.zmax = zmax;
     }
 
     /**
@@ -1216,6 +1310,7 @@ class Playnewton_GPU {
     SetVideoOutput(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
+        this.ctx.imageSmoothingEnabled = false;
     }
 
     /**
@@ -1282,9 +1377,51 @@ class Playnewton_GPU {
     }
 
     _DrawSprites() {
-        this.sprites.sort((a, b) => a.z > b.z);
-        this.sprites.forEach(sprite => this._IsSpriteVisible(sprite) && this._DrawSprite(sprite));
+        this.sprites.sort((a, b) => a.z - b.z);
+        this.fx.sort((a, b) => a.zmin - b.zmin || a.zmax - b.zmax);
+        let z;
+        for (let sprite of this.sprites) {
+            if (z !== sprite.z) {
+                this._PopFX(z);
+                z = sprite.z;
+                this._PushFX(z);
+            }
+            if (this._IsSpriteVisible(sprite)) {
+                this._DrawSprite(sprite);
+            }
+        }
+        this._PopFX(z);
     }
+
+    /**
+     * 
+     * @param {number} z
+     */
+    _PushFX(z) {
+        for (let fx of this.fx) {
+            if (fx.enabled && fx.zmin <= z && z <= fx.zmax) {
+                this.ctx.save();
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                this.ctx.rotate(fx.angle);
+                this.ctx.scale(fx.scale, fx.scale);
+                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+                this.ctx.globalAlpha = fx.alpha;
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param {number} z
+     */
+    _PopFX(z) {
+        for (let fx of this.fx) {
+            if (fx.enabled && fx.zmin <= z && z <= fx.zmax) {
+                this.ctx.restore();
+            }
+        }
+    }
+
     /**
      * 
      * @param {GPU_Sprite} sprite
