@@ -19,7 +19,7 @@ async function main() {
 
     let sara = GPU.GetAvailableSprite();
     GPU.SetSpriteAnimation(sara, walkAnimation);
-    GPU.SetSpritePosition(sara, 640, 100);
+    GPU.SetSpritePosition(sara, 640, 100, 666);
     GPU.EnableSprite(sara);
 
     GPU.SetVideoOutput(document.getElementById('game'));

@@ -68,6 +68,22 @@ class GPU_Sprite {
 
     /**
      * 
+     * @type number
+     */
+    x;
+    
+    /**
+     * 
+     * @type number
+     */
+    y;
+    /**
+     * Z order (greater z order is always in front of than lower)
+     * @type number
+     */
+    z = 0;
+    /**
+     * 
      * @type GPU_SpritePicture
      */
     picture;
@@ -695,8 +711,9 @@ class Playnewton_DRIVE {
      * @param {TMX_Map} map
      * @param {number} mapX
      * @param {number} mapY
+     * @param {number} mapZ
      */
-    ConvertTmxMapToGPUSprites(GPU, map, mapX = 0, mapY = 0) {
+    ConvertTmxMapToGPUSprites(GPU, map, mapX = 0, mapY = 0, mapZ = 0) {
         /**
          * @type Map<TMX_Tile, GPU_SpritePicture>
          */
@@ -728,7 +745,9 @@ class Playnewton_DRIVE {
                 }
             }
         }
+        let z = 0;
         for (let layer of map.layers) {
+            ++z;
             for (let chunk of layer.chunks) {
                 for (let y = 0; y < chunk.height; ++y) {
                     for (let x = 0; x < chunk.width; ++x) {
@@ -746,7 +765,7 @@ class Playnewton_DRIVE {
                                     GPU.SetSpriteAnimation(sprite, animation);                         
                                 }
                                 if(animation || picture) {
-                                    GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight);
+                                    GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight, mapZ + z);
                                     GPU.EnableSprite(sprite);
                                 }
                             } else {
@@ -1138,10 +1157,12 @@ class Playnewton_GPU {
      * @param {GPU_Sprite} sprite
      * @param {number} x Horizontal position (0 = left margin)
      * @param {number} y Vertical position (0 = top margin)
+     * @param {number} z order (greater = in front)
      */
-    SetSpritePosition(sprite, x, y) {
+    SetSpritePosition(sprite, x, y, z=0) {
         sprite.x = x;
         sprite.y = y;
+        sprite.z = z;
     }
 
     /**
@@ -1261,6 +1282,7 @@ class Playnewton_GPU {
     }
 
     _DrawSprites() {
+        this.sprites.sort((a, b) => a.z > b.z);
         this.sprites.forEach(sprite => this._IsSpriteVisible(sprite) && this._DrawSprite(sprite));
     }
     /**
