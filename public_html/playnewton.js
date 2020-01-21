@@ -719,12 +719,12 @@ class Playnewton_DRIVE {
                     for (let tileFrame of tile.animation.frames) {
                         let frame = new GPU_SpriteAnimationFrame();
                         frame.picture = picturesByTile.get(tileset.tiles.get(tileFrame.tileid));
-                        time += tileFrame.delay;
+                        time += tileFrame.duration;
                         frame.endTime = time;
                         animation.frames.push(frame);
                     }
                     animation.totalDuration = time;
-                    animationsByTile.set(animation);
+                    animationsByTile.set(tile, animation);
                 }
             }
         }
@@ -835,7 +835,7 @@ class Playnewton_DRIVE {
         for (let frameElement of animationElement.getElementsByTagName("frame")) {
             let frame = new TMX_TileAnimationFrame();
             frame.tileid = parseInt(frameElement.getAttribute("tileid"), 10);
-            frame.duration = frameElement.getAttribute("duration");
+            frame.duration = parseInt(frameElement.getAttribute("duration"), 10);
             animation.frames.push(frame);
         }
         return animation;
