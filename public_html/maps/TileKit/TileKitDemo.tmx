@@ -2,6 +2,30 @@
 <map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="220" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="21">
  <tileset firstgid="1" name="TileKit" tilewidth="32" tileheight="32" tilecount="228" columns="12">
   <image source="TileKit.png" width="384" height="608"/>
+  <tile id="133">
+   <animation>
+    <frame tileid="136" duration="500"/>
+    <frame tileid="137" duration="500"/>
+    <frame tileid="138" duration="500"/>
+    <frame tileid="139" duration="500"/>
+    <frame tileid="140" duration="500"/>
+    <frame tileid="141" duration="500"/>
+    <frame tileid="142" duration="500"/>
+    <frame tileid="143" duration="500"/>
+   </animation>
+  </tile>
+  <tile id="134">
+   <animation>
+    <frame tileid="148" duration="500"/>
+    <frame tileid="149" duration="500"/>
+    <frame tileid="150" duration="500"/>
+    <frame tileid="151" duration="500"/>
+    <frame tileid="152" duration="500"/>
+    <frame tileid="153" duration="500"/>
+    <frame tileid="154" duration="500"/>
+    <frame tileid="155" duration="500"/>
+   </animation>
+  </tile>
  </tileset>
  <layer id="1" name="Background" width="220" height="18">
   <data encoding="csv">
