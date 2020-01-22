@@ -1,14 +1,14 @@
 async function main() {
     let DRIVE = new Playnewton_DRIVE();
     let bitmap = await DRIVE.LoadBitmap("sprites/sara.png");
-    
+
     let map = await DRIVE.LoadTmxMap("maps/TileKit/TileKitDemo.tmx");
     console.log(map);
 
     let GPU = new Playnewton_GPU(100000);
-    
+
     DRIVE.ConvertTmxMapToGPUSprites(GPU, map, 0, 0, 0)
-    
+
     let spriteset = GPU.CreateSpriteset(bitmap, [
         {name: "stand", x: 1, y: 1, w: 32, h: 48},
         {name: "walk0", x: 35, y: 1, w: 32, h: 48},
@@ -28,9 +28,7 @@ async function main() {
 
     let scale = 1;
     let rotate = 0.01;
-    
-    let layer = GPU.GetLayer(3);
-    
+
     function redraw(timestamp) {
         CTRL.Poll();
 
@@ -51,8 +49,11 @@ async function main() {
 
         scale += scaleInc;
         rotate += rotateInc;
-        GPU.SetLayerRotozoom(layer, scale, rotate);
-        
+        for (let z = 0; z < 15; ++z) {
+            let layer = GPU.GetLayer(z);
+            GPU.SetLayerRotozoom(layer, scale, rotate);
+        }
+
         //GPU.SetSpriteRotozoom(sara, scale, rotate);
         GPU.DrawFrame(timestamp);
         requestAnimationFrame(redraw);
