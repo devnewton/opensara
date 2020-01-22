@@ -1207,11 +1207,18 @@ class Playnewton_GPU {
      * @param {GPU_Sprite} sprite
      * @param {number} x Horizontal position (0 = left margin)
      * @param {number} y Vertical position (0 = top margin)
-     * @param {number} z order (greater = in front), Math.floor(z) give the layer index
      */
-    SetSpritePosition(sprite, x, y, z = 0) {
+    SetSpritePosition(sprite, x, y) {
         sprite.x = x;
         sprite.y = y;
+    }
+    
+        /**
+     * 
+     * @param {GPU_Sprite} sprite
+     * @param {number} z order (greater = in front), Math.floor(z) give the layer index
+     */
+    SetSpriteZ(sprite, z) {
         sprite.z = z;
     }
 
@@ -1545,7 +1552,7 @@ class Playnewton_PPU {
      */
     constructor(nbodies) {
         for (let b = 0; b < nbodies; ++b) {
-            bodies.push(new PPU_Body());
+            this.bodies.push(new PPU_Body());
         }
         this.world = new PPU_World();
     }
@@ -1597,6 +1604,24 @@ class Playnewton_PPU {
      */
     DisableBody(body) {
         body.enabled = false;
+    }
+
+    /**
+     * @param {PPU_Body} body
+     * @param {number} x 
+     * @param {number} y 
+     */
+    SetBodyPosition(body, x, y) {
+        body.x = x;
+        body.y = y;
+    }
+
+    /**
+     * @param {PPU_Body} body
+     * @param {boolean} collide 
+     */
+    SetBodyCollideWorldBounds(body, collide) {
+        body.collideWorldBounds = collide;
     }
 
     Update() {

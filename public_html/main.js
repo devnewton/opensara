@@ -19,10 +19,20 @@ async function main() {
 
     let sara = GPU.GetAvailableSprite();
     GPU.SetSpriteAnimation(sara, walkAnimation);
-    GPU.SetSpritePosition(sara, 640, 100, 15);
+    GPU.SetSpritePosition(sara, 640, 100);
+    GPU.SetSpriteZ(sara, 15);
     GPU.EnableSprite(sara);
 
+    let PPU = new Playnewton_PPU(100);
+    PPU.SetWorldBounds(0, 0, 1280, 720);
+    PPU.SetWorldGravity(-10, -5);
+    let saraBody = PPU.GetAvailableBody();
+    PPU.SetBodyPosition(saraBody, 640, 100);
+    PPU.SetBodyCollideWorldBounds(saraBody, true);
+    PPU.EnableBody(saraBody);
+
     GPU.SetVideoOutput(document.getElementById('game'));
+    
 
     let CTRL = new Playnewton_CTRL();
 
@@ -30,6 +40,8 @@ async function main() {
     let rotate = 0.01;
 
     function redraw(timestamp) {
+        PPU.Update();
+
         CTRL.Poll();
 
         let pad = CTRL.GetPad(0);
@@ -55,6 +67,7 @@ async function main() {
         }
 
         //GPU.SetSpriteRotozoom(sara, scale, rotate);
+        GPU.SetSpritePosition(sara, saraBody.x, saraBody.y);
         GPU.DrawFrame(timestamp);
         requestAnimationFrame(redraw);
     }
