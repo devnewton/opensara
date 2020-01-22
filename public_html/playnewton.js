@@ -79,6 +79,7 @@ class GPU_Sprite {
     y;
     /**
      * Z order (greater z order is always in front of than lower)
+     * Math.floor(z) gives the layer index
      * @type number
      */
     z = 0;
@@ -1012,9 +1013,19 @@ class Playnewton_DRIVE {
 
 /**
  * 
- * @type GPU_FX
+ * @type GPU_Layer
  */
-class GPU_FX {
+class GPU_Layer {
+    /**
+     * 
+     * @type number
+     */
+    x = 0;
+    /**
+     * 
+     * @type number
+     */
+    y = 0;
     /**
      * 
      * @type number
@@ -1032,32 +1043,23 @@ class GPU_FX {
     alpha = 1;
     /**
      * 
-     * @type number
-     */
-    zmin = -9999;
-    /**
-     * 
-     * @type number
-     */
-    zmax = 9999;
-    /**
-     * 
      * @type boolean
      */
-    enabled = false;
+    enabled = true;
 }
 
 class Playnewton_GPU {
 
     /**
+     * 
+     * @type GPU_Layer[]
+     */
+    layers = [];
+
+    /**
      * @type GPU_Sprite[]
      */
     sprites = [];
-    /**
-     * 
-     * @type GPU_FX[]
-     */
-    fx = [];
     /**
      * Time elapsed since last frame for animation control
      * @type number 
@@ -1081,15 +1083,15 @@ class Playnewton_GPU {
     /**
      * 
      * @param {number} numsprites Max number of sprite
-     * @param {number} numfx Max number of fx
+     * @param {number} numlayers Max number of layer
      * @returns {Playnewton_GPU}
      */
-    constructor(numsprites, numfx = 16) {
+    constructor(numsprites, numlayers = 16) {
         for (let s = 0; s < numsprites; ++s) {
             this.sprites.push(new GPU_Sprite());
         }
-        for (let f = 0; f < numfx; ++f) {
-            this.fx.push(new GPU_FX());
+        for (let f = 0; f < numlayers; ++f) {
+            this.layers.push(new GPU_Layer());
         }
         this.fpsLimiter = new GPU_FpsLimiter();
     }
@@ -1202,7 +1204,7 @@ class Playnewton_GPU {
      * @param {GPU_Sprite} sprite
      * @param {number} x Horizontal position (0 = left margin)
      * @param {number} y Vertical position (0 = top margin)
-     * @param {number} z order (greater = in front)
+     * @param {number} z order (greater = in front), Math.floor(z) give the layer index
      */
     SetSpritePosition(sprite, x, y, z = 0) {
         sprite.x = x;
@@ -1222,60 +1224,51 @@ class Playnewton_GPU {
     }
 
     /**
-     * @returns {GPU_FX}
-     */
-    GetAvailableFX() {
-        return this.fx.find((fx) => !fx.enabled);
-    }
-
-    /**
-     * @param {GPU_FX} fx
-     */
-    EnableFx(fx) {
-        fx.enabled = true;
-    }
-
-    /**
-     * @param {GPU_FX} fx
-     */
-    DisableFX(fx) {
-        fx.enabled = false;
-    }
-
-    /**
-     * @param {GPU_FX} fx
-     * @param {number} scale size factor
-     * @param {number} angle rotation angle in radians
-     */
-    SetFXRotozoom(fx, scale = 1, angle = 0) {
-        fx.scale = scale;
-        fx.angle = angle;
-    }
-
-    /**
-     * @param {GPU_FX} fx
-     * @param {number} alpha opacity
-     */
-    SetFXOpacity(fx, alpha = 1) {
-        fx.alpha = alpha;
-    }
-
-    /**
-     * @param {GPU_FX} fx
-     * @param {number} zmin Effect apply only to sprite with zmin <= z
-     * @param {number} zmax Effect apply only to sprite with z <= zmax
-     */
-    SetFXZRange(fx, zmin = 9999, zmax = 9999) {
-        fx.zmin = zmin;
-        fx.zmax = zmax;
-    }
-
-    /**
      * Disable rotozoom effect on sprite
      * @param {GPU_Sprite} sprite
      */
     DisableSpriteRotozoom(sprite) {
         this.SetSpriteRotozoom(sprite, null, null);
+    }
+
+    /**
+     * @param {number} z order (greater = in front), Math.floor(z) give the layer index
+     * @returns {GPU_Layer}
+     */
+    GetLayer(z) {
+        return this.layers[Math.floor(z)];
+    }
+
+    /**
+     * @param {GPU_Layer} layer
+     */
+    EnableLayer(layer) {
+        layer.enabled = true;
+    }
+
+    /**
+     * @param {GPU_Layer} layer
+     */
+    DisableLayer(layer) {
+        layer.enabled = false;
+    }
+
+    /**
+     * @param {GPU_Layer} layer
+     * @param {number} scale size factor
+     * @param {number} angle rotation angle in radians
+     */
+    SetLayerRotozoom(layer, scale = 1, angle = 0) {
+        layer.scale = scale;
+        layer.angle = angle;
+    }
+
+    /**
+     * @param {GPU_Layer} layer
+     * @param {number} alpha opacity
+     */
+    SetLayerOpacity(layer, alpha = 1) {
+        layer.alpha = alpha;
     }
 
     /**
@@ -1377,46 +1370,23 @@ class Playnewton_GPU {
     }
 
     _DrawSprites() {
-        this.sprites.sort((a, b) => a.z - b.z);
-        this.fx.sort((a, b) => a.zmin - b.zmin || a.zmax - b.zmax);
-        let z;
-        for (let sprite of this.sprites) {
-            if (z !== sprite.z) {
-                this._PopFX(z);
-                z = sprite.z;
-                this._PushFX(z);
-            }
-            if (this._IsSpriteVisible(sprite)) {
-                this._DrawSprite(sprite);
-            }
-        }
-        this._PopFX(z);
-    }
-
-    /**
-     * 
-     * @param {number} z
-     */
-    _PushFX(z) {
-        for (let fx of this.fx) {
-            if (fx.enabled && fx.zmin <= z && z <= fx.zmax) {
+        for (let z=0; z<this.layers.length; ++z) {
+            let layer = this.layers[z];
+            if (layer.enabled) {
                 this.ctx.save();
+                this.ctx.translate(layer.x, layer.y);
                 this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-                this.ctx.rotate(fx.angle);
-                this.ctx.scale(fx.scale, fx.scale);
+                this.ctx.rotate(layer.angle);
+                this.ctx.scale(layer.scale, layer.scale);
                 this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
-                this.ctx.globalAlpha = fx.alpha;
-            }
-        }
-    }
-
-    /**
-     * 
-     * @param {number} z
-     */
-    _PopFX(z) {
-        for (let fx of this.fx) {
-            if (fx.enabled && fx.zmin <= z && z <= fx.zmax) {
+                this.ctx.globalAlpha = layer.alpha;
+                for (let sprite of this.sprites) {
+                    if (z === Math.floor(sprite.z)) {
+                        if (this._IsSpriteVisible(sprite)) {
+                            this._DrawSprite(sprite);
+                        }
+                    }
+                }
                 this.ctx.restore();
             }
         }

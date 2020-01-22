@@ -7,7 +7,7 @@ async function main() {
 
     let GPU = new Playnewton_GPU(100000);
     
-    DRIVE.ConvertTmxMapToGPUSprites(GPU, map, 0, 0, -100)
+    DRIVE.ConvertTmxMapToGPUSprites(GPU, map, 0, 0, 0)
     
     let spriteset = GPU.CreateSpriteset(bitmap, [
         {name: "stand", x: 1, y: 1, w: 32, h: 48},
@@ -19,7 +19,7 @@ async function main() {
 
     let sara = GPU.GetAvailableSprite();
     GPU.SetSpriteAnimation(sara, walkAnimation);
-    GPU.SetSpritePosition(sara, 640, 100);
+    GPU.SetSpritePosition(sara, 640, 100, 15);
     GPU.EnableSprite(sara);
 
     GPU.SetVideoOutput(document.getElementById('game'));
@@ -29,9 +29,7 @@ async function main() {
     let scale = 1;
     let rotate = 0.01;
     
-    let fx = GPU.GetAvailableFX();
-    GPU.SetFXZRange(fx, -100, -1);
-    GPU.EnableFx(fx);
+    let layer = GPU.GetLayer(3);
     
     function redraw(timestamp) {
         CTRL.Poll();
@@ -53,7 +51,7 @@ async function main() {
 
         scale += scaleInc;
         rotate += rotateInc;
-        GPU.SetFXRotozoom(fx, scale, rotate);
+        GPU.SetLayerRotozoom(layer, scale, rotate);
         
         //GPU.SetSpriteRotozoom(sara, scale, rotate);
         GPU.DrawFrame(timestamp);
