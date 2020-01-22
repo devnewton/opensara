@@ -1,3 +1,6 @@
+const PLAYNEWTON_DEFAULT_SCREEN_WIDTH = 1280;
+const PLAYNEWTON_DEFAULT_SCREEN_HEIGHT = 720;
+
 /**
  * Frame description for TLN.CreateSpriteset()
  * @type GPU_SpritesetFrameDescription
@@ -1302,7 +1305,7 @@ class Playnewton_GPU {
      */
     SetVideoOutput(canvas) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext("2d", { alpha: false });
+        this.ctx = canvas.getContext("2d", {alpha: false});
         this.ctx.imageSmoothingEnabled = false;
     }
 
@@ -1370,7 +1373,7 @@ class Playnewton_GPU {
     }
 
     _DrawSprites() {
-        for (let z=0; z<this.layers.length; ++z) {
+        for (let z = 0; z < this.layers.length; ++z) {
             let layer = this.layers[z];
             if (layer.enabled) {
                 this.ctx.save();
@@ -1415,6 +1418,212 @@ class Playnewton_GPU {
             this.ctx.restore();
         } else {
             this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, sprite.x, sprite.y, sprite.picture.w, sprite.picture.h);
+        }
+    }
+}
+
+class PPU_Rectangle {
+
+    /**
+     * 
+     * @type number
+     */
+    x = 0;
+    /**
+     * 
+     * @type number
+     */
+    y = 0;
+    /**
+     * 
+     * @type number
+     */
+    w = PLAYNEWTON_DEFAULT_SCREEN_WIDTH;
+    /**
+     * 
+     * @type number
+     */
+    h = PLAYNEWTON_DEFAULT_SCREEN_HEIGHT;
+
+    get left() {
+        return this.x;
+    }
+    get top() {
+        return this.y;
+    }
+    get right() {
+        return this.x + this.w;
+    }
+    get bottom() {
+        return this.y + this.h;
+    }
+}
+
+/**
+ * 
+ * @type PPU_Vector
+ */
+class PPU_Vector {
+    /**
+     * 
+     * @type number
+     */
+    x = 0;
+    /**
+     * 
+     * @type number
+     */
+    y = 0;
+}
+
+/**
+ * 
+ * @type PPU_World
+ */
+class PPU_World {
+    /**
+     * 
+     * @type PPU_Rectangle
+     */
+    bounds = new PPU_Rectangle();
+    /**
+     * 
+     * @type PPU_Vector
+     */
+    gravity = new PPU_Vector();
+}
+
+/**
+ * 
+ * @type PPU_Body
+ */
+class PPU_Body {
+    /**
+     * 
+     * @type number
+     */
+    x = 0;
+    /**
+     * 
+     * @type number
+     */
+    y = 0;
+
+    /**
+     * Keep the body in world bounds?
+     * @type boolean
+     */
+    collideWorldBounds;
+
+    /**
+     * 
+     * @type boolean
+     */
+    enabled = false;
+}
+
+/**
+ * Physics Processing Unit for arcade physic and collision detection
+ * @type Playnewton_PPU
+ */
+class Playnewton_PPU {
+    /**
+     * 
+     * @type PPU_World
+     */
+    world;
+
+    /**
+     * 
+     * @type PPU_Body[] 
+     */
+    bodies = [];
+
+    /**
+     * 
+     * @param {number} nbodies Max number of bodies
+     */
+    constructor(nbodies) {
+        for (let b = 0; b < nbodies; ++b) {
+            bodies.push(new PPU_Body());
+        }
+        this.world = new PPU_World();
+    }
+
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} w 
+     * @param {number} h 
+     */
+    SetWorldBounds(x, y, w, h) {
+        this.world.bounds.x = x;
+        this.world.bounds.y = y;
+        this.world.bounds.w = w;
+        this.world.bounds.h = h;
+    }
+
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     */
+    SetWorldGravity(x, y) {
+        this.world.gravity.x = x;
+        this.world.gravity.y = y;
+    }
+
+    /**
+     * Finds an available (unused) body. 
+     * @returns {PPU_Body} body
+     */
+    GetAvailableBody() {
+        return this.bodies.find((body) => !body.enabled);
+    }
+
+    /**
+     * Enable the body so it is updated. 
+     * @param {PPU_Body} body
+     */
+    EnableBody(body) {
+        body.enabled = true;
+    }
+
+    /**
+     * Disables the body so it is not updated. 
+     * Disabled bodies are returned by the function GetAvailableBody as available 
+     * @param {PPU_Body} body
+     */
+    DisableBody(body) {
+        body.enabled = false;
+    }
+
+    Update() {
+        for (let body of this.bodies) {
+            if (body.enabled) {
+                this._UpdateBody(body);
+            }
+        }
+    }
+
+    _UpdateBody(body) {
+        body.x += this.world.gravity.x;
+        body.y += this.world.gravity.y;
+
+        if(body.collideWorldBounds) {
+            if(body.x < this.world.bounds.left) {
+                body.x = this.world.bounds.left;
+            }
+            if(body.y < this.world.bounds.top) {
+                body.y = this.world.bounds.top;
+            }
+            if(body.x > this.world.bounds.right) {
+                body.x = this.world.bounds.right;
+            }
+            if(body.y > this.world.bounds.bottom) {
+                body.y = this.world.bounds.bottom;
+            }
         }
     }
 }
