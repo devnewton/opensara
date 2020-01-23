@@ -91,8 +91,8 @@ class GPU_Sprite {
      * @type GPU_SpritePicture
      */
     picture;
-    scale;
-    angle;
+    scale = 1;
+    angle = 0;
     enabled = false;
     /**
      * 
@@ -1038,7 +1038,7 @@ class GPU_Layer {
      * 
      * @type number
      */
-    rotate = 0;
+    angle = 0;
     /**
      * 
      * @type number
@@ -1212,8 +1212,8 @@ class Playnewton_GPU {
         sprite.x = x;
         sprite.y = y;
     }
-    
-        /**
+
+    /**
      * 
      * @param {GPU_Sprite} sprite
      * @param {number} z order (greater = in front), Math.floor(z) give the layer index
@@ -1228,17 +1228,9 @@ class Playnewton_GPU {
      * @param {number} scale size factor
      * @param {number} angle rotation angle in radians
      */
-    SetSpriteRotozoom(sprite, scale, angle) {
+    SetSpriteRotozoom(sprite, scale = 1, angle = 0) {
         sprite.scale = scale;
         sprite.angle = angle;
-    }
-
-    /**
-     * Disable rotozoom effect on sprite
-     * @param {GPU_Sprite} sprite
-     */
-    DisableSpriteRotozoom(sprite) {
-        this.SetSpriteRotozoom(sprite, null, null);
     }
 
     /**
@@ -1329,9 +1321,9 @@ class Playnewton_GPU {
      */
     DrawFrame(elapsedTime) {
         if (this.fpsLimiter.ShouldDraw()) {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this._UpdateSprites(elapsedTime);
             if (this.ctx) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this._DrawSprites();
             }
         }
@@ -1384,12 +1376,18 @@ class Playnewton_GPU {
             let layer = this.layers[z];
             if (layer.enabled) {
                 this.ctx.save();
-                this.ctx.translate(layer.x, layer.y);
-                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-                this.ctx.rotate(layer.angle);
-                this.ctx.scale(layer.scale, layer.scale);
-                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
-                this.ctx.globalAlpha = layer.alpha;
+                if (layer.x !== 0 && layer.x !== 0) {
+                    this.ctx.translate(layer.x, layer.y);
+                }
+                if (layer.angle !== 0 || layer.scale !== 1) {
+                    this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                    this.ctx.rotate(layer.angle);
+                    this.ctx.scale(layer.scale, layer.scale);
+                    this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+                }
+                if (layer.alpha !== 1) {
+                    this.ctx.globalAlpha = layer.alpha;
+                }
                 for (let sprite of this.sprites) {
                     if (z === Math.floor(sprite.z)) {
                         if (this._IsSpriteVisible(sprite)) {
@@ -1415,8 +1413,7 @@ class Playnewton_GPU {
      * @param {GPU_Sprite} sprite
      */
     _DrawSprite(sprite) {
-        let hasRotozoom = sprite.scale || sprite.angle;
-        if (hasRotozoom) {
+        if (sprite.scale !== 1 || sprite.angle !== 0) {
             this.ctx.save();
             this.ctx.translate(sprite.x, sprite.y);
             this.ctx.rotate(sprite.angle);
@@ -1636,17 +1633,17 @@ class Playnewton_PPU {
         body.x += this.world.gravity.x;
         body.y += this.world.gravity.y;
 
-        if(body.collideWorldBounds) {
-            if(body.x < this.world.bounds.left) {
+        if (body.collideWorldBounds) {
+            if (body.x < this.world.bounds.left) {
                 body.x = this.world.bounds.left;
             }
-            if(body.y < this.world.bounds.top) {
+            if (body.y < this.world.bounds.top) {
                 body.y = this.world.bounds.top;
             }
-            if(body.x > this.world.bounds.right) {
+            if (body.x > this.world.bounds.right) {
                 body.x = this.world.bounds.right;
             }
-            if(body.y > this.world.bounds.bottom) {
+            if (body.y > this.world.bounds.bottom) {
                 body.y = this.world.bounds.bottom;
             }
         }
