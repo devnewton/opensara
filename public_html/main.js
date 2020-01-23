@@ -3,7 +3,6 @@ async function main() {
     let bitmap = await DRIVE.LoadBitmap("sprites/sara.png");
 
     let map = await DRIVE.LoadTmxMap("maps/TileKit/TileKitDemo.tmx");
-    console.log(map);
 
     let GPU = new Playnewton_GPU(100000);
 
@@ -37,7 +36,7 @@ async function main() {
     let CTRL = new Playnewton_CTRL();
 
     let scale = 1;
-    let rotate = 0.01;
+    let angle = 0;
 
     function redraw(timestamp) {
         PPU.Update();
@@ -60,13 +59,12 @@ async function main() {
         }
 
         scale += scaleInc;
-        rotate += rotateInc;
+        angle += rotateInc;
         for (let z = 0; z < 15; ++z) {
             let layer = GPU.GetLayer(z);
-            GPU.SetLayerRotozoom(layer, scale, rotate);
+            GPU.SetLayerRotozoom(layer, scale, angle);
         }
 
-        //GPU.SetSpriteRotozoom(sara, scale, rotate);
         GPU.SetSpritePosition(sara, saraBody.x, saraBody.y);
         GPU.DrawFrame(timestamp);
         requestAnimationFrame(redraw);
