@@ -18,17 +18,15 @@ async function main() {
 
     let sara = GPU.GetAvailableSprite();
     GPU.SetSpriteAnimation(sara, walkAnimation);
-    GPU.SetSpritePosition(sara, 640, 100);
     GPU.SetSpriteZ(sara, 15);
     GPU.EnableSprite(sara);
 
     let PPU = new Playnewton_PPU(100);
-    PPU.SetWorldBounds(0, 0, 1280, 720);
+    PPU.SetWorldBounds(0, 0, 640, 360);
     PPU.SetWorldGravity(10, 5);
     let saraBody = PPU.GetAvailableBody();
-    //PPU.SetBodyRectangle(saraBody, 0, 0, 32, 48);
-    PPU.SetBodyCircle(saraBody, 0, 0, 8);
-    PPU.SetBodyPosition(saraBody, 640, 100);
+    PPU.SetBodyRectangle(saraBody, 0, 0, 32, 48);
+    PPU.SetBodyPosition(saraBody, 320, 180);
     PPU.SetBodyCollideWorldBounds(saraBody, true);
     PPU.EnableBody(saraBody);
 
