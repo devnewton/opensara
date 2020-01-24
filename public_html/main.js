@@ -1,14 +1,21 @@
 async function main() {
     let DRIVE = new Playnewton_DRIVE();
-    let bitmap = await DRIVE.LoadBitmap("sprites/sara.png");
+    let skyBitmap = await DRIVE.LoadBitmap("sprites/sky.png");
 
-    let map = await DRIVE.LoadTmxMap("maps/TileKit/TileKitDemo.tmx");
+    let map = await DRIVE.LoadTmxMap("maps/mountain/mountain_01.tmx");
 
     let GPU = new Playnewton_GPU(100000);
 
-    DRIVE.ConvertTmxMapToGPUSprites(GPU, map, 0, 0, 0)
+    let skySprite = GPU.GetAvailableSprite();
+    GPU.SetSpritePicture(skySprite, GPU.CreatePicture(skyBitmap));
+    GPU.SetSpritePosition(skySprite, 0, 0);
+    GPU.EnableSprite(skySprite);
 
-    let spriteset = GPU.CreateSpriteset(bitmap, [
+    DRIVE.ConvertTmxMapToGPUSprites(GPU, map, 0, 0, 0);
+
+    let saraBitmap = await DRIVE.LoadBitmap("sprites/sara.png");
+
+    let spriteset = GPU.CreateSpriteset(saraBitmap, [
         {name: "stand", x: 1, y: 1, w: 32, h: 48},
         {name: "walk0", x: 35, y: 1, w: 32, h: 48},
         {name: "walk1", x: 70, y: 1, w: 32, h: 48},
