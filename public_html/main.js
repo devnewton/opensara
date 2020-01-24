@@ -24,14 +24,15 @@ async function main() {
 
     let PPU = new Playnewton_PPU(100);
     PPU.SetWorldBounds(0, 0, 1280, 720);
-    PPU.SetWorldGravity(-10, -5);
+    PPU.SetWorldGravity(10, 5);
     let saraBody = PPU.GetAvailableBody();
+    //PPU.SetBodyRectangle(saraBody, 0, 0, 32, 48);
+    PPU.SetBodyCircle(saraBody, 0, 0, 8);
     PPU.SetBodyPosition(saraBody, 640, 100);
     PPU.SetBodyCollideWorldBounds(saraBody, true);
     PPU.EnableBody(saraBody);
 
     GPU.SetVideoOutput(document.getElementById('game'));
-    
 
     let CTRL = new Playnewton_CTRL();
 

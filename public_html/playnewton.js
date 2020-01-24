@@ -1426,7 +1426,80 @@ class Playnewton_GPU {
     }
 }
 
-class PPU_Rectangle {
+/**
+ * 
+ * @type PPU_Shape
+ */
+class PPU_Shape {
+
+    get left() {
+        return 0;
+    }
+    get top() {
+        return 0;
+    }
+    
+    get right() {
+        return 0;
+    }
+    get bottom() {
+        return 0;
+    }
+
+    get width() {
+        return this.right - this.left;
+    }
+
+    get height() {
+        return this.bottom - this.top;
+    }
+}
+
+const PPU_DEFAULT_SHAPE = new PPU_Shape();
+
+
+/**
+ * 
+ * @type PPU_Circle
+ */
+class PPU_Circle extends PPU_Shape {
+    /**
+     * 
+     * @type number
+     */
+    x = 0;
+    /**
+     * 
+     * @type number
+     */
+    y = 0;
+    /**
+     * 
+     * @type number
+     */
+    radius = 16;
+    
+    get left() {
+        return this.x - this.radius;
+    }
+    get top() {
+        return this.y - this.radius;
+    }
+    
+    get right() {
+        return this.x + this.radius;
+    }
+    get bottom() {
+        return this.y + this.radius;
+    }
+    
+}
+
+/**
+ * 
+ * @type PPU_Rectangle
+ */
+class PPU_Rectangle extends PPU_Shape {
 
     /**
      * 
@@ -1442,12 +1515,12 @@ class PPU_Rectangle {
      * 
      * @type number
      */
-    w = PLAYNEWTON_DEFAULT_SCREEN_WIDTH;
+    w = 32;
     /**
      * 
      * @type number
      */
-    h = PLAYNEWTON_DEFAULT_SCREEN_HEIGHT;
+    h = 32;
 
     get left() {
         return this.x;
@@ -1455,11 +1528,12 @@ class PPU_Rectangle {
     get top() {
         return this.y;
     }
+
     get right() {
-        return this.x + this.w;
+        return this.left + this.w;
     }
     get bottom() {
-        return this.y + this.h;
+        return this.top + this.h;
     }
 }
 
@@ -1485,6 +1559,14 @@ class PPU_Vector {
  * @type PPU_World
  */
 class PPU_World {
+    
+    constructor() {
+        this.bounds = new PPU_Rectangle();
+        this.bounds.x = 0;
+        this.bounds.y = 0;
+        this.bounds.w = PLAYNEWTON_DEFAULT_SCREEN_WIDTH;
+        this.bounds.h = PLAYNEWTON_DEFAULT_SCREEN_HEIGHT;
+    }
     /**
      * 
      * @type PPU_Rectangle
@@ -1514,16 +1596,74 @@ class PPU_Body {
     y = 0;
 
     /**
+     * 
+     * @type PPU_Shape
+     */
+    shape = PPU_DEFAULT_SHAPE;
+
+    /**
      * Keep the body in world bounds?
      * @type boolean
      */
-    collideWorldBounds;
+    collideWorldBounds = false;
 
     /**
      * 
      * @type boolean
      */
     enabled = false;
+
+    get left() {
+        return this.x + this.shape.left;
+    }
+
+    /**
+     * @param {number} x
+     */
+    set left(x) {
+        this.x = x - this.shape.left;
+    }
+
+    get top() {
+        return this.y + this.shape.top;
+    }
+
+    /**
+     * @param {number} y
+     */
+    set top(y) {
+        this.y = y - this.shape.top;
+    }
+    
+    get right() {
+        return this.x + this.shape.right;
+    }
+
+    /**
+     * @param {number} x
+     */
+    set right(x) {
+        this.x = x - this.shape.right;
+    }
+
+    get bottom() {
+        return this.y + this.shape.bottom;
+    }
+
+    /**
+     * @param {number} y
+     */
+    set bottom(y) {
+        this.y = y - this.shape.bottom;
+    }
+
+    get width() {
+        return this.shape.width;
+    }
+
+    get height() {
+        return this.shape.height;
+    }
 }
 
 /**
@@ -1593,6 +1733,36 @@ class Playnewton_PPU {
     EnableBody(body) {
         body.enabled = true;
     }
+    
+    /**
+     * Set collision rectangle on body
+     * @param {PPU_Body} body
+     * @param {number} leftx left x
+     * @param {number} topy top y
+     * @param {number} w
+     * @param {number} h
+     */
+    SetBodyRectangle(body, leftx, topy, w, h) {
+        body.shape = new PPU_Rectangle();
+        body.shape.x = leftx;
+        body.shape.y = topy;
+        body.shape.w = w;
+        body.shape.h = h;
+    }
+
+    /**
+     * Set collision circle on body
+     * @param {PPU_Body} body
+     * @param {number} centerx
+     * @param {number} centery
+     * @param {number} radius
+     */
+    SetBodyCircle(body, centerx, centery, radius) {
+        body.shape = new PPU_Circle();
+        body.shape.centerx = centerx;
+        body.shape.centery = centery;
+        body.shape.radius = radius;
+    }
 
     /**
      * Disables the body so it is not updated. 
@@ -1634,17 +1804,17 @@ class Playnewton_PPU {
         body.y += this.world.gravity.y;
 
         if (body.collideWorldBounds) {
-            if (body.x < this.world.bounds.left) {
-                body.x = this.world.bounds.left;
+            if (body.left < this.world.bounds.left) {
+                body.left = this.world.bounds.left;
             }
-            if (body.y < this.world.bounds.top) {
-                body.y = this.world.bounds.top;
+            if (body.top < this.world.bounds.top) {
+                body.top = this.world.bounds.top;
             }
-            if (body.x > this.world.bounds.right) {
-                body.x = this.world.bounds.right;
+            if (body.right > this.world.bounds.right) {
+                body.right = this.world.bounds.right;
             }
-            if (body.y > this.world.bounds.bottom) {
-                body.y = this.world.bounds.bottom;
+            if (body.bottom > this.world.bounds.bottom) {
+                body.bottom = this.world.bounds.bottom;
             }
         }
     }
