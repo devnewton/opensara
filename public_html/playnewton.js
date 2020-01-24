@@ -698,10 +698,16 @@ class Playnewton_DRIVE {
 
             let dataElement = layerElement.getElementsByTagName("data")[0];
             if (dataElement) {
-                layer.chunks.push(this._LoadChunkElement(map, dataElement));
-                for (let chunkElement of dataElement.getElementsByTagName("chunk")) {
-                    layer.chunks.push(this._LoadChunkElement(map, chunkElement));
+                let encoding = dataElement.getAttribute("encoding");
+                let chunkElements = dataElement.getElementsByTagName("chunk");
+                if (chunkElements.length > 0) {
+                    for (let chunkElement of chunkElements) {
+                        layer.chunks.push(this._LoadChunkElement(map, chunkElement, encoding));
+                    }
+                } else {
+                    layer.chunks.push(this._LoadChunkElement(map, dataElement));
                 }
+
             }
             map.layers.push(layer);
         }
@@ -751,7 +757,6 @@ class Playnewton_DRIVE {
         }
         let z = 0;
         for (let layer of map.layers) {
-            ++z;
             for (let chunk of layer.chunks) {
                 for (let y = 0; y < chunk.height; ++y) {
                     for (let x = 0; x < chunk.width; ++x) {
@@ -769,7 +774,8 @@ class Playnewton_DRIVE {
                                     GPU.SetSpriteAnimation(sprite, animation);
                                 }
                                 if (animation || picture) {
-                                    GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight, mapZ + z);
+                                    GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight);
+                                    GPU.SetSpriteZ(sprite, mapZ + z);
                                     GPU.EnableSprite(sprite);
                                 }
                             } else {
@@ -778,6 +784,7 @@ class Playnewton_DRIVE {
                         }
                     }
                 }
+                ++z;
             }
     }
     }
@@ -868,16 +875,17 @@ class Playnewton_DRIVE {
      * 
      * @param {TMX_Map} map
      * @param {Element} dataOrChunkElement
+     * @param {Element} encoding
      * @returns {TMX_Chunk}
      */
-    _LoadChunkElement(map, dataOrChunkElement) {
+    _LoadChunkElement(map, dataOrChunkElement, encoding) {
         let chunk = new TMX_Chunk();
 
         chunk.x = parseInt(dataOrChunkElement.getAttribute("x") || 0, 10);
         chunk.y = parseInt(dataOrChunkElement.getAttribute("y") || 0, 10);
         chunk.width = parseInt(dataOrChunkElement.getAttribute("width") || map.width, 10);
         chunk.height = parseInt(dataOrChunkElement.getAttribute("height") || map.height, 10);
-        let data = this._DecodeChunkData(dataOrChunkElement, chunk.width * chunk.height);
+        let data = this._DecodeChunkData(dataOrChunkElement, chunk.width * chunk.height, encoding);
         this._ConvertDataToTiles(map, chunk, data);
         return chunk;
     }
@@ -886,10 +894,11 @@ class Playnewton_DRIVE {
      * 
      * @param {Element} dataOrChunkElement
      * @param {number} nbtiles
+     * @param {string} encoding
      * @returns {Uint32Array}
      */
-    _DecodeChunkData(dataOrChunkElement, nbtiles) {
-        switch (dataOrChunkElement.getAttribute("encoding")) {
+    _DecodeChunkData(dataOrChunkElement, nbtiles, encoding) {
+        switch (dataOrChunkElement.getAttribute("encoding") || encoding) {
             case "base64":
                 return this._DecodeBase64ChunkData(dataOrChunkElement, nbtiles);
             case "csv":
@@ -1438,7 +1447,7 @@ class PPU_Shape {
     get top() {
         return 0;
     }
-    
+
     get right() {
         return 0;
     }
@@ -1478,21 +1487,21 @@ class PPU_Circle extends PPU_Shape {
      * @type number
      */
     radius = 16;
-    
+
     get left() {
         return this.x - this.radius;
     }
     get top() {
         return this.y - this.radius;
     }
-    
+
     get right() {
         return this.x + this.radius;
     }
     get bottom() {
         return this.y + this.radius;
     }
-    
+
 }
 
 /**
@@ -1559,7 +1568,7 @@ class PPU_Vector {
  * @type PPU_World
  */
 class PPU_World {
-    
+
     constructor() {
         this.bounds = new PPU_Rectangle();
         this.bounds.x = 0;
@@ -1634,7 +1643,7 @@ class PPU_Body {
     set top(y) {
         this.y = y - this.shape.top;
     }
-    
+
     get right() {
         return this.x + this.shape.right;
     }
@@ -1733,7 +1742,7 @@ class Playnewton_PPU {
     EnableBody(body) {
         body.enabled = true;
     }
-    
+
     /**
      * Set collision rectangle on body
      * @param {PPU_Body} body
