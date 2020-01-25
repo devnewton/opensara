@@ -29,7 +29,7 @@ async function main() {
     GPU.EnableSprite(sara);
 
     let PPU = new Playnewton_PPU(100);
-    PPU.SetWorldBounds(0, 0, 640, 360);
+    PPU.SetWorldBounds(0, 0, 1024, 576);
     PPU.SetWorldGravity(10, 5);
     let saraBody = PPU.GetAvailableBody();
     PPU.SetBodyRectangle(saraBody, 0, 0, 32, 48);

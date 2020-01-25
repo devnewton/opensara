@@ -831,11 +831,11 @@ class Playnewton_DRIVE {
             tileset.tiles.set(tile.id, tile);
         }
         if (tileset.bitmap) {
-            let maxX = tileset.bitmap.width - tileset.margin;
-            let maxY = tileset.bitmap.height - tileset.margin;
+            let maxX = tileset.bitmap.width - tileset.margin - tileset.tileHeight - tileset.spacing;
+            let maxY = tileset.bitmap.height - tileset.margin - tileset.tileWidth - tileset.spacing;
             let id = 0;
-            for (let y = tileset.margin; y < maxY; y += tileset.tileWidth + tileset.spacing) {
-                for (let x = tileset.margin; x < maxX; x += tileset.tileHeight + tileset.spacing) {
+            for (let y = tileset.margin; y <= maxY; y += tileset.tileHeight + tileset.spacing) {
+                for (let x = tileset.margin; x <= maxX; x += tileset.tileWidth + tileset.spacing) {
                     let tile = tileset.tiles.get(id);
                     if (!tile) {
                         tile = new TMX_Tile();
