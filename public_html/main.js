@@ -4,7 +4,7 @@ async function main() {
 
     let map = await DRIVE.LoadTmxMap("maps/mountain/mountain_01.tmx");
 
-    let GPU = new Playnewton_GPU(100000);
+    let GPU = new Playnewton_GPU();
 
     let skySprite = GPU.GetAvailableSprite();
     GPU.SetSpritePicture(skySprite, GPU.CreatePicture(skyBitmap));
@@ -28,7 +28,7 @@ async function main() {
     GPU.SetSpriteZ(sara, 15);
     GPU.EnableSprite(sara);
 
-    let PPU = new Playnewton_PPU(100);
+    let PPU = new Playnewton_PPU();
     PPU.SetWorldBounds(0, 0, 1024, 576);
     PPU.SetWorldGravity(10, 5);
     let saraBody = PPU.GetAvailableBody();
@@ -66,7 +66,7 @@ async function main() {
 
         scale += scaleInc;
         angle += rotateInc;
-        for (let z = 0; z < 15; ++z) {
+        for (let z = 0; z < 16; ++z) {
             let layer = GPU.GetLayer(z);
             GPU.SetLayerRotozoom(layer, scale, angle);
         }

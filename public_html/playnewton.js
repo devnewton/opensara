@@ -1094,17 +1094,9 @@ class Playnewton_GPU {
     ctx;
     /**
      * 
-     * @param {number} numsprites Max number of sprite
-     * @param {number} numlayers Max number of layer
      * @returns {Playnewton_GPU}
      */
-    constructor(numsprites, numlayers = 16) {
-        for (let s = 0; s < numsprites; ++s) {
-            this.sprites.push(new GPU_Sprite());
-        }
-        for (let f = 0; f < numlayers; ++f) {
-            this.layers.push(new GPU_Layer());
-        }
+    constructor() {
         this.fpsLimiter = new GPU_FpsLimiter();
     }
 
@@ -1247,7 +1239,13 @@ class Playnewton_GPU {
      * @returns {GPU_Layer}
      */
     GetLayer(z) {
-        return this.layers[Math.floor(z)];
+        z = Math.floor(z);
+        let layer = this.layers[z];
+        if(!layer) {
+            layer = new GPU_Layer();
+            this.layers[z] = layer;
+        }
+        return layer;
     }
 
     /**
@@ -1287,7 +1285,12 @@ class Playnewton_GPU {
      * @returns {GPU_Sprite} sprite
      */
     GetAvailableSprite() {
-        return this.sprites.find(sprite => !sprite.enabled);
+        let sprite = this.sprites.find(sprite => !sprite.enabled);
+        if(!sprite) {
+            sprite = new GPU_Sprite();
+            this.sprites.push(sprite);
+        }
+        return sprite;
     }
 
     /**
@@ -1383,7 +1386,7 @@ class Playnewton_GPU {
     _DrawSprites() {
         for (let z = 0; z < this.layers.length; ++z) {
             let layer = this.layers[z];
-            if (layer.enabled) {
+            if (layer && layer.enabled) {
                 this.ctx.save();
                 if (layer.x !== 0 && layer.x !== 0) {
                     this.ctx.translate(layer.x, layer.y);
@@ -1694,12 +1697,8 @@ class Playnewton_PPU {
 
     /**
      * 
-     * @param {number} nbodies Max number of bodies
      */
-    constructor(nbodies) {
-        for (let b = 0; b < nbodies; ++b) {
-            this.bodies.push(new PPU_Body());
-        }
+    constructor() {
         this.world = new PPU_World();
     }
 
@@ -1732,7 +1731,12 @@ class Playnewton_PPU {
      * @returns {PPU_Body} body
      */
     GetAvailableBody() {
-        return this.bodies.find((body) => !body.enabled);
+        let body = this.bodies.find((body) => !body.enabled);
+        if(!body) {
+            body = new PPU_Body();
+            this.bodies.push(body);
+        }
+        return body;
     }
 
     /**
