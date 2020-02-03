@@ -35,50 +35,6 @@ class OpenSara {
      */
     saraBody;
 
-    async Start() {
-        this.GPU.SetVideoOutput(document.getElementById('game'));
-        await this.InitSara();
-        await this.InitCollectibles();
-        await this.InitMoutainLevels();
-
-        let scale = 1;
-        let angle = 0;
-
-        let redraw = (timestamp) => {
-            this.PPU.Update();
-
-            this.CTRL.Poll();
-
-            let pad = this.CTRL.GetPad(0);
-            let rotateInc = 0;
-            if (pad.left) {
-                rotateInc = -0.04;
-            } else if (pad.right) {
-                rotateInc = 0.04;
-            }
-
-            let scaleInc = 0;
-            if (pad.down) {
-                scaleInc = -0.1;
-            } else if (pad.up) {
-                scaleInc = 0.1;
-            }
-
-            scale += scaleInc;
-            angle += rotateInc;
-            for (let z = 0; z < 16; ++z) {
-                let layer = this.GPU.GetLayer(z);
-                this.GPU.SetLayerRotozoom(layer, scale, angle);
-            }
-
-            this.GPU.SetSpritePosition(this.sara, this.saraBody.x, this.saraBody.y);
-            this.GPU.DrawFrame(timestamp);
-            requestAnimationFrame(redraw);
-        };
-        requestAnimationFrame(redraw);
-
-    }
-
     async InitSara() {
         let saraBitmap = await this.DRIVE.LoadBitmap("sprites/sara.png");
 
@@ -88,7 +44,7 @@ class OpenSara {
             {name: "walk1", x: 70, y: 1, w: 32, h: 48},
             {name: "walk2", x: 104, y: 1, w: 32, h: 48}
         ]);
-        let walkAnimation = this.GPU.CreateAnimation(spriteset, [{name: "walk0", delay: 500}, {name: "walk1", delay: 500}, {name: "walk2", delay: 500}]);
+        let walkAnimation = this.GPU.CreateAnimation(spriteset, [{name: "walk0", delay: 100}, {name: "walk1", delay: 100}, {name: "walk2", delay: 100}]);
 
         this.sara = this.GPU.GetAvailableSprite();
         this.GPU.SetSpriteAnimation(this.sara, walkAnimation);
@@ -143,9 +99,43 @@ class OpenSara {
         this.GPU.EnableSprite(skySprite);
 
         this.PPU.SetWorldBounds(0, 0, 1024, 576);
-        this.PPU.SetWorldGravity(10, 5);
+        this.PPU.SetWorldGravity(0, 5);
 
         this.DRIVE.ConvertTmxMapToGPUSprites(this.GPU, map, 0, 0, 0);
+    }
+
+    async Start() {
+        this.GPU.SetVideoOutput(document.getElementById('game'));
+        await this.InitSara();
+        await this.InitCollectibles();
+        await this.InitMoutainLevels();
+
+        let angle = 0;
+
+        let redraw = (timestamp) => {
+            this.CTRL.Poll();
+
+            let pad = this.CTRL.GetPad(0);
+            let rotateInc = 0;
+            if (pad.L) {
+                rotateInc = -0.04;
+            } else if (pad.R) {
+                rotateInc = 0.04;
+            }
+            angle += rotateInc;
+            for (let z = 0; z < 16; ++z) {
+                let layer = this.GPU.GetLayer(z);
+                this.GPU.SetLayerRotozoom(layer, 1, angle);
+            }
+
+            this.saraBody.velocity.x = (pad.left && -1) || (pad.right && 1) || 0;
+            this.PPU.Update();
+
+            this.GPU.SetSpritePosition(this.sara, this.saraBody.position.x, this.saraBody.position.y);
+            this.GPU.DrawFrame(timestamp);
+            requestAnimationFrame(redraw);
+        };
+        requestAnimationFrame(redraw);
     }
 }
 

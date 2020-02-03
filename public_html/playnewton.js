@@ -341,7 +341,7 @@ class Playnewton_CTRL {
                 this.keyboardVirtualPad.L = down;
                 break;
             case "KeyC":
-                this.keyboardVirtualPad.L = down;
+                this.keyboardVirtualPad.R = down;
                 break;
         }
         return false;
@@ -1564,6 +1564,15 @@ class PPU_Vector {
      * @type number
      */
     y = 0;
+    
+    /**
+     * 
+     * @param {PPU_Vector} force
+     */
+    addForce(force) {
+        this.x += force.x;
+        this.y += force.y;
+    }
 }
 
 /**
@@ -1598,14 +1607,15 @@ class PPU_World {
 class PPU_Body {
     /**
      * 
-     * @type number
+     * @type PPU_Vector
      */
-    x = 0;
+    position = new PPU_Vector();
+    
     /**
      * 
-     * @type number
+     * @type PPU_Vector
      */
-    y = 0;
+    velocity = new PPU_Vector();
 
     /**
      * 
@@ -1626,47 +1636,47 @@ class PPU_Body {
     enabled = false;
 
     get left() {
-        return this.x + this.shape.left;
+        return this.position.x + this.shape.left;
     }
 
     /**
      * @param {number} x
      */
     set left(x) {
-        this.x = x - this.shape.left;
+        this.position.x = x - this.shape.left;
     }
 
     get top() {
-        return this.y + this.shape.top;
+        return this.position.y + this.shape.top;
     }
 
     /**
      * @param {number} y
      */
     set top(y) {
-        this.y = y - this.shape.top;
+        this.position.y = y - this.shape.top;
     }
 
     get right() {
-        return this.x + this.shape.right;
+        return this.position.x + this.shape.right;
     }
 
     /**
      * @param {number} x
      */
     set right(x) {
-        this.x = x - this.shape.right;
+        this.position.x = x - this.shape.right;
     }
 
     get bottom() {
-        return this.y + this.shape.bottom;
+        return this.position.y + this.shape.bottom;
     }
 
     /**
      * @param {number} y
      */
     set bottom(y) {
-        this.y = y - this.shape.bottom;
+        this.position.y = y - this.shape.bottom;
     }
 
     get width() {
@@ -1792,8 +1802,8 @@ class Playnewton_PPU {
      * @param {number} y 
      */
     SetBodyPosition(body, x, y) {
-        body.x = x;
-        body.y = y;
+        body.position.x = x;
+        body.position.y = y;
     }
 
     /**
@@ -1812,9 +1822,13 @@ class Playnewton_PPU {
         }
     }
 
+    /**
+     * 
+     * @param {PPU_Body} body
+     */
     _UpdateBody(body) {
-        body.x += this.world.gravity.x;
-        body.y += this.world.gravity.y;
+        body.position.addForce(this.world.gravity);
+        body.position.addForce(body.velocity);
 
         if (body.collideWorldBounds) {
             if (body.left < this.world.bounds.left) {
