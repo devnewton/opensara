@@ -1846,3 +1846,31 @@ class Playnewton_PPU {
         }
     }
 }
+
+class Playnewton {
+            /**
+     * 
+     * @type Playnewton_DRIVE
+     */
+    DRIVE = new Playnewton_DRIVE();
+
+    /**
+     * 
+     * @type Playnewton_GPU
+     */
+    GPU = new Playnewton_GPU();
+
+    /**
+     * 
+     * @type Playnewton_PPU
+     */
+    PPU = new Playnewton_PPU();
+
+    /**
+     * 
+     * @type Playnewton_CTRL
+     */
+    CTRL = new Playnewton_CTRL();
+}
+
+export default new Playnewton();
