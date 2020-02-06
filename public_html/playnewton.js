@@ -1196,11 +1196,13 @@ class Playnewton_GPU {
      * @param {GPU_AnimationMode} mode play mode
      */
     SetSpriteAnimation(sprite, animation, mode = GPU_AnimationMode.LOOP) {
-        sprite.animation = animation;
         sprite.animationMode = mode;
-        sprite.animationCurrentFrameIndex = 0;
-        sprite.animationCurrentTime = 0;
-        sprite.picture = sprite.animation.frames[0].picture;
+        if (sprite.animation !== animation) {
+            sprite.animation = animation;
+            sprite.animationCurrentFrameIndex = 0;
+            sprite.animationCurrentTime = 0;
+            sprite.picture = sprite.animation.frames[0].picture;
+        }
     }
 
     /**
@@ -1241,7 +1243,7 @@ class Playnewton_GPU {
     GetLayer(z) {
         z = Math.floor(z);
         let layer = this.layers[z];
-        if(!layer) {
+        if (!layer) {
             layer = new GPU_Layer();
             this.layers[z] = layer;
         }
@@ -1286,7 +1288,7 @@ class Playnewton_GPU {
      */
     GetAvailableSprite() {
         let sprite = this.sprites.find(sprite => !sprite.enabled);
-        if(!sprite) {
+        if (!sprite) {
             sprite = new GPU_Sprite();
             this.sprites.push(sprite);
         }
@@ -1564,7 +1566,7 @@ class PPU_Vector {
      * @type number
      */
     y = 0;
-    
+
     /**
      * 
      * @param {PPU_Vector} force
@@ -1610,7 +1612,7 @@ class PPU_Body {
      * @type PPU_Vector
      */
     position = new PPU_Vector();
-    
+
     /**
      * 
      * @type PPU_Vector
@@ -1742,7 +1744,7 @@ class Playnewton_PPU {
      */
     GetAvailableBody() {
         let body = this.bodies.find((body) => !body.enabled);
-        if(!body) {
+        if (!body) {
             body = new PPU_Body();
             this.bodies.push(body);
         }
@@ -1848,7 +1850,7 @@ class Playnewton_PPU {
 }
 
 class Playnewton {
-            /**
+    /**
      * 
      * @type Playnewton_DRIVE
      */

@@ -1,39 +1,16 @@
 import Playnewton from "./playnewton.js"
+import Sara from "./entities/sara.js"
 
-export class OpenSara {
+export default class OpenSara {
+
     /**
-     * 
-     * @type GPU_Sprite
+     * @type Sara
      */
     sara;
-
-    /**
-     * 
-     * @type PPU_Body
-     */
-    saraBody;
-
+    
     async InitSara() {
-        let saraBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
-
-        let spriteset = Playnewton.GPU.CreateSpriteset(saraBitmap, [
-            {name: "stand", x: 1, y: 1, w: 32, h: 48},
-            {name: "walk0", x: 35, y: 1, w: 32, h: 48},
-            {name: "walk1", x: 70, y: 1, w: 32, h: 48},
-            {name: "walk2", x: 104, y: 1, w: 32, h: 48}
-        ]);
-        let walkAnimation = Playnewton.GPU.CreateAnimation(spriteset, [{name: "walk0", delay: 100}, {name: "walk1", delay: 100}, {name: "walk2", delay: 100}]);
-
-        this.sara = Playnewton.GPU.GetAvailableSprite();
-        Playnewton.GPU.SetSpriteAnimation(this.sara, walkAnimation);
-        Playnewton.GPU.SetSpriteZ(this.sara, 15);
-        Playnewton.GPU.EnableSprite(this.sara);
-
-        this.saraBody = Playnewton.PPU.GetAvailableBody();
-        Playnewton.PPU.SetBodyRectangle(this.saraBody, 0, 0, 32, 48);
-        Playnewton.PPU.SetBodyPosition(this.saraBody, 320, 180);
-        Playnewton.PPU.SetBodyCollideWorldBounds(this.saraBody, true);
-        Playnewton.PPU.EnableBody(this.saraBody);
+        await Sara.Preload();
+        this.sara = new Sara();
     }
 
     async InitCollectibles() {
@@ -106,10 +83,10 @@ export class OpenSara {
                 Playnewton.GPU.SetLayerRotozoom(layer, 1, angle);
             }
 
-            this.saraBody.velocity.x = (pad.left && -1) || (pad.right && 1) || 0;
+            this.sara.UpdateBody();
             Playnewton.PPU.Update();
 
-            Playnewton.GPU.SetSpritePosition(this.sara, this.saraBody.position.x, this.saraBody.position.y);
+            this.sara.UpdateSprite();
             Playnewton.GPU.DrawFrame(timestamp);
             requestAnimationFrame(redraw);
         };
