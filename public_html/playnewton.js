@@ -224,57 +224,57 @@ class CTRL_Gamepad {
      * Is the up button being pressed?
      * @type boolean
      */
-    up;
+    up = false;
     /**
      * Is the down button being pressed?
      * @type boolean
      */
-    down;
+    down = false;
     /**
      * Is the left button being pressed?
      * @type boolean
      */
-    left;
+    left = false;
     /**
      * Is the right button being pressed?
      * @type boolean
      */
-    right;
+    right = false;
     /**
      * Is the bottom button in the right button cluster being pressed?
      * @type boolean
      */
-    A;
+    A = false;
     /**
      * Is the right button in the right button cluster being pressed?
      * @type boolean
      */
-    B;
+    B = false;
     /**
      * Is the left button in the right button cluster being pressed?
      * @type boolean
      */
-    X;
+    X = false;
     /**
      * Is the top button in the right button cluster being pressed?
      * @type boolean
      */
-    Y;
+    Y = false;
     /**
      * Is the left shoulder button being pressed?
      * @type boolean
      */
-    L;
+    L = false;
     /**
      * Is the right shoulder button being pressed?
      * @type boolean
      */
-    R;
+    R = false;
     /**
      * Is the start button being pressed?
      * @type boolean
      */
-    start;
+    start = false;
 }
 
 class Playnewton_CTRL {
