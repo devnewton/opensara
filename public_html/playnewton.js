@@ -1202,7 +1202,7 @@ class Playnewton_GPU {
             sprite.animationCurrentFrameIndex = 0;
             sprite.animationCurrentTime = 0;
             sprite.picture = sprite.animation.frames[0].picture;
-        }
+    }
     }
 
     /**
@@ -1560,12 +1560,23 @@ class PPU_Vector {
      * 
      * @type number
      */
-    x = 0;
+    x;
     /**
      * 
      * @type number
      */
-    y = 0;
+    y;
+
+    /**
+     * 
+     * @param {number} x
+     * @param {number} y
+     * @returns {PPU_Vector}
+     */
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+    }
 
     /**
      * 
@@ -1618,6 +1629,17 @@ class PPU_Body {
      * @type PPU_Vector
      */
     velocity = new PPU_Vector();
+
+    /**
+     * 
+     * @type number
+     */
+    maxXVelocity;
+    /**
+     * 
+     * @type number
+     */
+    maxYVelocity;
 
     /**
      * 
@@ -1829,7 +1851,20 @@ class Playnewton_PPU {
      * @param {PPU_Body} body
      */
     _UpdateBody(body) {
-        body.position.addForce(this.world.gravity);
+        body.velocity.addForce(this.world.gravity);
+
+        if (body.velocity.x > body.maxXVelocity) {
+            body.velocity.x = body.maxXVelocity;
+        } else if (body.velocity.x < -body.maxXVelocity) {
+            body.velocity.x = -body.maxXVelocity;
+        }
+        
+        if (body.velocity.y > body.maxYVelocity) {
+            body.velocity.y = body.maxYVelocity;
+        } else if (body.velocity.y < -body.maxYVelocity) {
+            body.velocity.y = -body.maxYVelocity;
+        }
+
         body.position.addForce(body.velocity);
 
         if (body.collideWorldBounds) {

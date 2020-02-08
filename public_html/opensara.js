@@ -54,7 +54,7 @@ export default class OpenSara {
         Playnewton.GPU.EnableSprite(skySprite);
 
         Playnewton.PPU.SetWorldBounds(0, 0, 1024, 576);
-        Playnewton.PPU.SetWorldGravity(0, 5);
+        Playnewton.PPU.SetWorldGravity(0, 1);
 
         Playnewton.DRIVE.ConvertTmxMapToGPUSprites(Playnewton.GPU, map, 0, 0, 0);
     }
