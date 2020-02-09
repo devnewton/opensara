@@ -1,5 +1,47 @@
 import Playnewton from "../playnewton.js"
 
+        /**
+         * @readonly
+         * @enum {number}
+         */
+        const SaraState = {
+            WALK: 1,
+            JUMP: 2,
+            DOUBLE_JUMP: 3
+        };
+
+/**
+ * @readonly
+ * @enum {number}
+ */
+const SaraDirection = {
+    LEFT: 1,
+    RIGHT: 2
+};
+
+/**
+ * 
+ * @type SaraAnimations
+ */
+class SaraAnimations {
+    /**
+     * @type GPU_SpriteAnimation
+     */
+    stand;
+    /**
+     * @type GPU_SpriteAnimation
+     */
+    walk;
+    /**
+     * @type GPU_SpriteAnimation
+     */
+    jump;
+    /**
+     * @type GPU_SpriteAnimation
+     */
+    doubleJump;
+}
+
 export default class Sara {
     /**
      * 
@@ -12,12 +54,6 @@ export default class Sara {
      * @type PPU_Body
      */
     body;
-
-    /**
-     * @type GPU_SpriteAnimation
-     * @static
-     */
-    walkLeftAnimation;
 
     /**
      *  @type number
@@ -35,7 +71,17 @@ export default class Sara {
     isOnGround = false;
 
     /**
-     *  @type boolean
+     *  @type SaraState
+     */
+    state = SaraState.WALK;
+
+    /**
+     * @type SaraDirection
+     */
+    direction = SaraDirection.LEFT;
+
+    /**
+     * @type boolean
      */
     canJump = true;
 
@@ -43,26 +89,80 @@ export default class Sara {
         let saraBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
 
         let spriteset = Playnewton.GPU.CreateSpriteset(saraBitmap, [
-            {name: "stand", x: 1, y: 1, w: 32, h: 48},
+            {name: "stand-left", x: 1, y: 1, w: 32, h: 48},
+            {name: "stand-right", x: 1, y: 50, w: 32, h: 48},
             {name: "walk-left0", x: 35, y: 1, w: 32, h: 48},
             {name: "walk-left1", x: 70, y: 1, w: 32, h: 48},
             {name: "walk-left2", x: 104, y: 1, w: 32, h: 48},
             {name: "walk-right0", x: 35, y: 50, w: 32, h: 48},
             {name: "walk-right1", x: 70, y: 50, w: 32, h: 48},
-            {name: "walk-right2", x: 104, y: 50, w: 32, h: 48}
+            {name: "walk-right2", x: 104, y: 50, w: 32, h: 48},
+            {name: "jump-left0", x: 1, y: 100, w: 32, h: 48},
+            {name: "jump-left1", x: 35, y: 100, w: 32, h: 48},
+            {name: "jump-left2", x: 70, y: 100, w: 32, h: 48},
+            {name: "jump-right0", x: 1, y: 150, w: 32, h: 48},
+            {name: "jump-right1", x: 35, y: 150, w: 32, h: 48},
+            {name: "jump-right2", x: 70, y: 150, w: 32, h: 48},
+            {name: "doublejump-left0", x: 102, y: 100, w: 32, h: 48},
+            {name: "doublejump-left1", x: 136, y: 100, w: 32, h: 48},
+            {name: "doublejump-left2", x: 170, y: 100, w: 32, h: 48},
+            {name: "doublejump-left3", x: 204, y: 100, w: 32, h: 48},
+            {name: "doublejump-right0", x: 102, y: 150, w: 32, h: 48},
+            {name: "doublejump-right1", x: 136, y: 150, w: 32, h: 48},
+            {name: "doublejump-right2", x: 170, y: 150, w: 32, h: 48},
+            {name: "doublejump-right3", x: 204, y: 150, w: 32, h: 48}
         ]);
-        Sara.standAnimation = Playnewton.GPU.CreateAnimation(spriteset, [
-            {name: "stand", delay: 1000}
+
+        /**
+         * @type SaraAnimations[]
+         * @static
+         */
+        Sara.animations = [];
+        Sara.animations[SaraDirection.LEFT] = new SaraAnimations();
+        Sara.animations[SaraDirection.RIGHT] = new SaraAnimations();
+
+        Sara.animations[SaraDirection.LEFT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "stand-left", delay: 1000}
         ]);
-        Sara.walkLeftAnimation = Playnewton.GPU.CreateAnimation(spriteset, [
+
+        Sara.animations[SaraDirection.RIGHT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "stand-right", delay: 1000}
+        ]);
+
+        Sara.animations[SaraDirection.LEFT].walk = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "walk-left0", delay: 100},
             {name: "walk-left1", delay: 100},
             {name: "walk-left2", delay: 100}
         ]);
-        Sara.walkRightAnimation = Playnewton.GPU.CreateAnimation(spriteset, [
+
+        Sara.animations[SaraDirection.RIGHT].walk = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "walk-right0", delay: 100},
             {name: "walk-right1", delay: 100},
             {name: "walk-right2", delay: 100}
+        ]);
+
+        Sara.animations[SaraDirection.LEFT].jump = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-left0", delay: 100},
+            {name: "jump-left1", delay: 100},
+            {name: "jump-left2", delay: 100}
+        ]);
+
+        Sara.animations[SaraDirection.RIGHT].jump = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-right0", delay: 100},
+            {name: "jump-right1", delay: 100},
+            {name: "jump-right2", delay: 100}
+        ]);
+
+        Sara.animations[SaraDirection.LEFT].doubleJump = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "doublejump-left0", delay: 100},
+            {name: "doublejump-left1", delay: 100},
+            {name: "doublejump-left2", delay: 100}
+        ]);
+
+        Sara.animations[SaraDirection.RIGHT].doubleJump = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "doublejump-right0", delay: 100},
+            {name: "doublejump-right1", delay: 100},
+            {name: "doublejump-right2", delay: 100}
         ]);
     }
 
@@ -91,31 +191,64 @@ export default class Sara {
         }
 
         if (pad.left) {
+            this.direction = SaraDirection.LEFT;
             this.body.velocity.x -= this.walkSpeed;
         } else if (pad.right) {
+            this.direction = SaraDirection.RIGHT;
             this.body.velocity.x += this.walkSpeed;
         } else {
             this.body.velocity.x = 0;
         }
 
-        if (pad.A) {
-            if (this.canJump && this.isOnGround) {
-                this.body.velocity.y = -this.jumpImpulse;
-                this.canJump = false;
-            }
-        } else {
-            this.canJump = true;
+        switch (this.state) {
+            case SaraState.WALK:
+                if (pad.A) {
+                    if (this.canJump && this.isOnGround) {
+                        this.body.velocity.y = -this.jumpImpulse;
+                        this.canJump = false;
+                        this.state = SaraState.JUMP;
+                    }
+                } else {
+                    this.canJump = true;
+                }
+                break;
+            case SaraState.JUMP:
+                if (pad.A) {
+                    if (this.canJump) {
+                        this.body.velocity.y = -this.jumpImpulse;
+                        this.canJump = false;
+                        this.state = SaraState.DOUBLE_JUMP;
+                    }
+                } else {
+                    this.canJump = true;
+                }
+                if (this.isOnGround) {
+                    this.state = SaraState.WALK;
+                }
+                break;
+            case SaraState.DOUBLE_JUMP:
+                if (this.isOnGround) {
+                    this.state = SaraState.WALK;
+                }
+                break;
         }
     }
 
     UpdateSprite() {
-        let pad = Playnewton.CTRL.GetPad(0);
-        if (pad.left) {
-            Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.walkLeftAnimation);
-        } else if (pad.right) {
-            Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.walkRightAnimation);
-        } else {
-            Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.standAnimation);
+        switch (this.state) {
+            case SaraState.WALK:
+                if (Math.abs(this.body.velocity.x) < Number.EPSILON) {
+                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].stand);
+                } else {
+                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].walk);
+                }
+                break;
+            case SaraState.JUMP:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].jump);
+                break;
+            case SaraState.DOUBLE_JUMP:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].doubleJump);
+                break;
         }
 
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
