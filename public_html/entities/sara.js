@@ -34,6 +34,11 @@ export default class Sara {
      */
     isOnGround = false;
 
+    /**
+     *  @type boolean
+     */
+    canJump = true;
+
     static async Preload() {
         let saraBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
 
@@ -72,7 +77,7 @@ export default class Sara {
         Playnewton.PPU.SetBodyPosition(this.body, 320, 180);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);
         Playnewton.PPU.EnableBody(this.body);
-        
+
         this.body.maxXVelocity = 10;
         this.body.maxYVelocity = 20;
     }
@@ -84,20 +89,22 @@ export default class Sara {
             this.isOnGround = true;
             this.body.velocity.y = 0;
         }
-        
-        if(pad.left) {
-             this.body.velocity.x -= this.walkSpeed;
-        } else if(pad.right) {
+
+        if (pad.left) {
+            this.body.velocity.x -= this.walkSpeed;
+        } else if (pad.right) {
             this.body.velocity.x += this.walkSpeed;
         } else {
             this.body.velocity.x = 0;
         }
 
-
         if (pad.A) {
-            if (this.isOnGround) {
+            if (this.canJump && this.isOnGround) {
                 this.body.velocity.y = -this.jumpImpulse;
+                this.canJump = false;
             }
+        } else {
+            this.canJump = true;
         }
     }
 
