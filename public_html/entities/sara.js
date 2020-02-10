@@ -35,7 +35,15 @@ class SaraAnimations {
     /**
      * @type GPU_SpriteAnimation
      */
-    jump;
+    jumpAscend;
+    /**
+     * @type GPU_SpriteAnimation
+     */
+    jumpFloat;
+    /**
+     * @type GPU_SpriteAnimation
+     */
+    jumpDescend;
     /**
      * @type GPU_SpriteAnimation
      */
@@ -97,12 +105,12 @@ export default class Sara {
             {name: "walk-right0", x: 35, y: 50, w: 32, h: 48},
             {name: "walk-right1", x: 70, y: 50, w: 32, h: 48},
             {name: "walk-right2", x: 104, y: 50, w: 32, h: 48},
-            {name: "jump-left0", x: 1, y: 100, w: 32, h: 48},
-            {name: "jump-left1", x: 35, y: 100, w: 32, h: 48},
-            {name: "jump-left2", x: 70, y: 100, w: 32, h: 48},
-            {name: "jump-right0", x: 1, y: 150, w: 32, h: 48},
-            {name: "jump-right1", x: 35, y: 150, w: 32, h: 48},
-            {name: "jump-right2", x: 70, y: 150, w: 32, h: 48},
+            {name: "jump-descend-left", x: 1, y: 100, w: 32, h: 48},
+            {name: "jump-float-left", x: 35, y: 100, w: 32, h: 48},
+            {name: "jump-ascend-left", x: 70, y: 100, w: 32, h: 48},
+            {name: "jump-ascend-right", x: 1, y: 150, w: 32, h: 48},
+            {name: "jump-float-right", x: 35, y: 150, w: 32, h: 48},
+            {name: "jump-descend-right", x: 70, y: 150, w: 32, h: 48},
             {name: "doublejump-left0", x: 102, y: 100, w: 32, h: 48},
             {name: "doublejump-left1", x: 136, y: 100, w: 32, h: 48},
             {name: "doublejump-left2", x: 170, y: 100, w: 32, h: 48},
@@ -141,16 +149,28 @@ export default class Sara {
             {name: "walk-right2", delay: 100}
         ]);
 
-        Sara.animations[SaraDirection.LEFT].jump = Playnewton.GPU.CreateAnimation(spriteset, [
-            {name: "jump-left0", delay: 100},
-            {name: "jump-left1", delay: 100},
-            {name: "jump-left2", delay: 100}
+        Sara.animations[SaraDirection.LEFT].jumpAscend = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-ascend-left", delay: 1000}
         ]);
 
-        Sara.animations[SaraDirection.RIGHT].jump = Playnewton.GPU.CreateAnimation(spriteset, [
-            {name: "jump-right0", delay: 100},
-            {name: "jump-right1", delay: 100},
-            {name: "jump-right2", delay: 100}
+        Sara.animations[SaraDirection.LEFT].jumpFloat = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-float-left", delay: 1000}
+        ]);
+
+        Sara.animations[SaraDirection.LEFT].jumpDescend = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-descend-left", delay: 1000}
+        ]);
+
+        Sara.animations[SaraDirection.RIGHT].jumpAscend = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-ascend-right", delay: 1000}
+        ]);
+
+        Sara.animations[SaraDirection.RIGHT].jumpFloat = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-float-right", delay: 1000}
+        ]);
+
+        Sara.animations[SaraDirection.RIGHT].jumpDescend = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "jump-descend-right", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.LEFT].doubleJump = Playnewton.GPU.CreateAnimation(spriteset, [
@@ -244,7 +264,13 @@ export default class Sara {
                 }
                 break;
             case SaraState.JUMP:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].jump);
+                if (this.body.velocity.y > 5) {
+                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].jumpDescend);
+                } else if (this.body.velocity.y < -5) {
+                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].jumpAscend);
+                } else {
+                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].jumpFloat);
+                }
                 break;
             case SaraState.DOUBLE_JUMP:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].doubleJump);
