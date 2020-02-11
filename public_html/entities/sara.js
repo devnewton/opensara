@@ -196,35 +196,35 @@ export default class Sara {
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 48);
         Playnewton.PPU.SetBodyPosition(this.body, 320, 180);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);
+        Playnewton.PPU.SetBodyMaxVelocity(this.body, 10, 20);
         Playnewton.PPU.EnableBody(this.body);
-
-        this.body.maxXVelocity = 10;
-        this.body.maxYVelocity = 20;
     }
 
     UpdateBody() {
         let pad = Playnewton.CTRL.GetPad(0);
         this.isOnGround = false;
+        let velocityX = this.body.velocity.x;
+        let velocityY= this.body.velocity.y;
         if (this.body.bottom >= Playnewton.PPU.world.bounds.bottom) {
             this.isOnGround = true;
-            this.body.velocity.y = 0;
+            velocityX = 0;
         }
 
         if (pad.left) {
             this.direction = SaraDirection.LEFT;
-            this.body.velocity.x -= this.walkSpeed;
+            velocityX -= this.walkSpeed;
         } else if (pad.right) {
             this.direction = SaraDirection.RIGHT;
-            this.body.velocity.x += this.walkSpeed;
+            velocityX += this.walkSpeed;
         } else {
-            this.body.velocity.x = 0;
+            velocityX = 0;
         }
 
         switch (this.state) {
             case SaraState.WALK:
                 if (pad.A) {
                     if (this.canJump && this.isOnGround) {
-                        this.body.velocity.y = -this.jumpImpulse;
+                        velocityY = -this.jumpImpulse;
                         this.canJump = false;
                         this.state = SaraState.JUMP;
                     }
@@ -235,7 +235,7 @@ export default class Sara {
             case SaraState.JUMP:
                 if (pad.A) {
                     if (this.canJump) {
-                        this.body.velocity.y = -this.jumpImpulse;
+                        velocityY = -this.jumpImpulse;
                         this.canJump = false;
                         this.state = SaraState.DOUBLE_JUMP;
                     }
@@ -252,6 +252,7 @@ export default class Sara {
                 }
                 break;
         }
+        Playnewton.PPU.SetBodyVelocity(this.body, velocityX, velocityY);
     }
 
     UpdateSprite() {

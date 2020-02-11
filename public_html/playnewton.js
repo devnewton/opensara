@@ -1634,12 +1634,12 @@ class PPU_Body {
      * 
      * @type number
      */
-    maxXVelocity;
+    maxXVelocity = 10000;
     /**
      * 
      * @type number
      */
-    maxYVelocity;
+    maxYVelocity = 10000;
 
     /**
      * 
@@ -1822,12 +1822,32 @@ class Playnewton_PPU {
 
     /**
      * @param {PPU_Body} body
+     * @param {number} maxX
+     * @param {number} maxY
+     */
+    SetBodyMaxVelocity(body, maxX, maxY) {
+        body.maxXVelocity = maxX;
+        body.maxYVelocity = maxY;
+    }
+
+    /**
+     * @param {PPU_Body} body
      * @param {number} x 
      * @param {number} y 
      */
     SetBodyPosition(body, x, y) {
         body.position.x = x;
         body.position.y = y;
+    }
+
+    /**
+     * @param {PPU_Body} body
+     * @param {number} vx 
+     * @param {number} vy 
+     */
+    SetBodyVelocity(body, vx, vy) {
+        body.velocity.x = vx;
+        body.velocity.y = vy;
     }
 
     /**
@@ -1858,7 +1878,7 @@ class Playnewton_PPU {
         } else if (body.velocity.x < -body.maxXVelocity) {
             body.velocity.x = -body.maxXVelocity;
         }
-        
+
         if (body.velocity.y > body.maxYVelocity) {
             body.velocity.y = body.maxYVelocity;
         } else if (body.velocity.y < -body.maxYVelocity) {
