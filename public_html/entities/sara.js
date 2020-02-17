@@ -204,7 +204,7 @@ export default class Sara {
         let pad = Playnewton.CTRL.GetPad(0);
         this.isOnGround = false;
         let velocityX = this.body.velocity.x;
-        let velocityY= this.body.velocity.y;
+        let velocityY = this.body.velocity.y;
         if (this.body.bottom >= Playnewton.PPU.world.bounds.bottom) {
             this.isOnGround = true;
             velocityX = 0;

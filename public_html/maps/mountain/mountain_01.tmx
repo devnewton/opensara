@@ -23,7 +23,7 @@
 1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3
 </data>
  </layer>
- <objectgroup id="2" name="platforms">
+ <objectgroup color="#00ff7f" id="2" name="platforms">
   <properties>
    <property name="immovable" value="true"/>
   </properties>

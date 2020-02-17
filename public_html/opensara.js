@@ -57,6 +57,8 @@ export default class OpenSara {
         Playnewton.PPU.SetWorldGravity(0, 1);
 
         Playnewton.DRIVE.ConvertTmxMapToGPUSprites(Playnewton.GPU, map, 0, 0, 0);
+        Playnewton.DRIVE.ConvertTmxMapToPPUBodies(Playnewton.PPU, map, 0, 0);
+        
     }
 
     async Start() {
@@ -88,6 +90,7 @@ export default class OpenSara {
 
             this.sara.UpdateSprite();
             Playnewton.GPU.DrawFrame(timestamp);
+            Playnewton.PPU.DebugDraw(Playnewton.GPU.ctx);
             requestAnimationFrame(redraw);
         };
         requestAnimationFrame(redraw);

@@ -653,7 +653,6 @@ class TMX_Object {
     properties;
 }
 
-
 /**
  * 
  * @type TMX_ObjectGroup
@@ -665,6 +664,12 @@ class TMX_ObjectGroup {
      * @type string
      */
     name;
+
+    /**
+     * Color of the object group
+     * @type string
+     */
+    color;
 
     /**
      * The x coordinate of the object group in tiles
@@ -795,6 +800,10 @@ class Playnewton_DRIVE {
 
         for (let objectgroupElement of doc.getElementsByTagName("objectgroup")) {
             let objectGroup = new TMX_ObjectGroup();
+            objectGroup.name = objectgroupElement.getAttribute("name");
+            objectGroup.color = objectgroupElement.getAttribute("color");
+            objectGroup.x = parseInt(objectgroupElement.getAttribute("x"), 10) || 0;
+            objectGroup.y = parseInt(objectgroupElement.getAttribute("y"), 10) || 0;
             objectGroup.properties = this._LoadTmxProperties(objectgroupElement);
             for (let objectElement of objectgroupElement.getElementsByTagName("object")) {
                 let object = new TMX_Object();
@@ -886,12 +895,42 @@ class Playnewton_DRIVE {
     }
     }
 
+    /**
+     * Convert map tiles to GPU sprites
+     * @param {Playnewton_PPU} PPU
+     * @param {TMX_Map} map
+     * @param {number} mapX
+     * @param {number} mapY
+     */
+    ConvertTmxMapToPPUBodies(PPU, map, mapX = 0, mapY = 0) {
+        for (let objectgroup of map.objectgroups) {
+            let groupX = mapX + objectgroup.x * map.tileWidth;
+            let groupY = mapY + objectgroup.y * map.tileWidth;
+            for (let object of objectgroup.objects) {
+                let body = PPU.GetAvailableBody();
+                if (body) {
+                    body.debugColor = objectgroup.color;
+                    PPU.SetBodyPosition(body, groupX + object.x, groupY + object.y);
+                    PPU.SetBodyRectangle(body, 0, 0, object.width, object.height);
+                    PPU.SetBodyImmovable(body, this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties));
+                    PPU.EnableBody(body);
+                } else {
+                    console.log("No available body");
+                }
+            }
+    }
+    }
     async LoadTileset(tsxUrl) {
         let tsx = await (await fetch(tsxUrl)).text();
         let parser = new DOMParser();
         let tilesetElement = parser.parseFromString(tsx, "application/xml").getElementsByTagName("tileset")[0];
         let baseUrl = tsxUrl.slice(0, tsxUrl.lastIndexOf("/") + 1);
         return await this._LoadTilesetElement(tilesetElement, baseUrl);
+    }
+
+    _ParseBooleanProperty(name, objectProperties, groupProperties) {
+        let prop = objectProperties.get(name) || groupProperties.get(name);
+        return "true" === prop;
     }
 
     /**
@@ -1772,6 +1811,11 @@ class PPU_Body {
      * @type boolean
      */
     enabled = false;
+    
+    /**
+     * @type string
+     */
+    debugColor;
 
     get left() {
         return this.position.x + this.shape.left;
@@ -1998,37 +2042,54 @@ class Playnewton_PPU {
 
     /**
      * 
+     * @param ctx CanvasRenderingContext2D
+     */
+    DebugDraw(ctx) {
+        ctx.save();
+        for (let body of this.bodies) {
+            if (body.enabled) {
+                ctx.strokeStyle = body.debugColor || "#00FF00";
+                ctx.strokeRect(body.left, body.top, body.width, body.height);
+            }
+        }
+        ctx.restore();
+    }
+
+    /**
+     * 
      * @param {PPU_Body} body
      */
     _UpdateBody(body) {
-        body.velocity.addForce(this.world.gravity);
+        if (!body.immovable) {
+            body.velocity.addForce(this.world.gravity);
 
-        if (body.velocity.x > body.maxXVelocity) {
-            body.velocity.x = body.maxXVelocity;
-        } else if (body.velocity.x < -body.maxXVelocity) {
-            body.velocity.x = -body.maxXVelocity;
-        }
-
-        if (body.velocity.y > body.maxYVelocity) {
-            body.velocity.y = body.maxYVelocity;
-        } else if (body.velocity.y < -body.maxYVelocity) {
-            body.velocity.y = -body.maxYVelocity;
-        }
-
-        body.position.addForce(body.velocity);
-
-        if (body.collideWorldBounds) {
-            if (body.left < this.world.bounds.left) {
-                body.left = this.world.bounds.left;
+            if (body.velocity.x > body.maxXVelocity) {
+                body.velocity.x = body.maxXVelocity;
+            } else if (body.velocity.x < -body.maxXVelocity) {
+                body.velocity.x = -body.maxXVelocity;
             }
-            if (body.top < this.world.bounds.top) {
-                body.top = this.world.bounds.top;
+
+            if (body.velocity.y > body.maxYVelocity) {
+                body.velocity.y = body.maxYVelocity;
+            } else if (body.velocity.y < -body.maxYVelocity) {
+                body.velocity.y = -body.maxYVelocity;
             }
-            if (body.right > this.world.bounds.right) {
-                body.right = this.world.bounds.right;
-            }
-            if (body.bottom > this.world.bounds.bottom) {
-                body.bottom = this.world.bounds.bottom;
+
+            body.position.addForce(body.velocity);
+
+            if (body.collideWorldBounds) {
+                if (body.left < this.world.bounds.left) {
+                    body.left = this.world.bounds.left;
+                }
+                if (body.top < this.world.bounds.top) {
+                    body.top = this.world.bounds.top;
+                }
+                if (body.right > this.world.bounds.right) {
+                    body.right = this.world.bounds.right;
+                }
+                if (body.bottom > this.world.bounds.bottom) {
+                    body.bottom = this.world.bounds.bottom;
+                }
             }
         }
     }
