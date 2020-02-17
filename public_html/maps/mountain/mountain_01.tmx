@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="2" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="9">
  <tileset firstgid="1" source="mountain.tsx"/>
- <layer id="1" name="Calque 1" width="32" height="18">
+ <layer id="1" name="tiles" width="32" height="18">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -23,4 +23,16 @@
 1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3
 </data>
  </layer>
+ <objectgroup id="2" name="platforms">
+  <properties>
+   <property name="immovable" value="true"/>
+  </properties>
+  <object id="1" x="0" y="554" width="1024.5" height="22.5"/>
+  <object id="2" x="609" y="427" width="286" height="19.5"/>
+  <object id="4" x="866.5" y="234" width="92" height="84.5"/>
+  <object id="5" x="1" y="266.5" width="509.5" height="20.5"/>
+  <object id="6" x="98.5" y="170" width="60" height="19.5"/>
+  <object id="7" x="225.5" y="75.5" width="61.5" height="18.5"/>
+  <object id="8" x="321" y="139" width="62" height="19"/>
+ </objectgroup>
 </map>

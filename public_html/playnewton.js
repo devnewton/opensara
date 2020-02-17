@@ -613,6 +613,82 @@ class TMX_Layer {
     chunks = [];
 }
 
+
+/**
+ * 
+ * @type TMX_Object
+ */
+class TMX_Object {
+    /**
+     * Name of the object
+     * @type string
+     */
+    name;
+
+    /**
+     * The x coordinate of the object in pixels
+     * @type number
+     */
+    x;
+    /**
+     * The y coordinate of object in pixels
+     * @type number
+     */
+    y;
+
+    /**
+     * Width of the object
+     * @type number
+     */
+    width;
+    /**
+     * Height of the object
+     * @type number
+     */
+    height;
+
+    /**
+     * @type Map
+     */
+    properties;
+}
+
+
+/**
+ * 
+ * @type TMX_ObjectGroup
+ */
+class TMX_ObjectGroup {
+
+    /**
+     * Name of the object group
+     * @type string
+     */
+    name;
+
+    /**
+     * The x coordinate of the object group in tiles
+     * @type number
+     */
+    x;
+    /**
+     * The y coordinate of the object group in tiles
+     * @type number
+     */
+    y;
+
+    /**
+     * @type Map
+     */
+    properties;
+
+    /**
+     * Object list
+     * @type TMX_Object[]
+     */
+    objects = [];
+}
+
 class TMX_Map {
 
     /**
@@ -646,6 +722,11 @@ class TMX_Map {
      * @type TMX_Layer[]
      */
     layers = [];
+
+    /**
+     * @type TMX_ObjectGroup[]
+     */
+    objectgroups = [];
 }
 
 class Playnewton_DRIVE {
@@ -710,6 +791,22 @@ class Playnewton_DRIVE {
 
             }
             map.layers.push(layer);
+        }
+
+        for (let objectgroupElement of doc.getElementsByTagName("objectgroup")) {
+            let objectGroup = new TMX_ObjectGroup();
+            objectGroup.properties = this._LoadTmxProperties(objectgroupElement);
+            for (let objectElement of objectgroupElement.getElementsByTagName("object")) {
+                let object = new TMX_Object();
+                object.name = objectElement.getAttribute("name");
+                object.x = parseInt(objectElement.getAttribute("x"), 10) || 0;
+                object.y = parseInt(objectElement.getAttribute("y"), 10) || 0;
+                object.width = parseInt(objectElement.getAttribute("width"), 10);
+                object.height = parseInt(objectElement.getAttribute("height"), 10);
+                object.properties = this._LoadTmxProperties(objectElement);
+                objectGroup.objects.push(object);
+            }
+            map.objectgroups.push(objectGroup);
         }
 
         return map;
@@ -873,6 +970,19 @@ class Playnewton_DRIVE {
 
     /**
      * 
+     * @param {Element} element
+     * @returns {Map}
+     */
+    _LoadTmxProperties(element) {
+        let props = new Map();
+        for (let propertyElement of element.getElementsByTagName("property")) {
+            props.set(propertyElement.getAttribute("name"), propertyElement.getAttribute("value"));
+        }
+        return props;
+    }
+
+    /**
+     * 
      * @param {TMX_Map} map
      * @param {Element} dataOrChunkElement
      * @param {Element} encoding
@@ -880,7 +990,6 @@ class Playnewton_DRIVE {
      */
     _LoadChunkElement(map, dataOrChunkElement, encoding) {
         let chunk = new TMX_Chunk();
-
         chunk.x = parseInt(dataOrChunkElement.getAttribute("x") || 0, 10);
         chunk.y = parseInt(dataOrChunkElement.getAttribute("y") || 0, 10);
         chunk.width = parseInt(dataOrChunkElement.getAttribute("width") || map.width, 10);
@@ -1642,6 +1751,11 @@ class PPU_Body {
     maxYVelocity = 10000;
 
     /**
+     * @type boolean 
+     */
+    immovable = false;
+
+    /**
      * 
      * @type PPU_Shape
      */
@@ -1832,6 +1946,14 @@ class Playnewton_PPU {
 
     /**
      * @param {PPU_Body} body
+     * @param {boolean} immovable 
+     */
+    SetBodyImmovable(body, immovable) {
+        body.immovable = immovable;
+    }
+
+    /**
+     * @param {PPU_Body} body
      * @param {number} x 
      * @param {number} y 
      */
@@ -1848,6 +1970,14 @@ class Playnewton_PPU {
     SetBodyVelocity(body, vx, vy) {
         body.velocity.x = vx;
         body.velocity.y = vy;
+    }
+
+    /**
+     * @param {PPU_Body} body
+     * @param {boolean} immovable 
+     */
+    SetBodyImmovable(body, immovable) {
+        body.immovable = immovable;
     }
 
     /**
