@@ -28,11 +28,5 @@
    <property name="immovable" value="true"/>
   </properties>
   <object id="1" x="0" y="554" width="1024.5" height="22.5"/>
-  <object id="2" x="609" y="427" width="286" height="19.5"/>
-  <object id="4" x="866.5" y="234" width="92" height="84.5"/>
-  <object id="5" x="1" y="266.5" width="509.5" height="20.5"/>
-  <object id="6" x="98.5" y="170" width="60" height="19.5"/>
-  <object id="7" x="225.5" y="75.5" width="61.5" height="18.5"/>
-  <object id="8" x="321" y="139" width="62" height="19"/>
  </objectgroup>
 </map>

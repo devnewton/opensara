@@ -1770,6 +1770,12 @@ class PPU_Body {
      * 
      * @type PPU_Vector
      */
+    previousPosition = new PPU_Vector();
+
+    /**
+     * 
+     * @type PPU_Vector
+     */
     position = new PPU_Vector();
 
     /**
@@ -1811,12 +1817,31 @@ class PPU_Body {
      * @type boolean
      */
     enabled = false;
-    
+
     /**
      * @type string
      */
     debugColor;
 
+    /**
+     * 
+     * @returns {boolean}
+     */
+    get movable() {
+        return !this.immovable;
+    }
+
+    /**
+     * @param {boolean} movable
+     */
+    set movable(movable) {
+        this.immovable = !movable;
+    }
+
+    /**
+     * 
+     * @returns {number}
+     */
     get left() {
         return this.position.x + this.shape.left;
     }
@@ -1828,6 +1853,10 @@ class PPU_Body {
         this.position.x = x - this.shape.left;
     }
 
+    /**
+     * 
+     * @returns {number}
+     */
     get top() {
         return this.position.y + this.shape.top;
     }
@@ -1839,6 +1868,10 @@ class PPU_Body {
         this.position.y = y - this.shape.top;
     }
 
+    /**
+     * 
+     * @returns {number}
+     */
     get right() {
         return this.position.x + this.shape.right;
     }
@@ -1850,6 +1883,10 @@ class PPU_Body {
         this.position.x = x - this.shape.right;
     }
 
+    /**
+     * 
+     * @returns {number}
+     */
     get bottom() {
         return this.position.y + this.shape.bottom;
     }
@@ -1861,12 +1898,52 @@ class PPU_Body {
         this.position.y = y - this.shape.bottom;
     }
 
+    /**
+     * 
+     * @returns {number}
+     */
     get width() {
         return this.shape.width;
     }
 
+    /**
+     * 
+     * @returns {number}
+     */
     get height() {
         return this.shape.height;
+    }
+
+    /**
+     * 
+     * @returns {boolean}
+     */
+    get isGoingLeft() {
+        return this.position.x < this.previousPosition.x;
+    }
+
+    /**
+     * 
+     * @returns {boolean}
+     */
+    get isGoingRight() {
+        return this.position.x > this.previousPosition.x;
+    }
+
+    /**
+     * 
+     * @returns {boolean}
+     */
+    get isGoingUp() {
+        return this.position.y < this.previousPosition.y;
+    }
+
+    /**
+     * 
+     * @returns {boolean}
+     */
+    get isGoingDown() {
+        return this.position.y < this.previousPosition.y;
     }
 }
 
@@ -2034,9 +2111,15 @@ class Playnewton_PPU {
 
     Update() {
         for (let body of this.bodies) {
-            if (body.enabled) {
-                this._UpdateBody(body);
+            this._MoveBody(body);
+        }
+        for (let bodyA of this.bodies) {
+            for (let bodyB of this.bodies) {
+                this._CollideBodies(bodyA, bodyB);
             }
+        }
+        for (let body of this.bodies) {
+            this._KeepBodyInWorldBound(body);
         }
     }
 
@@ -2057,10 +2140,151 @@ class Playnewton_PPU {
 
     /**
      * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    _CollideBodies(bodyA, bodyB) {
+        if (bodyA !== bodyB && bodyA.enabled && bodyB.enabled && (!bodyA.immovable || !bodyB.immovable)) {
+            if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
+                if (Math.abs(this.world.gravity.x) <= Math.abs(this.world.gravity.y)) {
+                    this._SeparateBodiesByY(bodyA, bodyB);
+                    if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
+                        this._SeparateBodiesByX(bodyA, bodyB);
+                    }
+                } else {
+                    this._SeparateBodiesByX(bodyA, bodyB);
+                    if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
+                        this._SeparateBodiesByY(bodyA, bodyB);
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    _CheckIfBodiesIntersects(bodyA, bodyB) {
+        if (bodyA.right <= bodyB.position.x) {
+            return false;
+        }
+        if (bodyA.bottom <= bodyB.position.y) {
+            return false;
+        }
+        if (bodyA.position.x >= bodyB.right) {
+            return false;
+        }
+        if (bodyA.position.y >= bodyB.bottom) {
+            return false;
+        }
+        bodyA.debugColor = "#ff0000";
+        bodyB.debugColor = "#ff0000";
+        return true;
+    }
+    /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    _SeparateBodiesByX(bodyA, bodyB) {
+        if (bodyA.movable && bodyB.immovable) {
+            this._SeparateMovableBodyFromImmovableBodyByX(bodyA, bodyB);
+        } else
+        if (bodyA.immovable && bodyB.movable) {
+            this._SeparateMovableBodyFromImmovableBodyByX(bodyB, bodyA);
+        } else if (bodyA.movable && bodyB.movable) {
+            this._SeparateMovableBodiesByX(bodyB, bodyA);
+        }
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} movableBody
+     * @param {PPU_Body} immovableBody
+     */
+    _SeparateMovableBodyFromImmovableBodyByX(movableBody, immovableBody) {
+        if (movableBody.isGoingLeft) {
+            movableBody.right = immovableBody.left;
+        } else {
+            movableBody.left = immovableBody.right;
+        }
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    _SeparateMovableBodiesByX(bodyA, bodyB) {
+        //TODO
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    _SeparateBodiesByY(bodyA, bodyB) {
+        if (bodyA.movable && bodyB.immovable) {
+            this._SeparateMovableBodyFromImmovableBodyByY(bodyA, bodyB);
+        } else
+        if (bodyA.immovable && bodyB.movable) {
+            this._SeparateMovableBodyFromImmovableBodyByY(bodyB, bodyA);
+        } else if (bodyA.movable && bodyB.movable) {
+            this._SeparateMovableBodiesByY(bodyB, bodyA);
+        }
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} movableBody
+     * @param {PPU_Body} immovableBody
+     */
+    _SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody) {
+        if (movableBody.isGoingUp) {
+            movableBody.top = immovableBody.bottom;
+        } else {
+            movableBody.bottom = immovableBody.top;
+        }
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    _ComputeBodiesOverlapX(bodyA, bodyB) {
+        if (bodyA.isGoingLeft)
+            if (bodyA.left < bodyB.left) {
+                return bodyA.right - bodyB.left;
+            } else {
+                return bodyB.right - bodyA.left;
+            }
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    _ComputeBodiesOverlapY(bodyA, bodyB) {
+        if (bodyA.top < bodyB.top) {
+            return bodyA.bottom - bodyB.top;
+        } else {
+            return bodyB.bottom - bodyA.top;
+        }
+    }
+
+    /**
+     * 
      * @param {PPU_Body} body
      */
-    _UpdateBody(body) {
-        if (!body.immovable) {
+    _MoveBody(body) {
+        if (body.enabled && !body.immovable) {
+            body.previousPosition.x = body.position.x;
+            body.previousPosition.y = body.position.y;
+
             body.velocity.addForce(this.world.gravity);
 
             if (body.velocity.x > body.maxXVelocity) {
@@ -2076,22 +2300,29 @@ class Playnewton_PPU {
             }
 
             body.position.addForce(body.velocity);
+        }
+    }
 
-            if (body.collideWorldBounds) {
-                if (body.left < this.world.bounds.left) {
-                    body.left = this.world.bounds.left;
-                }
-                if (body.top < this.world.bounds.top) {
-                    body.top = this.world.bounds.top;
-                }
-                if (body.right > this.world.bounds.right) {
-                    body.right = this.world.bounds.right;
-                }
-                if (body.bottom > this.world.bounds.bottom) {
-                    body.bottom = this.world.bounds.bottom;
-                }
+    /**
+     * 
+     * @param {PPU_Body} body
+     */
+    _KeepBodyInWorldBound(body) {
+        if (body.enabled && body.collideWorldBounds) {
+            if (body.left < this.world.bounds.left) {
+                body.left = this.world.bounds.left;
+            }
+            if (body.top < this.world.bounds.top) {
+                body.top = this.world.bounds.top;
+            }
+            if (body.right > this.world.bounds.right) {
+                body.right = this.world.bounds.right;
+            }
+            if (body.bottom > this.world.bounds.bottom) {
+                body.bottom = this.world.bounds.bottom;
             }
         }
+
     }
 }
 
