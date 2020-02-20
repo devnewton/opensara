@@ -205,7 +205,7 @@ export default class Sara {
         this.isOnGround = false;
         let velocityX = this.body.velocity.x;
         let velocityY = this.body.velocity.y;
-        if (this.body.bottom >= Playnewton.PPU.world.bounds.bottom) {
+        if (this.body.bottom >= Playnewton.PPU.world.bounds.bottom || this.body.touches.bottom) {
             this.isOnGround = true;
             velocityX = 0;
         }

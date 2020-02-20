@@ -1763,6 +1763,36 @@ class PPU_World {
 
 /**
  * 
+ * @type PPU_BodyTouches
+ */
+class PPU_BodyTouches {
+    /**
+     * @type PPU_Body
+     */
+    left;
+    /**
+     * @type PPU_Body
+     */
+    right;
+    /**
+     * @type PPU_Body
+     */
+    top;
+    /**
+     * @type PPU_Body
+     */
+    bottom;
+    
+    reset() {
+        this.left = null;
+        this.right = null;
+        this.top = null;
+        this.bottom = null;
+    }
+}
+
+/**
+ * 
  * @type PPU_Body
  */
 class PPU_Body {
@@ -1811,6 +1841,11 @@ class PPU_Body {
      * @type boolean
      */
     collideWorldBounds = false;
+    
+    /**
+     * @type PPU_BodyTouches
+     */
+    touches = new PPU_BodyTouches();
 
     /**
      * 
@@ -2113,6 +2148,10 @@ class Playnewton_PPU {
         for (let body of this.bodies) {
             this._MoveBody(body);
         }
+        for (let body of this.bodies) {
+            body.debugColor = "#00FF00";            
+            body.touches.reset();
+        }
         for (let bodyA of this.bodies) {
             for (let bodyB of this.bodies) {
                 this._CollideBodies(bodyA, bodyB);
@@ -2206,8 +2245,10 @@ class Playnewton_PPU {
     _SeparateMovableBodyFromImmovableBodyByX(movableBody, immovableBody) {
         if (movableBody.isGoingLeft) {
             movableBody.right = immovableBody.left;
+            movableBody.touches.right = immovableBody;
         } else {
             movableBody.left = immovableBody.right;
+            movableBody.touches.left = immovableBody;
         }
     }
 
@@ -2244,8 +2285,10 @@ class Playnewton_PPU {
     _SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody) {
         if (movableBody.isGoingUp) {
             movableBody.top = immovableBody.bottom;
+            movableBody.touches.top = immovableBody;
         } else {
             movableBody.bottom = immovableBody.top;
+            movableBody.touches.bottom = immovableBody;
         }
     }
 
