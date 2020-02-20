@@ -1589,6 +1589,24 @@ class Playnewton_GPU {
 }
 
 /**
+ * Enum for intersection tests.
+ * @readonly
+ * @enum {number}
+ */
+const PPU_Intersection = {
+    NONE: 0,
+    INTERSECTS: 1,
+    TOP: 2,
+    BOTTOM: 4,
+    LEFT: 8,
+    RIGHT: 16,
+    TOP_LEFT: 2 | 8,
+    TOP_RIGHT: 2 | 16,
+    BOTTOM_LEFT: 4 | 8,
+    BOTTOM_RIGHT: 4 | 16
+};
+
+/**
  * 
  * @type PPU_Shape
  */
@@ -1782,7 +1800,7 @@ class PPU_BodyTouches {
      * @type PPU_Body
      */
     bottom;
-    
+
     reset() {
         this.left = null;
         this.right = null;
@@ -1841,7 +1859,7 @@ class PPU_Body {
      * @type boolean
      */
     collideWorldBounds = false;
-    
+
     /**
      * @type PPU_BodyTouches
      */
@@ -2149,7 +2167,7 @@ class Playnewton_PPU {
             this._MoveBody(body);
         }
         for (let body of this.bodies) {
-            body.debugColor = "#00FF00";            
+            body.debugColor = "#00FF00";
             body.touches.reset();
         }
         for (let bodyA of this.bodies) {
@@ -2184,8 +2202,15 @@ class Playnewton_PPU {
      */
     _CollideBodies(bodyA, bodyB) {
         if (bodyA !== bodyB && bodyA.enabled && bodyB.enabled && (!bodyA.immovable || !bodyB.immovable)) {
-            if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
-                if (Math.abs(this.world.gravity.x) <= Math.abs(this.world.gravity.y)) {
+            let intersection = this._CheckIfBodiesIntersects(bodyA, bodyB);
+            if (intersection) {
+                let horizontal = intersection & (PPU_Intersection.LEFT | PPU_Intersection.RIGHT);
+                let vertical = intersection & (PPU_Intersection.TOP | PPU_Intersection.BOTTOM);
+                if (horizontal && !vertical) {
+                    this._SeparateBodiesByX(bodyA, bodyB);
+                } else if (!horizontal && vertical) {
+                    this._SeparateBodiesByY(bodyA, bodyB);
+                } else if (Math.abs(this.world.gravity.x) <= Math.abs(this.world.gravity.y)) {
                     this._SeparateBodiesByY(bodyA, bodyB);
                     if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
                         this._SeparateBodiesByX(bodyA, bodyB);
@@ -2203,23 +2228,37 @@ class Playnewton_PPU {
      * 
      * @param {PPU_Body} bodyA
      * @param {PPU_Body} bodyB
+     * @returns {PPU_Intersection} 
      */
     _CheckIfBodiesIntersects(bodyA, bodyB) {
         if (bodyA.right <= bodyB.position.x) {
-            return false;
+            return PPU_Intersection.NONE;
         }
         if (bodyA.bottom <= bodyB.position.y) {
-            return false;
+            return PPU_Intersection.NONE;
         }
         if (bodyA.position.x >= bodyB.right) {
-            return false;
+            return PPU_Intersection.NONE;
         }
         if (bodyA.position.y >= bodyB.bottom) {
-            return false;
+            return PPU_Intersection.NONE;
+        }
+        let intersects = PPU_Intersection.INTERSECTS;
+        if (bodyA.left > bodyB.left && bodyA.left < bodyB.right && bodyA.right > bodyB.right) {
+            intersects |= PPU_Intersection.RIGHT;
+        }
+        if (bodyA.right > bodyB.left && bodyA.right < bodyB.right && bodyA.left < bodyB.left) {
+            intersects |= PPU_Intersection.LEFT;
+        }
+        if (bodyA.top < bodyB.bottom && bodyA.top > bodyB.top && bodyA.bottom > bodyB.bottom) {
+            intersects |= PPU_Intersection.TOP;
+        }
+        if (bodyA.bottom > bodyB.top && bodyA.bottom < bodyB.bottom && bodyA.top < bodyB.top) {
+            intersects |= PPU_Intersection.BOTTOM;
         }
         bodyA.debugColor = "#ff0000";
         bodyB.debugColor = "#ff0000";
-        return true;
+        return intersects;
     }
     /**
      * 
@@ -2243,7 +2282,7 @@ class Playnewton_PPU {
      * @param {PPU_Body} immovableBody
      */
     _SeparateMovableBodyFromImmovableBodyByX(movableBody, immovableBody) {
-        if (movableBody.isGoingLeft) {
+        if (movableBody.left < immovableBody.left && movableBody.right < immovableBody.right) {
             movableBody.right = immovableBody.left;
             movableBody.touches.right = immovableBody;
         } else {
@@ -2283,12 +2322,12 @@ class Playnewton_PPU {
      * @param {PPU_Body} immovableBody
      */
     _SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody) {
-        if (movableBody.isGoingUp) {
-            movableBody.top = immovableBody.bottom;
-            movableBody.touches.top = immovableBody;
-        } else {
+        if (movableBody.bottom > immovableBody.top && movableBody.top < immovableBody.top) {
             movableBody.bottom = immovableBody.top;
             movableBody.touches.bottom = immovableBody;
+        } else {
+            movableBody.top = immovableBody.bottom;
+            movableBody.touches.top = immovableBody;
         }
     }
 
