@@ -1589,22 +1589,43 @@ class Playnewton_GPU {
 }
 
 /**
- * Enum for intersection tests.
- * @readonly
- * @enum {number}
+ * 
+ * @type PPU_Intersection
  */
-const PPU_Intersection = {
-    NONE: 0,
-    INTERSECTS: 1,
-    TOP: 2,
-    BOTTOM: 4,
-    LEFT: 8,
-    RIGHT: 16,
-    TOP_LEFT: 2 | 8,
-    TOP_RIGHT: 2 | 16,
-    BOTTOM_LEFT: 4 | 8,
-    BOTTOM_RIGHT: 4 | 16
-};
+class PPU_Intersection {
+    /**
+     * @type boolean
+     */
+    top;
+    /**
+     * @type boolean
+     */
+    bottom;
+    /**
+     * @type boolean
+     */
+    left;
+    /**
+     * @type boolean
+     */
+    right;
+
+    /**
+     * 
+     * @returns {boolean}
+     */
+    get horizontalOnly() {
+        return (this.left || this.right) && (!this.top && !this.bottom);
+    }
+
+    /**
+     * 
+     * @returns {boolean}
+     */
+    get verticalOnly() {
+        return (this.top || this.bottom) && (!this.left && !this.right);
+    }
+}
 
 /**
  * 
@@ -2204,11 +2225,9 @@ class Playnewton_PPU {
         if (bodyA !== bodyB && bodyA.enabled && bodyB.enabled && (!bodyA.immovable || !bodyB.immovable)) {
             let intersection = this._CheckIfBodiesIntersects(bodyA, bodyB);
             if (intersection) {
-                let horizontal = intersection & (PPU_Intersection.LEFT | PPU_Intersection.RIGHT);
-                let vertical = intersection & (PPU_Intersection.TOP | PPU_Intersection.BOTTOM);
-                if (horizontal && !vertical) {
+                if (intersection.horizontalOnly) {
                     this._SeparateBodiesByX(bodyA, bodyB);
-                } else if (!horizontal && vertical) {
+                } else if (intersection.verticalOnly) {
                     this._SeparateBodiesByY(bodyA, bodyB);
                 } else if (Math.abs(this.world.gravity.x) <= Math.abs(this.world.gravity.y)) {
                     this._SeparateBodiesByY(bodyA, bodyB);
@@ -2232,33 +2251,25 @@ class Playnewton_PPU {
      */
     _CheckIfBodiesIntersects(bodyA, bodyB) {
         if (bodyA.right <= bodyB.position.x) {
-            return PPU_Intersection.NONE;
+            return null;
         }
         if (bodyA.bottom <= bodyB.position.y) {
-            return PPU_Intersection.NONE;
+            return null;
         }
         if (bodyA.position.x >= bodyB.right) {
-            return PPU_Intersection.NONE;
+            return null;
         }
         if (bodyA.position.y >= bodyB.bottom) {
-            return PPU_Intersection.NONE;
+            return null;
         }
-        let intersects = PPU_Intersection.INTERSECTS;
-        if (bodyA.left > bodyB.left && bodyA.left < bodyB.right && bodyA.right > bodyB.right) {
-            intersects |= PPU_Intersection.RIGHT;
-        }
-        if (bodyA.right > bodyB.left && bodyA.right < bodyB.right && bodyA.left < bodyB.left) {
-            intersects |= PPU_Intersection.LEFT;
-        }
-        if (bodyA.top < bodyB.bottom && bodyA.top > bodyB.top && bodyA.bottom > bodyB.bottom) {
-            intersects |= PPU_Intersection.TOP;
-        }
-        if (bodyA.bottom > bodyB.top && bodyA.bottom < bodyB.bottom && bodyA.top < bodyB.top) {
-            intersects |= PPU_Intersection.BOTTOM;
-        }
+        let intersection = new PPU_Intersection();
+        intersection.right = bodyA.left > bodyB.left && bodyA.left < bodyB.right && bodyA.right > bodyB.right;
+        intersection.left = bodyA.right > bodyB.left && bodyA.right < bodyB.right && bodyA.left < bodyB.left;
+        intersection.top = bodyA.top < bodyB.bottom && bodyA.top > bodyB.top && bodyA.bottom > bodyB.bottom;
+        intersection.bottom = bodyA.bottom > bodyB.top && bodyA.bottom < bodyB.bottom && bodyA.top < bodyB.top;
         bodyA.debugColor = "#ff0000";
         bodyB.debugColor = "#ff0000";
-        return intersects;
+        return intersection;
     }
     /**
      * 
