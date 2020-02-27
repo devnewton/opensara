@@ -2299,9 +2299,9 @@ class Playnewton_PPU {
         if (movableBody.top < immovableBody.top && movableBody.bottom > immovableBody.bottom) {
             intersection.bottom = movableBody.isGoingDown;
             intersection.top = movableBody.isGoingUp;
-        } else if(movableBody.top > immovableBody.top && movableBody.bottom < immovableBody.bottom) {
+        } else if (movableBody.top > immovableBody.top && movableBody.bottom < immovableBody.bottom) {
             //NOTHING ?
-        }        else {
+        } else {
             intersection.top = immovableBody.top < movableBody.top && movableBody.top < immovableBody.bottom;
             intersection.bottom = immovableBody.top < movableBody.bottom && movableBody.bottom < immovableBody.bottom;
         }
