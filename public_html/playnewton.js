@@ -1990,6 +1990,22 @@ class PPU_Body {
 
     /**
      * 
+     * @returns {number}
+     */
+    get centerX() {
+        return (this.left + this.right) / 2;
+    }
+
+    /**
+     * 
+     * @returns {number}
+     */
+    get centerY() {
+        return (this.top + this.bottom) / 2;
+    }
+
+    /**
+     * 
      * @returns {boolean}
      */
     get isGoingLeft() {
@@ -2017,7 +2033,7 @@ class PPU_Body {
      * @returns {boolean}
      */
     get isGoingDown() {
-        return this.position.y < this.previousPosition.y;
+        return this.position.y > this.previousPosition.y;
     }
 }
 
@@ -2222,69 +2238,97 @@ class Playnewton_PPU {
      * @param {PPU_Body} bodyB
      */
     _CollideBodies(bodyA, bodyB) {
-        if (bodyA !== bodyB && bodyA.enabled && bodyB.enabled && (!bodyA.immovable || !bodyB.immovable)) {
-            let intersection = this._CheckIfBodiesIntersects(bodyA, bodyB);
-            if (intersection) {
-                if (intersection.horizontalOnly) {
-                    this._SeparateBodiesByX(bodyA, bodyB);
-                } else if (intersection.verticalOnly) {
-                    this._SeparateBodiesByY(bodyA, bodyB);
-                } else if (Math.abs(this.world.gravity.x) <= Math.abs(this.world.gravity.y)) {
-                    this._SeparateBodiesByY(bodyA, bodyB);
-                    if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
-                        this._SeparateBodiesByX(bodyA, bodyB);
-                    }
-                } else {
-                    this._SeparateBodiesByX(bodyA, bodyB);
-                    if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
-                        this._SeparateBodiesByY(bodyA, bodyB);
-                    }
-                }
+        if (bodyA !== bodyB && bodyA.enabled && bodyB.enabled) {
+            if (bodyA.movable && bodyB.immovable) {
+                this._CollideMovableAndImmovableBodies(bodyA, bodyB);
+            } else if (bodyA.immovable && bodyB.movable) {
+                this._CollideMovableAndImmovableBodies(bodyB, bodyA);
+            } else if (bodyA.movable && bodyB.movable) {
+                //TODO
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} movableBody
+     * @param {PPU_Body} immovableBody
+     */
+    _CollideMovableAndImmovableBodies(movableBody, immovableBody) {
+        let intersection = this._CheckIfMovableBodyIntersectsImmovableBody(movableBody, immovableBody);
+        if (intersection) {
+            if (intersection.horizontalOnly) {
+                this._SeparateMovableBodyFromImmovableBodyByX(movableBody, immovableBody);
+            } else if (intersection.verticalOnly) {
+                this._SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody);
+            } else if (true/*Math.abs(this.world.gravity.x) <= Math.abs(this.world.gravity.y)*/) {
+                this._SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody);
+                //if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
+                //  this._SeparateBodiesByX(bodyA, bodyB);
+                //}
+            } else {
+                /* this._SeparateBodiesByX(bodyA, bodyB);
+                 if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
+                 this._SeparateBodiesByY(bodyA, bodyB);
+                 }*/
             }
         }
     }
     /**
      * 
-     * @param {PPU_Body} bodyA
-     * @param {PPU_Body} bodyB
+     * @param {PPU_Body} movableBody
+     * @param {PPU_Body} immovableBody
      * @returns {PPU_Intersection} 
      */
-    _CheckIfBodiesIntersects(bodyA, bodyB) {
-        if (bodyA.right <= bodyB.position.x) {
+    _CheckIfMovableBodyIntersectsImmovableBody(movableBody, immovableBody) {
+        if (movableBody.right <= immovableBody.left) {
             return null;
         }
-        if (bodyA.bottom <= bodyB.position.y) {
+        if (movableBody.left >= immovableBody.right) {
             return null;
         }
-        if (bodyA.position.x >= bodyB.right) {
+        if (movableBody.bottom <= immovableBody.top) {
             return null;
         }
-        if (bodyA.position.y >= bodyB.bottom) {
+        if (movableBody.top >= immovableBody.bottom) {
             return null;
         }
         let intersection = new PPU_Intersection();
-        intersection.right = bodyA.left > bodyB.left && bodyA.left < bodyB.right && bodyA.right > bodyB.right;
-        intersection.left = bodyA.right > bodyB.left && bodyA.right < bodyB.right && bodyA.left < bodyB.left;
-        intersection.top = bodyA.top < bodyB.bottom && bodyA.top > bodyB.top && bodyA.bottom > bodyB.bottom;
-        intersection.bottom = bodyA.bottom > bodyB.top && bodyA.bottom < bodyB.bottom && bodyA.top < bodyB.top;
-        bodyA.debugColor = "#ff0000";
-        bodyB.debugColor = "#ff0000";
-        return intersection;
-    }
-    /**
-     * 
-     * @param {PPU_Body} bodyA
-     * @param {PPU_Body} bodyB
-     */
-    _SeparateBodiesByX(bodyA, bodyB) {
-        if (bodyA.movable && bodyB.immovable) {
-            this._SeparateMovableBodyFromImmovableBodyByX(bodyA, bodyB);
-        } else
-        if (bodyA.immovable && bodyB.movable) {
-            this._SeparateMovableBodyFromImmovableBodyByX(bodyB, bodyA);
-        } else if (bodyA.movable && bodyB.movable) {
-            this._SeparateMovableBodiesByX(bodyB, bodyA);
+        intersection.right = immovableBody.left < movableBody.right && movableBody.right < immovableBody.right && movableBody.left < immovableBody.left;
+        intersection.left = immovableBody.left < movableBody.left && movableBody.left < immovableBody.right && movableBody.right > immovableBody.right;
+        if (movableBody.top < immovableBody.top && movableBody.bottom > immovableBody.bottom) {
+            intersection.bottom = movableBody.isGoingDown;
+            intersection.top = movableBody.isGoingUp;
+        } else if(movableBody.top > immovableBody.top && movableBody.bottom < immovableBody.bottom) {
+            //NOTHING ?
+        }        else {
+            intersection.top = immovableBody.top < movableBody.top && movableBody.top < immovableBody.bottom;
+            intersection.bottom = immovableBody.top < movableBody.bottom && movableBody.bottom < immovableBody.bottom;
         }
+
+        // Calculate the vertical and horizontal
+        // length between the centres of rectangles
+
+        /*let hd = Math.abs(movableBody.centerX * movableBody.centerX + immovableBody.centerX * immovableBody.centerX);
+         let vd = Math.abs(movableBody.centerY * movableBody.centerY + immovableBody.centerY * immovableBody.centerY);
+         if (hd < vd)
+         {
+         if (movableBody.centerX < immovableBody.centerX) {
+         intersection.right = true;
+         } else {
+         intersection.left = true;
+         }
+         } else if (vd < hd)
+         {
+         if (movableBody.centerY < immovableBody.centerY) {
+         intersection.top = true;
+         } else {
+         intersection.bottom = true;
+         }
+         }*/
+        movableBody.debugColor = "#ff0000";
+        immovableBody.debugColor = "#ff0000";
+        return intersection;
     }
 
     /**

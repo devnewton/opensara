@@ -66,7 +66,7 @@ export default class Sara {
     /**
      *  @type number
      */
-    walkSpeed = 5
+    walkSpeed = 2
 
     /**
      *  @type number
