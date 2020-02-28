@@ -2302,8 +2302,8 @@ class Playnewton_PPU {
         } else if (movableBody.top > immovableBody.top && movableBody.bottom < immovableBody.bottom) {
             //NOTHING ?
         } else {
-            intersection.top = immovableBody.top < movableBody.top && movableBody.top < immovableBody.bottom;
-            intersection.bottom = immovableBody.top < movableBody.bottom && movableBody.bottom < immovableBody.bottom;
+            intersection.top = immovableBody.top <= movableBody.top && movableBody.top <= immovableBody.bottom;
+            intersection.bottom = immovableBody.top <= movableBody.bottom && movableBody.bottom <= immovableBody.bottom;
         }
 
         // Calculate the vertical and horizontal
