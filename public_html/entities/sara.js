@@ -71,7 +71,7 @@ export default class Sara {
     /**
      *  @type number
      */
-    jumpImpulse = 20;
+    jumpImpulse = 18;
 
     /**
      * @type boolean
