@@ -1,5 +1,6 @@
 import Playnewton from "./playnewton.js"
 import Sara from "./entities/sara.js"
+import Heart from "./entities/heart.js"
 
 export default class OpenSara {
 
@@ -8,39 +9,19 @@ export default class OpenSara {
      */
     sara;
     
+    /**
+     * @type Heart[]
+     */
+    hearts = [];
+    
     async InitSara() {
         await Sara.Preload();
         this.sara = new Sara();
     }
 
     async InitCollectibles() {
-        let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/collectibles.png");
-
-        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
-            {name: "heart1", x: 0, y: 0, w: 32, h: 32},
-            {name: "heart2", x: 32, y: 0, w: 32, h: 32},
-            {name: "heart3", x: 64, y: 0, w: 32, h: 32},
-            {name: "heart4", x: 96, y: 0, w: 32, h: 32},
-            {name: "heart5", x: 128, y: 0, w: 32, h: 32},
-            {name: "heart6", x: 160, y: 0, w: 32, h: 32},
-            {name: "heart7", x: 192, y: 0, w: 32, h: 32}
-
-        ]);
-        let heartAnimation = Playnewton.GPU.CreateAnimation(spriteset, [
-            {name: "heart1", delay: 100},
-            {name: "heart2", delay: 100},
-            {name: "heart3", delay: 100},
-            {name: "heart4", delay: 100},
-            {name: "heart5", delay: 100},
-            {name: "heart6", delay: 100},
-            {name: "heart7", delay: 100}
-        ]);
-
-        let heart = Playnewton.GPU.GetAvailableSprite();
-        Playnewton.GPU.SetSpriteAnimation(heart, heartAnimation);
-        Playnewton.GPU.SetSpriteZ(heart, 15);
-        Playnewton.GPU.EnableSprite(heart);
-        Playnewton.GPU.SetSpritePosition(heart, 200, 200);
+        await Heart.Preload();
+        this.hearts.push(new Heart());
     }
 
     async InitMoutainLevels() {
@@ -89,6 +70,9 @@ export default class OpenSara {
             Playnewton.PPU.Update();
 
             this.sara.UpdateSprite();
+            for(let heart of this.hearts) {
+                heart.UpdateSprite();
+            }
             Playnewton.GPU.DrawFrame(timestamp);
             Playnewton.PPU.DebugDraw(Playnewton.GPU.ctx);
             requestAnimationFrame(redraw);
