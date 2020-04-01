@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="19">
+<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="43">
  <tileset firstgid="1" source="mountain.tsx"/>
+ <tileset firstgid="50" name="collectibles" tilewidth="32" tileheight="32" tilecount="64" columns="8">
+  <image source="../../sprites/collectibles.png" width="256" height="256"/>
+  <tile id="0">
+   <properties>
+    <property name="type" value="heart"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer id="1" name="tiles" width="32" height="18">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -26,6 +34,7 @@
  <objectgroup color="#00ff7f" id="2" name="platforms">
   <properties>
    <property name="immovable" value="true"/>
+   <property name="type" value="body"/>
   </properties>
   <object id="1" x="0" y="554" width="1024.5" height="22.5"/>
   <object id="9" x="610" y="427.5" width="284.5" height="19"/>
@@ -40,5 +49,31 @@
     <property name="immovable" type="bool" value="true"/>
    </properties>
   </object>
+ </objectgroup>
+ <objectgroup id="3" name="collectibles">
+  <object id="19" gid="50" x="614.667" y="394.667" width="32" height="32"/>
+  <object id="20" gid="50" x="654.667" y="372" width="32" height="32"/>
+  <object id="21" gid="50" x="698.667" y="345.333" width="32" height="32"/>
+  <object id="22" gid="50" x="737.333" y="317.333" width="32" height="32"/>
+  <object id="23" gid="50" x="784" y="353.333" width="32" height="32"/>
+  <object id="24" gid="50" x="821.333" y="384" width="32" height="32"/>
+  <object id="25" gid="50" x="861.333" y="408" width="32" height="32"/>
+  <object id="26" gid="50" x="93.3333" y="341.333" width="32" height="32"/>
+  <object id="27" gid="50" x="145.333" y="433.333" width="32" height="32"/>
+  <object id="28" gid="50" x="45.3333" y="429.333" width="32" height="32"/>
+  <object id="29" gid="50" x="46.6667" y="377.333" width="32" height="32"/>
+  <object id="30" gid="50" x="148" y="369.333" width="32" height="32"/>
+  <object id="31" gid="50" x="141.333" y="484" width="32" height="32"/>
+  <object id="32" gid="50" x="93.3333" y="524" width="32" height="32"/>
+  <object id="33" gid="50" x="42.6667" y="481.333" width="32" height="32"/>
+  <object id="34" gid="50" x="321.333" y="120" width="32" height="32"/>
+  <object id="35" gid="50" x="360" y="120" width="32" height="32"/>
+  <object id="36" gid="50" x="254.667" y="57.3333" width="32" height="32"/>
+  <object id="37" gid="50" x="213.333" y="57.3333" width="32" height="32"/>
+  <object id="38" gid="50" x="128" y="150.667" width="32" height="32"/>
+  <object id="39" gid="50" x="82.6667" y="149.333" width="32" height="32"/>
+  <object id="40" gid="50" x="446.667" y="184" width="32" height="32"/>
+  <object id="41" gid="50" x="873.333" y="54.6667" width="32" height="32"/>
+  <object id="42" gid="50" x="917.333" y="53.3333" width="32" height="32"/>
  </objectgroup>
 </map>

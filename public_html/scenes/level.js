@@ -20,9 +20,18 @@ export default class Level extends Scene {
         this.sara = new Sara();
     }
 
-    async InitCollectibles() {
+    async InitCollectibles(map) {
         await Heart.Preload();
-        this.hearts.push(new Heart());
+        Playnewton.DRIVE.ForeachTmxMapObject(
+                (object, objectgroup, x, y) => {
+            if (object.tile && object.tile.properties.get("type") === "heart") {
+                let heart = new Heart();
+                Playnewton.GPU.SetSpritePosition(heart.sprite, x, y - heart.sprite.height);
+                this.hearts.push(heart);
+            }
+        },
+                map);
+
     }
 
     async InitMoutainLevels() {
@@ -41,11 +50,12 @@ export default class Level extends Scene {
         Playnewton.DRIVE.ConvertTmxMapToGPUSprites(Playnewton.GPU, map, 0, 0, 0);
         Playnewton.DRIVE.ConvertTmxMapToPPUBodies(Playnewton.PPU, map, 0, 0);
 
+        await this.InitCollectibles(map);
+
     }
 
     async Start() {
         await this.InitSara();
-        await this.InitCollectibles();
         await this.InitMoutainLevels();
     }
 
@@ -56,7 +66,7 @@ export default class Level extends Scene {
     UpdateSprites() {
         this.sara.UpdateSprite();
         this.hearts = this.hearts.filter((heart) => {
-            if(heart.Pursue(this.sara.sprite)) {
+            if (heart.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneHeart();
                 heart.Free();
                 return false;

@@ -484,6 +484,11 @@ class Playnewton_CTRL {
     }
 }
 
+// Bits on the far end of the 32-bit global tile ID are used for tile flags
+const TMX_FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+const TMX_FLIPPED_VERTICALLY_FLAG = 0x40000000;
+const TMX_FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+
 class TMX_TileAnimationFrame {
     /**
      * 
@@ -554,6 +559,8 @@ class TMX_Tile {
      * @type TMX_TileAnimation
      */
     animation;
+
+    properties = new Map();
 }
 
 class TMX_Tileset {
@@ -710,6 +717,12 @@ class TMX_Object {
      * @type Map
      */
     properties;
+
+    /**
+     * 
+     * @type TMX_Tile
+     */
+    tile;
 }
 
 /**
@@ -871,6 +884,26 @@ class Playnewton_DRIVE {
                 object.y = parseInt(objectElement.getAttribute("y"), 10) || 0;
                 object.width = parseInt(objectElement.getAttribute("width"), 10);
                 object.height = parseInt(objectElement.getAttribute("height"), 10);
+                let global_tile_id = parseInt(objectElement.getAttribute("gid"), 10);
+                if (global_tile_id) {
+                    //TODO Read out the flags
+                    //let flipped_horizontally = (global_tile_id & TMX_FLIPPED_HORIZONTALLY_FLAG);
+                    //let flipped_vertically = (global_tile_id & TMX_FLIPPED_VERTICALLY_FLAG);
+                    //let flipped_diagonally = (global_tile_id & TMX_FLIPPED_DIAGONALLY_FLAG);
+
+                    // Clear the flags
+                    global_tile_id &= ~(TMX_FLIPPED_HORIZONTALLY_FLAG | TMX_FLIPPED_VERTICALLY_FLAG | TMX_FLIPPED_DIAGONALLY_FLAG);
+
+                    // Resolve the tile
+                    for (let i = map.tilesets.length - 1; i >= 0; --i) {
+                        let tileset = map.tilesets[i];
+
+                        if (tileset.firstgid <= global_tile_id) {
+                            object.tile = tileset.tiles.get(global_tile_id - tileset.firstgid);
+                            break;
+                        }
+                    }
+                }
                 object.properties = this._LoadTmxProperties(objectElement);
                 objectGroup.objects.push(object);
             }
@@ -899,7 +932,7 @@ class Playnewton_DRIVE {
         let animationsByTile = new Map();
         for (let tileset of map.tilesets) {
             for (let tile of tileset.tiles.values()) {
-                if (!tile.animation) {
+                if (!tile.animation && tile.bitmap) {
                     let picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
                     picturesByTile.set(tile, picture);
                 }
@@ -927,22 +960,20 @@ class Playnewton_DRIVE {
                     for (let x = 0; x < chunk.width; ++x) {
                         let tile = chunk.tiles[y][x];
                         if (tile) {
+                            let picture = picturesByTile.get(tile);
+                            let animation = animationsByTile.get(tile);
                             let sprite = GPU.GetAvailableSprite();
-                            if (sprite) {
-                                let picture = picturesByTile.get(tile);
+                            if (sprite && (picture || animation)) {
                                 if (picture) {
                                     picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
                                     GPU.SetSpritePicture(sprite, picture);
                                 }
-                                let animation = animationsByTile.get(tile);
                                 if (animation) {
                                     GPU.SetSpriteAnimation(sprite, animation);
                                 }
-                                if (animation || picture) {
-                                    GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight);
-                                    GPU.SetSpriteZ(sprite, mapZ + z);
-                                    GPU.EnableSprite(sprite);
-                                }
+                                GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight);
+                                GPU.SetSpriteZ(sprite, mapZ + z);
+                                GPU.EnableSprite(sprite);
                             } else {
                                 console.log("No available sprite");
                             }
@@ -966,25 +997,60 @@ class Playnewton_DRIVE {
             let groupX = mapX + objectgroup.x * map.tileWidth;
             let groupY = mapY + objectgroup.y * map.tileWidth;
             for (let object of objectgroup.objects) {
-                let body = PPU.GetAvailableBody();
-                if (body) {
-                    body.debugColor = objectgroup.color;
-                    PPU.SetBodyPosition(body, groupX + object.x, groupY + object.y);
-                    PPU.SetBodyRectangle(body, 0, 0, object.width, object.height);
-                    PPU.SetBodyImmovable(body, this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties));
-                    PPU.EnableBody(body);
-                } else {
-                    console.log("No available body");
+                let type = this._ParseStringProperty("type", object.properties, objectgroup.properties);
+                if (type === "body") {
+                    let body = PPU.GetAvailableBody();
+                    if (body) {
+                        body.debugColor = objectgroup.color;
+                        PPU.SetBodyPosition(body, groupX + object.x, groupY + object.y);
+                        PPU.SetBodyRectangle(body, 0, 0, object.width, object.height);
+                        PPU.SetBodyImmovable(body, this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties));
+                        PPU.EnableBody(body);
+                    } else {
+                        console.log("No available body");
+                    }
                 }
             }
     }
     }
+
+    /**
+     * @callback ForeachTmxMapObjectCallback
+     * @param {TMX_Object} object
+     * @param {TMX_ObjectGroup} objectgroup
+     * @param {number} x
+     * @param {number} y
+     * 
+     */
+
+    /**
+     * Iterate over map objects
+     * @param {ForeachTmxMapObjectCallback} callback
+     * @param {TMX_Map} map
+     * @param {number} mapX
+     * @param {number} mapY
+     */
+    ForeachTmxMapObject(callback, map, mapX = 0, mapY = 0) {
+        for (let objectgroup of map.objectgroups) {
+            let groupX = mapX + objectgroup.x * map.tileWidth;
+            let groupY = mapY + objectgroup.y * map.tileWidth;
+            for (let object of objectgroup.objects) {
+                callback(object, objectgroup, groupX + object.x, groupY + object.y);
+            }
+    }
+    }
+
     async LoadTileset(tsxUrl) {
         let tsx = await (await fetch(tsxUrl)).text();
         let parser = new DOMParser();
         let tilesetElement = parser.parseFromString(tsx, "application/xml").getElementsByTagName("tileset")[0];
         let baseUrl = tsxUrl.slice(0, tsxUrl.lastIndexOf("/") + 1);
         return await this._LoadTilesetElement(tilesetElement, baseUrl);
+    }
+
+    _ParseStringProperty(name, objectProperties, groupProperties) {
+        let prop = objectProperties.get(name) || groupProperties.get(name);
+        return prop;
     }
 
     _ParseBooleanProperty(name, objectProperties, groupProperties) {
@@ -1023,6 +1089,7 @@ class Playnewton_DRIVE {
                 tile.w = tile.bitmap.width;
                 tile.h = tile.bitmap.height;
             }
+            tile.properties = this._LoadTmxProperties(tileElement);
             tileset.tiles.set(tile.id, tile);
         }
         if (tileset.bitmap) {
@@ -1191,11 +1258,6 @@ class Playnewton_DRIVE {
      * @returns {TMX_Tile[][]}
      */
     _ConvertDataToTiles(map, chunk, data) {
-
-        // Bits on the far end of the 32-bit global tile ID are used for tile flags
-        const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-        const FLIPPED_VERTICALLY_FLAG = 0x40000000;
-        const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
         let tile_index = 0;
 
         chunk.tiles = [];
@@ -1209,12 +1271,12 @@ class Playnewton_DRIVE {
                 let global_tile_id = data[tile_index++];
 
                 //TODO Read out the flags
-                //let flipped_horizontally = (global_tile_id & FLIPPED_HORIZONTALLY_FLAG);
-                //let flipped_vertically = (global_tile_id & FLIPPED_VERTICALLY_FLAG);
-                //let flipped_diagonally = (global_tile_id & FLIPPED_DIAGONALLY_FLAG);
+                //let flipped_horizontally = (global_tile_id & TMX_FLIPPED_HORIZONTALLY_FLAG);
+                //let flipped_vertically = (global_tile_id & TMX_FLIPPED_VERTICALLY_FLAG);
+                //let flipped_diagonally = (global_tile_id & TMX_FLIPPED_DIAGONALLY_FLAG);
 
                 // Clear the flags
-                global_tile_id &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+                global_tile_id &= ~(TMX_FLIPPED_HORIZONTALLY_FLAG | TMX_FLIPPED_VERTICALLY_FLAG | TMX_FLIPPED_DIAGONALLY_FLAG);
 
                 // Resolve the tile
                 for (let i = map.tilesets.length - 1; i >= 0; --i) {
