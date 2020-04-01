@@ -1611,6 +1611,16 @@ class PPU_Intersection {
     right;
 
     /**
+     * @type number
+     */
+    dx;
+
+    /**
+     * @type number
+     */
+    dy;
+
+    /**
      * 
      * @returns {boolean}
      */
@@ -2261,16 +2271,12 @@ class Playnewton_PPU {
                 this._SeparateMovableBodyFromImmovableBodyByX(movableBody, immovableBody);
             } else if (intersection.verticalOnly) {
                 this._SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody);
-            } else if (true/*Math.abs(this.world.gravity.x) <= Math.abs(this.world.gravity.y)*/) {
-                this._SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody);
-                //if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
-                //  this._SeparateBodiesByX(bodyA, bodyB);
-                //}
             } else {
-                /* this._SeparateBodiesByX(bodyA, bodyB);
-                 if (this._CheckIfBodiesIntersects(bodyA, bodyB)) {
-                 this._SeparateBodiesByY(bodyA, bodyB);
-                 }*/
+                if (Math.abs(intersection.dx) < Math.abs(intersection.dy)) {
+                    this._SeparateMovableBodyFromImmovableBodyByX(movableBody, immovableBody);
+                } else {
+                    this._SeparateMovableBodyFromImmovableBodyByY(movableBody, immovableBody);
+                }
             }
         }
     }
@@ -2306,26 +2312,14 @@ class Playnewton_PPU {
             intersection.bottom = immovableBody.top <= movableBody.bottom && movableBody.bottom <= immovableBody.bottom;
         }
 
-        // Calculate the vertical and horizontal
-        // length between the centres of rectangles
+        let dxRight = intersection.right ? immovableBody.left - movableBody.right : 0;
+        let dxLeft = intersection.left ? immovableBody.right - movableBody.left : 0;
+        intersection.dx = Math.abs(dxRight) > Math.abs(dxLeft) ? dxRight : dxLeft;
 
-        /*let hd = Math.abs(movableBody.centerX * movableBody.centerX + immovableBody.centerX * immovableBody.centerX);
-         let vd = Math.abs(movableBody.centerY * movableBody.centerY + immovableBody.centerY * immovableBody.centerY);
-         if (hd < vd)
-         {
-         if (movableBody.centerX < immovableBody.centerX) {
-         intersection.right = true;
-         } else {
-         intersection.left = true;
-         }
-         } else if (vd < hd)
-         {
-         if (movableBody.centerY < immovableBody.centerY) {
-         intersection.top = true;
-         } else {
-         intersection.bottom = true;
-         }
-         }*/
+        let dyTop = intersection.top ? immovableBody.bottom - movableBody.top : 0;
+        let dyBottom = intersection.bottom ? immovableBody.top - movableBody.bottom : 0;
+        intersection.dy = Math.abs(dyTop) > Math.abs(dyBottom) ? dyTop : dyBottom;
+
         movableBody.debugColor = "#ff0000";
         immovableBody.debugColor = "#ff0000";
         return intersection;
