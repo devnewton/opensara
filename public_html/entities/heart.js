@@ -27,12 +27,6 @@ export default class Heart {
     sprite;
 
     /**
-     * 
-     * @type PPU_Body
-     */
-    body;
-
-    /**
      *  @type SaraState
      */
     state = HeartState.IDLE;
@@ -67,20 +61,11 @@ export default class Heart {
     constructor() {
         this.sprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Heart.animations.idle);
+        Playnewton.GPU.SetSpritePosition(this.sprite, 200, 200);
         Playnewton.GPU.SetSpriteZ(this.sprite, 15);
         Playnewton.GPU.EnableSprite(this.sprite);
-
-        this.body = Playnewton.PPU.GetAvailableBody();
-        Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 32);
-        Playnewton.PPU.SetBodyPosition(this.body, 200, 200);
-        Playnewton.PPU.SetBodyImmovable(this.body, true);
-        Playnewton.PPU.EnableBody(this.body);
-    }
-
-    UpdateBody() {
     }
 
     UpdateSprite() {
-        Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
     }
 }
