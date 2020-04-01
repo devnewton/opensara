@@ -280,4 +280,8 @@ export default class Sara {
 
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
     }
+    
+    CollectOneHeart() {
+        //TODO
+    }
 }

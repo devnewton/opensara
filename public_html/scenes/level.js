@@ -52,11 +52,17 @@ export default class Level extends Scene {
     UpdateBodies() {
         this.sara.UpdateBody();
     }
-    
+
     UpdateSprites() {
         this.sara.UpdateSprite();
-        for (let heart of this.hearts) {
-            heart.UpdateSprite();
-        }
+        this.hearts = this.hearts.filter((heart) => {
+            if(heart.Pursue(this.sara.sprite)) {
+                this.sara.CollectOneHeart();
+                heart.Free();
+                return false;
+            } else {
+                return true;
+            }
+        });
     }
 }

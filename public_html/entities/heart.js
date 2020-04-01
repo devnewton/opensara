@@ -1,13 +1,18 @@
 import Playnewton from "../playnewton.js"
 
-        /**
-         * @readonly
-         * @enum {number}
-         */
-        const HeartState = {
-            IDLE: 1
-        };
+/**
+ * @readonly
+ * @enum {number}
+ */
+const HeartState = {
+    IDLE: 1,
+    PURSUE: 2
+};
 
+const PURSUE_START_DISTANCE = 64;
+const PURSUE_DONE_DISTANCE = 16;
+const PURSUE_SPEED = 8;
+        
 /**
  * 
  * @type SaraAnimations
@@ -25,6 +30,12 @@ export default class Heart {
      * @type GPU_Sprite
      */
     sprite;
+
+    /**
+     * 
+     * @type GPU_Sprite
+     */
+    pursued;
 
     /**
      *  @type SaraState
@@ -66,6 +77,28 @@ export default class Heart {
         Playnewton.GPU.EnableSprite(this.sprite);
     }
 
-    UpdateSprite() {
+    /**
+     * @param {GPU_Sprite} sprite
+     */
+    Pursue(sprite) {
+        let dx = sprite.centerX - this.sprite.centerX;
+        let dy = sprite.centerY - this.sprite.centerY;
+        let distance = Math.sqrt(dx ** 2 + dy ** 2);
+        if (distance < PURSUE_DONE_DISTANCE) {
+            return true;
+        }
+        if (this.state == HeartState.PURSUE || distance < PURSUE_START_DISTANCE) {
+            this.state = HeartState.PURSUE;
+            let speed = PURSUE_SPEED / distance;
+            dx *= speed;
+            dy *= speed;
+            this.sprite.centerX += dx;
+            this.sprite.centerY += dy;
+        }
+        return false;
+    }
+
+    Free() {
+        Playnewton.GPU.DisableSprite(this.sprite);
     }
 }

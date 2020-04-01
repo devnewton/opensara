@@ -111,6 +111,65 @@ class GPU_Sprite {
     animationState;
     animationCurrentFrameIndex;
     animationCurrentTime;
+
+    /**
+     * 
+     * @returns {number}
+     */
+    get width() {
+        return this.picture.w;
+    }
+    /**
+     * 
+     * @returns {number}
+     */
+    get height() {
+        return this.picture.h;
+    }
+
+    get left() {
+        return this.x;
+    }
+    get top() {
+        return this.y;
+    }
+
+    get right() {
+        return this.left + this.width;
+    }
+    get bottom() {
+        return this.top + this.height;
+    }
+
+    /**
+     * 
+     * @returns {number}
+     */
+    get centerX() {
+        return (this.left + this.right) / 2;
+    }
+
+    /**
+     * @param {number} x
+     */
+    set centerX(x) {
+        return this.x = x - this.width / 2;
+    }
+
+    /**
+     * @param {number} y
+     */
+    set centerY(y) {
+        return this.y = y - this.height / 2;
+    }
+
+    /**
+     * 
+     * @returns {number}
+     */
+    get centerY() {
+        return (this.top + this.bottom) / 2;
+    }
 }
 
 /**
