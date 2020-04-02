@@ -17,3 +17,6 @@ nbproject/private/
 
 # Krita
 *.kra
+
+# Tiled
+*~

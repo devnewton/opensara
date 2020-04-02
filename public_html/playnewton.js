@@ -982,7 +982,7 @@ class Playnewton_DRIVE {
                 }
                 ++z;
             }
-    }
+        }
     }
 
     /**
@@ -1011,7 +1011,7 @@ class Playnewton_DRIVE {
                     }
                 }
             }
-    }
+        }
     }
 
     /**
@@ -1037,7 +1037,7 @@ class Playnewton_DRIVE {
             for (let object of objectgroup.objects) {
                 callback(object, objectgroup, groupX + object.x, groupY + object.y);
             }
-    }
+        }
     }
 
     async LoadTileset(tsxUrl) {
@@ -1210,11 +1210,11 @@ class Playnewton_DRIVE {
         let data = new Uint32Array(nbtiles);
         for (let i = 0; i < str.length; i += 4) {
             data[i / 4] = (
-                    str.charCodeAt(i) |
-                    str.charCodeAt(i + 1) << 8 |
-                    str.charCodeAt(i + 2) << 16 |
-                    str.charCodeAt(i + 3) << 24
-                    ) >>> 0;
+                str.charCodeAt(i) |
+                str.charCodeAt(i + 1) << 8 |
+                str.charCodeAt(i + 2) << 16 |
+                str.charCodeAt(i + 3) << 24
+            ) >>> 0;
         }
         return data;
     }
@@ -1329,6 +1329,154 @@ class GPU_Layer {
     enabled = true;
 }
 
+class GPU_Bar {
+    /**
+     * @type number
+     */
+    level = 3;
+
+    /**
+     * @type number
+     */
+    nbColumns = 3
+
+    /**
+     * @type number
+     */
+    nbRows = 1;
+
+    /**
+     * @type number
+     */
+    cellWidth = 8;
+
+    /**
+     * @type number
+     */
+    cellHeight = 16;
+
+    /**
+     * @type number
+     */
+    cellSpacing = 4;
+
+    /**
+     * @type string
+     */
+    borderColor = "#101820";
+
+    /**
+     * @type string
+     */
+    emptyColor = "#9898c8";
+
+    /**
+     * @type string
+     */
+    filledColor = "#b80000";
+
+    /**
+     * @type number
+     */
+    x = 0;
+
+    /**
+     * @type number
+     */
+    y = 0;
+
+    /**
+     * @type boolean
+     */
+    enabled = false;
+}
+
+/**
+ * @type GPU_HUD
+ */
+class GPU_HUD {
+    /**
+     * @type GPU_Bar[]
+     */
+    bars = []
+
+    /**
+     * @type boolean
+     */
+    enabled = false;
+
+    /**
+     * Finds an available (unused) bar. 
+     * @returns {GPU_Bar} bar
+     */
+    GetAvailableBar() {
+        let bar = this.bars.find(bar => !bar.enabled);
+        if (!bar) {
+            bar = new GPU_Bar();
+            this.bars.push(bar);
+        }
+        return bar;
+    }
+
+    /**
+ * 
+ * @param {GPU_Bar} bar
+ * @param {number} x 
+ * @param {number} y 
+ */
+    SetBarPosition(bar, x, y) {
+        bar.x = x;
+        bar.y = y;
+    }
+
+    /**
+     * 
+     * @param {GPU_Bar} bar
+     * @param {number} nbColumns 
+     * @param {number} nbRows 
+     */
+    SetBarSize(bar, nbColumns = 3, nbRows = 1) {
+        bar.nbColumns = nbColumns;
+        bar.nbRows = nbRows;
+    }
+
+    /**
+     * 
+     * @param {GPU_Bar} bar
+     * @param {number} level
+     */
+    SetBarLevel(bar, level) {
+        bar.level = Math.max(0, Math.min(level, bar.nbColumns * bar.nbRows));
+    }
+
+    /**
+     *
+     * @param {GPU_Bar} bar 
+     * @param {number} cellWidth 
+     * @param {number} cellHeight 
+     * @param {number} cellSpacing 
+     * @param {string} borderColor 
+     * @param {string} emptyColor 
+     * @param {string} filledColor 
+     */
+    SetBarStyle(bar, cellWidth, cellHeight, cellSpacing, borderColor, emptyColor, filledColor) {
+        bar.cellWidth = cellWidth;
+        bar.cellHeight = cellHeight;
+        bar.cellSpacing = cellSpacing;
+        bar.borderColor = borderColor;
+        bar.emptyColor = emptyColor;
+        bar.filledColor = filledColor;
+    }
+
+    /**
+     * Enable the sprite so it is drawn. 
+     * @param {GPU_Bar} bar
+     */
+    EnableBar(bar) {
+        bar.enabled = true;
+    }
+}
+
 class Playnewton_GPU {
 
     /**
@@ -1341,6 +1489,12 @@ class Playnewton_GPU {
      * @type GPU_Sprite[]
      */
     sprites = [];
+
+    /**
+     * @type GPU_Hud
+     */
+    hud = new GPU_HUD();
+
     /**
      * Time elapsed since last frame for animation control
      * @type number 
@@ -1367,6 +1521,20 @@ class Playnewton_GPU {
      */
     constructor() {
         this.fpsLimiter = new GPU_FpsLimiter();
+    }
+
+    /**
+     * @returns {GPU_HUD}
+     */
+    GetHUD() {
+        return this.hud;
+    }
+
+    /**
+     * @param {boolean} enabled 
+     */
+    EnableHUD(enabled) {
+        this.hud.enabled = enabled;
     }
 
     /**
@@ -1471,7 +1639,7 @@ class Playnewton_GPU {
             sprite.animationCurrentFrameIndex = 0;
             sprite.animationCurrentTime = 0;
             sprite.picture = sprite.animation.frames[0].picture;
-    }
+        }
     }
 
     /**
@@ -1587,7 +1755,7 @@ class Playnewton_GPU {
      */
     SetVideoOutput(canvas) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext("2d", {alpha: false});
+        this.ctx = canvas.getContext("2d", { alpha: false });
         this.ctx.imageSmoothingEnabled = false;
     }
 
@@ -1608,6 +1776,7 @@ class Playnewton_GPU {
             if (this.ctx) {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this._DrawSprites();
+                this._DrawHUD(this.hud);
             }
         }
     }
@@ -1705,6 +1874,40 @@ class Playnewton_GPU {
             this.ctx.restore();
         } else {
             this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, sprite.x, sprite.y, sprite.picture.w, sprite.picture.h);
+        }
+    }
+
+    /**
+     * 
+     * @param {GPU_HUD} hud 
+     */
+    _DrawHUD(hud) {
+        if (hud.enabled) {
+            this.ctx.save();
+            for (let bar of hud.bars) {
+                this._DrawBar(bar);
+            }
+            this.ctx.restore();
+        }
+    }
+
+    /**
+     * 
+     * @param {GPU_Bar} bar 
+     */
+    _DrawBar(bar) {
+        let x, y;
+        let level = bar.level;
+        for (let x = 0; x < bar.nbColumns; ++x) {
+            for (let y = 0; y < bar.nbRows; ++y) {
+                this.ctx.beginPath();
+                this.ctx.rect(-0.5 + bar.x + x * (bar.cellWidth + bar.cellSpacing), -0.5 + bar.y + y * (bar.cellHeight + bar.cellSpacing), bar.cellWidth, bar.cellHeight);
+                this.ctx.fillStyle = level-- > 0 ? bar.filledColor : bar.emptyColor;
+                this.ctx.fill();
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = bar.borderColor;
+                this.ctx.stroke();
+            }
         }
     }
 }
@@ -2479,11 +2682,11 @@ class Playnewton_PPU {
         if (bodyA.movable && bodyB.immovable) {
             this._SeparateMovableBodyFromImmovableBodyByY(bodyA, bodyB);
         } else
-        if (bodyA.immovable && bodyB.movable) {
-            this._SeparateMovableBodyFromImmovableBodyByY(bodyB, bodyA);
-        } else if (bodyA.movable && bodyB.movable) {
-            this._SeparateMovableBodiesByY(bodyB, bodyA);
-        }
+            if (bodyA.immovable && bodyB.movable) {
+                this._SeparateMovableBodyFromImmovableBodyByY(bodyB, bodyA);
+            } else if (bodyA.movable && bodyB.movable) {
+                this._SeparateMovableBodiesByY(bodyB, bodyA);
+            }
     }
 
     /**

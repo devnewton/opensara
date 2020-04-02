@@ -15,6 +15,11 @@ export default class Level extends Scene {
      */
     hearts = [];
 
+    /**
+     * @type Playnewton.GPU_Bar
+     */
+    healthBar;
+
     async InitSara() {
         await Sara.Preload();
         this.sara = new Sara();
@@ -54,9 +59,20 @@ export default class Level extends Scene {
 
     }
 
+    async InitHUD() {
+        let hud = Playnewton.GPU.GetHUD();
+        this.healthBar = hud.GetAvailableBar();
+        hud.SetBarPosition(this.healthBar, 10, 10);
+        hud.SetBarSize(this.healthBar, this.sara.maxHealth);
+        hud.SetBarLevel(this.healthBar, this.sara.health);
+        hud.EnableBar(this.healthBar, true);
+        Playnewton.GPU.EnableHUD(hud, true);
+    }
+
     async Start() {
         await this.InitSara();
         await this.InitMoutainLevels();
+        await this.InitHUD();
     }
 
     UpdateBodies() {
@@ -65,6 +81,7 @@ export default class Level extends Scene {
 
     UpdateSprites() {
         this.sara.UpdateSprite();
+        Playnewton.GPU.GetHUD().SetBarLevel(this.healthBar, this.sara.health);        
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneHeart();

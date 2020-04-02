@@ -93,6 +93,16 @@ export default class Sara {
      */
     canJump = true;
 
+    /**
+     * @type number
+     */
+    health = 3;
+
+    /**
+     * @type number
+     */
+    maxHealth = 10;
+
     static async Preload() {
         let saraBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
 
@@ -282,6 +292,6 @@ export default class Sara {
     }
     
     CollectOneHeart() {
-        //TODO
+        this.health = Math.min(this.health+1, this.maxHealth);
     }
 }
