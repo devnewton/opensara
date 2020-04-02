@@ -2191,7 +2191,19 @@ class PPU_Body {
      * 
      * @type number
      */
+    minXVelocity = -10000;
+
+    /**
+     * 
+     * @type number
+     */
     maxXVelocity = 10000;
+    /**
+     * 
+     * @type number
+     */
+    minYVelocity = -10000;
+
     /**
      * 
      * @type number
@@ -2481,11 +2493,15 @@ class Playnewton_PPU {
 
     /**
      * @param {PPU_Body} body
+     * @param {number} minX
      * @param {number} maxX
+     * @param {number} minY
      * @param {number} maxY
      */
-    SetBodyMaxVelocity(body, maxX, maxY) {
+    SetBodyVelocityBounds(body, minX, maxX, minY, maxY) {
+        body.minXVelocity = minX;
         body.maxXVelocity = maxX;
+        body.minYVelocity = minY;
         body.maxYVelocity = maxY;
     }
 
@@ -2744,14 +2760,14 @@ class Playnewton_PPU {
 
             if (body.velocity.x > body.maxXVelocity) {
                 body.velocity.x = body.maxXVelocity;
-            } else if (body.velocity.x < -body.maxXVelocity) {
-                body.velocity.x = -body.maxXVelocity;
+            } else if (body.velocity.x < body.minXVelocity) {
+                body.velocity.x = body.minXVelocity;
             }
 
             if (body.velocity.y > body.maxYVelocity) {
                 body.velocity.y = body.maxYVelocity;
-            } else if (body.velocity.y < -body.maxYVelocity) {
-                body.velocity.y = -body.maxYVelocity;
+            } else if (body.velocity.y < body.minYVelocity) {
+                body.velocity.y = body.minYVelocity;
             }
 
             body.position.addForce(body.velocity);
