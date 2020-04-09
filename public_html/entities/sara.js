@@ -294,4 +294,8 @@ export default class Sara {
     CollectOneHeart() {
         this.health = Math.min(this.health+1, this.maxHealth);
     }
+    
+    HurtByPoison() {
+        this.health = Math.max(this.health-1, 0);
+    }
 }

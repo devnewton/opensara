@@ -982,7 +982,7 @@ class Playnewton_DRIVE {
                 }
                 ++z;
             }
-        }
+    }
     }
 
     /**
@@ -1011,7 +1011,7 @@ class Playnewton_DRIVE {
                     }
                 }
             }
-        }
+    }
     }
 
     /**
@@ -1037,7 +1037,7 @@ class Playnewton_DRIVE {
             for (let object of objectgroup.objects) {
                 callback(object, objectgroup, groupX + object.x, groupY + object.y);
             }
-        }
+    }
     }
 
     async LoadTileset(tsxUrl) {
@@ -1210,11 +1210,11 @@ class Playnewton_DRIVE {
         let data = new Uint32Array(nbtiles);
         for (let i = 0; i < str.length; i += 4) {
             data[i / 4] = (
-                str.charCodeAt(i) |
-                str.charCodeAt(i + 1) << 8 |
-                str.charCodeAt(i + 2) << 16 |
-                str.charCodeAt(i + 3) << 24
-            ) >>> 0;
+                    str.charCodeAt(i) |
+                    str.charCodeAt(i + 1) << 8 |
+                    str.charCodeAt(i + 2) << 16 |
+                    str.charCodeAt(i + 3) << 24
+                    ) >>> 0;
         }
         return data;
     }
@@ -1391,6 +1391,39 @@ class GPU_Bar {
     enabled = false;
 }
 
+class GPU_Label {
+    /**
+     * @type string
+     */
+    text;
+
+    /**
+     * @type number
+     */
+    x = 0;
+
+    /**
+     * @type number
+     */
+    y = 0;
+
+    /**
+     * @type string
+     */
+    font = "bold 16px monospace";
+
+    /**
+     * type string
+     */
+    color = "#ffffff";
+
+    /**
+     * 
+     * @type string
+     */
+    align = "start";
+}
+
 /**
  * @type GPU_HUD
  */
@@ -1401,9 +1434,90 @@ class GPU_HUD {
     bars = []
 
     /**
+     * @type GPU_Label[]
+     */
+    labels = []
+
+    /**
      * @type boolean
      */
     enabled = false;
+
+    /**
+     * Finds an available (unused) label. 
+     * @returns {GPU_Label} label
+     */
+    GetAvailableLabel() {
+        let label = this.labels.find(label => !label.enabled);
+        if (!label) {
+            label = new GPU_Label();
+            this.labels.push(label);
+        }
+        return label;
+    }
+
+    /**
+     * 
+     * @param {GPU_Label} label
+     * @param {string} text
+     */
+    SetLabelText(label, text) {
+        label.text = text;
+    }
+
+    /**
+     * 
+     * @param {GPU_Label} label
+     * @param {string} color
+     */
+    SetLabelColor(label, color) {
+        label.color = color;
+    }
+
+    /**
+     * 
+     * @param {GPU_Label} label
+     * @param {string} font
+     */
+    SetLabelFont(label, font) {
+        label.font = font;
+    }
+
+    /**
+     * 
+     * @param {GPU_Label} label
+     * @param {string} align
+     */
+    SetLabelAlign(label, align) {
+        label.align = align;
+    }
+
+    /**
+     * Enable the sprite so it is drawn. 
+     * @param {GPU_Label} label
+     */
+    EnableLabel(label) {
+        label.enabled = true;
+    }
+
+    /**
+     * Enable the sprite so it is drawn. 
+     * @param {GPU_Label} label
+     */
+    DisableLabel(label) {
+        label.enabled = false;
+    }
+
+    /**
+     * 
+     * @param {GPU_Label} label
+     * @param {number} x 
+     * @param {number} y 
+     */
+    SetLabelPosition(label, x, y) {
+        label.x = x;
+        label.y = y;
+    }
 
     /**
      * Finds an available (unused) bar. 
@@ -1419,11 +1533,11 @@ class GPU_HUD {
     }
 
     /**
- * 
- * @param {GPU_Bar} bar
- * @param {number} x 
- * @param {number} y 
- */
+     * 
+     * @param {GPU_Bar} bar
+     * @param {number} x 
+     * @param {number} y 
+     */
     SetBarPosition(bar, x, y) {
         bar.x = x;
         bar.y = y;
@@ -1474,6 +1588,14 @@ class GPU_HUD {
      */
     EnableBar(bar) {
         bar.enabled = true;
+    }
+
+    /**
+     * Enable the sprite so it is drawn. 
+     * @param {GPU_Bar} bar
+     */
+    DisableBar(bar) {
+        bar.enabled = false;
     }
 }
 
@@ -1639,7 +1761,7 @@ class Playnewton_GPU {
             sprite.animationCurrentFrameIndex = 0;
             sprite.animationCurrentTime = 0;
             sprite.picture = sprite.animation.frames[0].picture;
-        }
+    }
     }
 
     /**
@@ -1755,7 +1877,7 @@ class Playnewton_GPU {
      */
     SetVideoOutput(canvas) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext("2d", { alpha: false });
+        this.ctx = canvas.getContext("2d", {alpha: false});
         this.ctx.imageSmoothingEnabled = false;
     }
 
@@ -1887,8 +2009,22 @@ class Playnewton_GPU {
             for (let bar of hud.bars) {
                 this._DrawBar(bar);
             }
+            for (let label of hud.labels) {
+                this._DrawLabel(label);
+            }
             this.ctx.restore();
         }
+    }
+
+    /**
+     * 
+     * @param {type} label
+     */
+    _DrawLabel(label) {
+        this.ctx.font = label.font;
+        this.ctx.fillStyle = label.color;
+        this.ctx.textAlign = label.align;
+        this.ctx.fillText(label.text, label.x, label.y);
     }
 
     /**
@@ -2698,11 +2834,11 @@ class Playnewton_PPU {
         if (bodyA.movable && bodyB.immovable) {
             this._SeparateMovableBodyFromImmovableBodyByY(bodyA, bodyB);
         } else
-            if (bodyA.immovable && bodyB.movable) {
-                this._SeparateMovableBodyFromImmovableBodyByY(bodyB, bodyA);
-            } else if (bodyA.movable && bodyB.movable) {
-                this._SeparateMovableBodiesByY(bodyB, bodyA);
-            }
+        if (bodyA.immovable && bodyB.movable) {
+            this._SeparateMovableBodyFromImmovableBodyByY(bodyB, bodyA);
+        } else if (bodyA.movable && bodyB.movable) {
+            this._SeparateMovableBodiesByY(bodyB, bodyA);
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ import Scene from "./scene.js"
 import Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
 import Heart from "../entities/heart.js"
+import Poison from "../entities/poison.js"
 
 export default class Level extends Scene {
 
@@ -19,10 +20,21 @@ export default class Level extends Scene {
      * @type Playnewton.GPU_Bar
      */
     healthBar;
+    
+    /**
+     * @type Playnewton.GPU_Label
+     */
+    poisonCounterLabel;
+    
+    /**
+     * @type Poison
+     */
+    poison;
 
     async InitSara() {
         await Sara.Preload();
         this.sara = new Sara();
+        this.poison = new Poison(this.sara);
     }
 
     async InitCollectibles(map) {
@@ -61,11 +73,18 @@ export default class Level extends Scene {
 
     async InitHUD() {
         let hud = Playnewton.GPU.GetHUD();
+
         this.healthBar = hud.GetAvailableBar();
         hud.SetBarPosition(this.healthBar, 10, 10);
         hud.SetBarSize(this.healthBar, this.sara.maxHealth);
         hud.SetBarLevel(this.healthBar, this.sara.health);
         hud.EnableBar(this.healthBar, true);
+
+        this.poisonCounterLabel = hud.GetAvailableLabel();
+        hud.SetLabelPosition(this.poisonCounterLabel, 150, 22);
+        hud.SetLabelText(this.poisonCounterLabel, "16💀");
+        hud.EnableLabel(this.poisonCounterLabel);
+
         Playnewton.GPU.EnableHUD(hud, true);
     }
 
@@ -81,7 +100,9 @@ export default class Level extends Scene {
 
     UpdateSprites() {
         this.sara.UpdateSprite();
-        Playnewton.GPU.GetHUD().SetBarLevel(this.healthBar, this.sara.health);        
+        let hud = Playnewton.GPU.GetHUD();
+        hud.SetBarLevel(this.healthBar, this.sara.health);
+        hud.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneHeart();
