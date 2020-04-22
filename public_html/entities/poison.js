@@ -12,11 +12,16 @@ export default class Poison {
      */
     hurtCounter;
 
+    /**
+     * @type number
+     */
+    intervalId;
+
     constructor(victim) {
         this.victim = victim;
         this.hurtCounter = this.hurtCooldown;
-        
-        setInterval(() => this.Update(), 1000);
+
+        this.intervalId = setInterval(() => this.Update(), 1000);
     }
 
     Update() {
@@ -24,6 +29,9 @@ export default class Poison {
         if (this.hurtCounter < 0) {
             this.victim.HurtByPoison();
             this.hurtCounter = this.hurtCooldown;
+        }
+        if(this.victim.dead) {
+            clearInterval(this.intervalId);
         }
     }
 

@@ -22,7 +22,7 @@ export default class OpenSara {
             Playnewton.PPU.Update();
             scene.UpdateSprites();
             Playnewton.GPU.DrawFrame(timestamp);
-            Playnewton.PPU.DebugDraw(Playnewton.GPU.ctx);
+            //Playnewton.PPU.DebugDraw(Playnewton.GPU.ctx);
             requestAnimationFrame(redraw);
         };
         requestAnimationFrame(redraw);

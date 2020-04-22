@@ -73,7 +73,7 @@ export default class Heart {
         this.sprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Heart.animations.idle);
         Playnewton.GPU.SetSpritePosition(this.sprite, 200, 200);
-        Playnewton.GPU.SetSpriteZ(this.sprite, 15);
+        Playnewton.GPU.SetSpriteZ(this.sprite, 14);
         Playnewton.GPU.EnableSprite(this.sprite);
     }
 

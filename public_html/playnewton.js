@@ -1323,6 +1323,10 @@ class GPU_Layer {
      */
     alpha = 1;
     /**
+     * @type string
+     */
+    filter = "none";
+    /**
      * 
      * @type boolean
      */
@@ -1950,6 +1954,7 @@ class Playnewton_GPU {
             let layer = this.layers[z];
             if (layer && layer.enabled) {
                 this.ctx.save();
+                this.ctx.filter = layer.filter;
                 if (layer.x !== 0 && layer.x !== 0) {
                     this.ctx.translate(layer.x, layer.y);
                 }
@@ -2957,6 +2962,11 @@ class Playnewton {
      * @type Playnewton_CTRL
      */
     CTRL = new Playnewton_CTRL();
+
+    ENUMS = {
+        GPU_AnimationMode: GPU_AnimationMode,
+        GPU_AnimationState: GPU_AnimationState
+    }
 }
 
 export default new Playnewton();
