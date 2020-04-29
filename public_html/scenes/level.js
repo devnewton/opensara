@@ -1,7 +1,9 @@
 import Scene from "./scene.js"
 import Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
+import Collectible from "../entities/collectible.js"
 import Heart from "../entities/heart.js"
+import Key from "../entities/key.js"
 import Poison from "../entities/poison.js"
 
 export default class Level extends Scene {
@@ -15,17 +17,22 @@ export default class Level extends Scene {
      * @type Heart[]
      */
     hearts = [];
+    
+        /**
+     * @type Key[]
+     */
+    keys = [];
 
     /**
      * @type Playnewton.GPU_Bar
      */
     healthBar;
-    
+
     /**
      * @type Playnewton.GPU_Label
      */
     poisonCounterLabel;
-    
+
     /**
      * @type Poison
      */
@@ -38,13 +45,24 @@ export default class Level extends Scene {
     }
 
     async InitCollectibles(map) {
+        await Collectible.Preload();
         await Heart.Preload();
+        await Key.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
                 (object, objectgroup, x, y) => {
-            if (object.tile && object.tile.properties.get("type") === "heart") {
-                let heart = new Heart();
-                Playnewton.GPU.SetSpritePosition(heart.sprite, x, y - heart.sprite.height);
-                this.hearts.push(heart);
+            if (object.tile) {
+                switch (object.tile.properties.get("type")) {
+                    case "heart":
+                        let heart = new Heart();
+                        Playnewton.GPU.SetSpritePosition(heart.sprite, x, y - heart.sprite.height);
+                        this.hearts.push(heart);
+                        break;
+                    case "key":
+                        let key = new Key();
+                        Playnewton.GPU.SetSpritePosition(key.sprite, x, y - key.sprite.height);
+                        this.keys.push(key);
+                        break;
+                }
             }
         },
                 map);
@@ -103,10 +121,20 @@ export default class Level extends Scene {
         let hud = Playnewton.GPU.GetHUD();
         hud.SetBarLevel(this.healthBar, this.sara.health);
         hud.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
+        
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneHeart();
                 heart.Free();
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+        this.keys = this.keys.filter((key) => {
+            if (key.Pursue(this.sara.sprite)) {
+                key.Free();
                 return false;
             } else {
                 return true;

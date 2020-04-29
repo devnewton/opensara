@@ -5,7 +5,7 @@ import Collectible from "./collectible.js"
  * @readonly
  * @enum {number}
  */
-const HeartState = {
+const KeyState = {
     IDLE: 1,
     PURSUE: 2
 };
@@ -18,14 +18,14 @@ const PURSUE_SPEED = 8;
  * 
  * @type SaraAnimations
  */
-class HeatAnimations {
+class KeyAnimations {
     /**
      * @type GPU_SpriteAnimation
      */
     idle;
 }
 
-export default class Heart {
+export default class Key {
     /**
      * 
      * @type GPU_Sprite
@@ -33,46 +33,42 @@ export default class Heart {
     sprite;
 
     /**
-     * 
-     * @type GPU_Sprite
-     */
-    pursued;
-
-    /**
      *  @type SaraState
      */
-    state = HeartState.IDLE;
+    state = KeyState.IDLE;
 
     static async Preload() {
         let bitmap = Collectible.bitmap;
 
         let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
-            {name: "heart1", x: 0, y: 0, w: 32, h: 32},
-            {name: "heart2", x: 32, y: 0, w: 32, h: 32},
-            {name: "heart3", x: 64, y: 0, w: 32, h: 32},
-            {name: "heart4", x: 96, y: 0, w: 32, h: 32},
-            {name: "heart5", x: 128, y: 0, w: 32, h: 32},
-            {name: "heart6", x: 160, y: 0, w: 32, h: 32},
-            {name: "heart7", x: 192, y: 0, w: 32, h: 32}
+            {name: "key1", x: 0, y: 32, w: 32, h: 32},
+            {name: "key2", x: 32, y: 32, w: 32, h: 32},
+            {name: "key3", x: 64, y: 32, w: 32, h: 32},
+            {name: "key4", x: 96, y: 32, w: 32, h: 32},
+            {name: "key5", x: 128, y: 32, w: 32, h: 32},
+            {name: "key6", x: 160, y: 32, w: 32, h: 32},
+            {name: "key7", x: 192, y: 32, w: 32, h: 32},
+            {name: "key8", x: 224, y: 32, w: 32, h: 32}
 
         ]);
 
-        Heart.animations = new HeatAnimations();
+        Key.animations = new KeyAnimations();
 
-        Heart.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
-            {name: "heart1", delay: 100},
-            {name: "heart2", delay: 100},
-            {name: "heart3", delay: 100},
-            {name: "heart4", delay: 100},
-            {name: "heart5", delay: 100},
-            {name: "heart6", delay: 100},
-            {name: "heart7", delay: 100}
+        Key.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "key1", delay: 5000},
+            {name: "key2", delay: 100},
+            {name: "key3", delay: 100},
+            {name: "key4", delay: 100},
+            {name: "key5", delay: 100},
+            {name: "key6", delay: 100},
+            {name: "key7", delay: 100},
+            {name: "key8", delay: 100}
         ]);
     }
 
     constructor() {
         this.sprite = Playnewton.GPU.GetAvailableSprite();
-        Playnewton.GPU.SetSpriteAnimation(this.sprite, Heart.animations.idle);
+        Playnewton.GPU.SetSpriteAnimation(this.sprite, Key.animations.idle);
         Playnewton.GPU.SetSpritePosition(this.sprite, 200, 200);
         Playnewton.GPU.SetSpriteZ(this.sprite, 14);
         Playnewton.GPU.EnableSprite(this.sprite);
@@ -88,8 +84,8 @@ export default class Heart {
         if (distance < PURSUE_DONE_DISTANCE) {
             return true;
         }
-        if (this.state == HeartState.PURSUE || distance < PURSUE_START_DISTANCE) {
-            this.state = HeartState.PURSUE;
+        if (this.state == KeyState.PURSUE || distance < PURSUE_START_DISTANCE) {
+            this.state = KeyState.PURSUE;
             let speed = PURSUE_SPEED / distance;
             dx *= speed;
             dy *= speed;

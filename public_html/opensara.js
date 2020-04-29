@@ -1,6 +1,5 @@
 import Playnewton from "./playnewton.js"
 import Sara from "./entities/sara.js"
-import Heart from "./entities/heart.js"
 import Level from "./scenes/level.js"
 
 export default class OpenSara {
