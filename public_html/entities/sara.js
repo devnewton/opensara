@@ -336,6 +336,7 @@ export default class Sara {
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {
             this.state = SaraState.DYING;
+            Playnewton.PPU.SetBodyImmovable(this.body, true);
             new Fadeout(1000, Array.from({ length: 15 }, (v, i) => i));
         }
     }
