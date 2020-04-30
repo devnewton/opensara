@@ -129,9 +129,16 @@ export default class Level extends Scene {
     }
 
     async Start() {
+        this.progress = 0;
+
         await this.InitSara();
+        this.progress = 33;
+
         await this.InitMoutainLevels();
+        this.progress = 66;
+
         await this.InitHUD();
+        this.progress = 100;
     }
 
     UpdateBodies() {

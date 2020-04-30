@@ -5,6 +5,7 @@ import Level from "./scenes/level.js"
 export default class OpenSara {
 
     async Start() {
+        let progress = document.getElementById('progress');
         Playnewton.GPU.SetVideoOutput(document.getElementById('game'));
 
         for (let z = 0; z < 16; ++z) {
@@ -13,15 +14,21 @@ export default class OpenSara {
         }
 
         let scene = new Level();
-        await scene.Start();
+        scene.Start();
 
         let redraw = (timestamp) => {
-            Playnewton.CTRL.Poll();
-            scene.UpdateBodies();
-            Playnewton.PPU.Update();
-            scene.UpdateSprites();
-            Playnewton.GPU.DrawFrame(timestamp);
-            //Playnewton.PPU.DebugDraw(Playnewton.GPU.ctx);
+            if(scene.ready) {
+                progress.style.visibility = "hidden";
+                progress.innerText = "";
+                Playnewton.CTRL.Poll();
+                scene.UpdateBodies();
+                Playnewton.PPU.Update();
+                scene.UpdateSprites();
+                Playnewton.GPU.DrawFrame(timestamp);
+            } else {
+                progress.style.visibility = "visible";
+                progress.innerText = `Loading ${scene.progress}%`;
+            }
             requestAnimationFrame(redraw);
         };
         requestAnimationFrame(redraw);
