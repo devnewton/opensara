@@ -2,6 +2,7 @@ import Scene from "./scene.js"
 import Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
 import Collectible from "../entities/collectible.js"
+import Exit from "../entities/exit.js"
 import Heart from "../entities/heart.js"
 import Key from "../entities/key.js"
 import Poison from "../entities/poison.js"
@@ -18,10 +19,15 @@ export default class Level extends Scene {
      */
     hearts = [];
     
-        /**
+    /**
      * @type Key[]
      */
     keys = [];
+
+    /**
+     * @type Exit[]
+     */
+    exits = [];
 
     /**
      * @type Playnewton.GPU_Bar
@@ -51,12 +57,18 @@ export default class Level extends Scene {
 
     async InitCollectibles(map) {
         await Collectible.Preload();
+        await Exit.Preload();
         await Heart.Preload();
         await Key.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
                 (object, objectgroup, x, y) => {
             if (object.tile) {
                 switch (object.tile.properties.get("type")) {
+                    case "exit":
+                        let exit = new Exit();
+                        Playnewton.GPU.SetSpritePosition(exit.sprite, x, y - exit.sprite.height);
+                        this.exits.push(exit);
+                        break;
                     case "heart":
                         let heart = new Heart();
                         Playnewton.GPU.SetSpritePosition(heart.sprite, x, y - heart.sprite.height);
@@ -146,7 +158,17 @@ export default class Level extends Scene {
         this.keys = this.keys.filter((key) => {
             if (key.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneKey();
+                this.exits.some((exit) => exit.OpenOneLock() )
                 key.Free();
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+        this.exits = this.exits.filter((exit) => {
+            if (exit.Pursue(this.sara.sprite)) {
+                exit.Free();
                 return false;
             } else {
                 return true;
