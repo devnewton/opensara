@@ -34,6 +34,11 @@ export default class Level extends Scene {
     poisonCounterLabel;
 
     /**
+     * @type Playnewton.GPU_Label
+     */
+    itemsLabel;
+
+    /**
      * @type Poison
      */
     poison;
@@ -103,6 +108,11 @@ export default class Level extends Scene {
         hud.SetLabelText(this.poisonCounterLabel, "16💀");
         hud.EnableLabel(this.poisonCounterLabel);
 
+        this.itemsLabel = hud.GetAvailableLabel();
+        hud.SetLabelPosition(this.itemsLabel, 200, 22);
+        hud.SetLabelText(this.itemsLabel, "");
+        hud.EnableLabel(this.itemsLabel);
+
         Playnewton.GPU.EnableHUD(hud, true);
     }
 
@@ -121,6 +131,7 @@ export default class Level extends Scene {
         let hud = Playnewton.GPU.GetHUD();
         hud.SetBarLevel(this.healthBar, this.sara.health);
         hud.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
+        hud.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
         
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {
@@ -134,6 +145,7 @@ export default class Level extends Scene {
 
         this.keys = this.keys.filter((key) => {
             if (key.Pursue(this.sara.sprite)) {
+                this.sara.CollectOneKey();
                 key.Free();
                 return false;
             } else {

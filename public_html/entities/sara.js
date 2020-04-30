@@ -109,6 +109,11 @@ export default class Sara {
      */
     maxHealth = 10;
 
+    /**
+     * @type number
+     */
+    nbKeys = 0;
+
     get dead() {
         return this.health <= 0;
     }
@@ -233,7 +238,7 @@ export default class Sara {
     }
 
     UpdateBody() {
-        if(this.state === SaraState.DYING) {
+        if (this.state === SaraState.DYING) {
             return;
         }
 
@@ -323,9 +328,13 @@ export default class Sara {
         this.health = Math.min(this.health + 1, this.maxHealth);
     }
 
+    CollectOneKey() {
+        ++this.nbKeys;
+    }
+
     HurtByPoison() {
         this.health = Math.max(this.health - 1, 0);
-        if(this.dead) {
+        if (this.dead) {
             this.state = SaraState.DYING;
             new Fadeout(1000, Array.from({ length: 15 }, (v, i) => i));
         }
