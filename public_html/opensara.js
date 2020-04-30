@@ -6,7 +6,24 @@ export default class OpenSara {
 
     async Start() {
         let progress = document.getElementById('progress');
+        Playnewton.CTRL.MapKeyboardEventToPadButton = (pad, event, down) => {
+            switch (event.code) {
+                case "ArrowUp":
+                    pad.A = down;
+                    break;
+                case "ArrowLeft":
+                    pad.left = down;
+                    break;
+                case "ArrowRight":
+                    pad.right = down;
+                    break;
+                case "F1":
+                    pad.start = down;
+            }
+        };
+
         Playnewton.GPU.SetVideoOutput(document.getElementById('game'));
+
 
         for (let z = 0; z < 16; ++z) {
             let layer = Playnewton.GPU.GetLayer(z);

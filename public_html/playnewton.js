@@ -360,50 +360,57 @@ class Playnewton_CTRL {
             this.pads[i] = new CTRL_Gamepad();
         }
 
-        document.addEventListener("keydown", (event) => this._SetKeyboardPadButton(event, true));
-        document.addEventListener("keyup", (event) => this._SetKeyboardPadButton(event, false));
+        document.addEventListener("keydown", (event) => {
+            this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, true);
+            return false;
+        });
+        document.addEventListener("keyup", (event) => {
+            this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, false);
+            return false;
+        });
     }
 
     /**
-     * 
+     * @param {CTRL_Gamepad} pad
      * @param {KeyboardEvent} event
      * @param {boolean} down
      * @returns boolean
      */
-    _SetKeyboardPadButton(event, down) {
+    MapKeyboardEventToPadButton(pad, event, down) {
         switch (event.code) {
             case "ArrowUp":
-                this.keyboardVirtualPad.up = down;
+                pad.up = down;
                 break;
             case "ArrowDown":
-                this.keyboardVirtualPad.down = down;
+                pad.down = down;
                 break;
             case "ArrowLeft":
-                this.keyboardVirtualPad.left = down;
+                pad.left = down;
                 break;
             case "ArrowRight":
-                this.keyboardVirtualPad.right = down;
+                pad.right = down;
                 break;
             case "KeyZ":
-                this.keyboardVirtualPad.A = down;
+                pad.A = down;
                 break;
             case "KeyX":
-                this.keyboardVirtualPad.B = down;
+                pad.B = down;
                 break;
             case "KeyA":
-                this.keyboardVirtualPad.X = down;
+                pad.X = down;
                 break;
             case "KeyS":
-                this.keyboardVirtualPad.Y = down;
+                pad.Y = down;
                 break;
             case "KeyD":
-                this.keyboardVirtualPad.L = down;
+                pad.L = down;
                 break;
             case "KeyC":
-                this.keyboardVirtualPad.R = down;
+                pad.R = down;
                 break;
+            case "Enter":
+                pad.start = down;
         }
-        return false;
     }
 
     Poll() {
