@@ -5,7 +5,6 @@ import Title from "./scenes/title.js"
 export default class OpenSara {
 
     async Start() {
-        let progress = document.getElementById('progress');
         Playnewton.CTRL.MapKeyboardEventToPadButton = (pad, event, down) => {
             switch (event.code) {
                 case "ArrowUp":
@@ -29,18 +28,16 @@ export default class OpenSara {
 
         let redraw = (timestamp) => {
             if(scene.ready) {
-                progress.style.visibility = "hidden";
-                progress.innerText = "";
+                Playnewton.GPU.GetHUD().SetLoadingText("");
                 Playnewton.CTRL.Poll();
                 scene.UpdateBodies();
                 Playnewton.PPU.Update();
                 scene.UpdateSprites();
-                Playnewton.GPU.DrawFrame(timestamp);
-                scene = scene.nextScene;
             } else {
-                progress.style.visibility = "visible";
-                progress.innerText = `Loading ${scene.progress}%`;
+                Playnewton.GPU.GetHUD().SetLoadingText(`Loading ${scene.progress}%`);
             }
+            Playnewton.GPU.DrawFrame(timestamp);
+            scene = scene.nextScene;
             requestAnimationFrame(redraw);
         };
         requestAnimationFrame(redraw);

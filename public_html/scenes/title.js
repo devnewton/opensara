@@ -18,7 +18,8 @@ export default class Title extends Scene {
 
         let startLabel = hud.GetAvailableLabel();
         hud.SetLabelPosition(startLabel, 512, 288);
-        hud.SetLabelText(startLabel, "F1 start");
+        hud.SetLabelText(startLabel, "Press ⌨️F1 or 🎮start");
+        hud.SetLabelAlign(startLabel, "center");
         hud.EnableLabel(startLabel);
 
         Playnewton.GPU.EnableHUD(hud, true);

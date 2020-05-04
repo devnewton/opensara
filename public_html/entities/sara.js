@@ -102,7 +102,7 @@ export default class Sara {
     /**
      * @type number
      */
-    health = 1;
+    health = 5;
 
     /**
      * @type number

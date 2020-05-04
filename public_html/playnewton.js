@@ -1454,6 +1454,15 @@ class GPU_HUD {
      */
     enabled = false;
 
+    loadingFrames = [ '⣾', '⣽', '⣻', '⢿', '⡿', '⣟','⣯', '⣷' ];
+
+    currentLoadingFrame = 0;
+
+    /**
+     * @type string
+     */
+    loadingText;
+
     Reset() {
         this.bars = [];
         this.labels = [];
@@ -1612,6 +1621,20 @@ class GPU_HUD {
      */
     DisableBar(bar) {
         bar.enabled = false;
+    }
+
+    /**
+     * 
+     * @param {string} text 
+     */
+    SetLoadingText(text) {
+        if(text) {
+            this.currentLoadingFrame =  (this.currentLoadingFrame + 1) % this.loadingFrames.length;
+            this.loadingText = `${this.loadingFrames[this.currentLoadingFrame]}${text}`;
+            console.log(this.loadingText);
+        } else {
+            this.loadingText = null;
+        }
     }
 }
 
@@ -2036,6 +2059,9 @@ class Playnewton_GPU {
                 this._DrawLabel(label);
             }
             this.ctx.restore();
+            this.ctx.save();
+            this._DrawLoadingText(hud);
+            this.ctx.restore();
         }
     }
 
@@ -2048,6 +2074,21 @@ class Playnewton_GPU {
         this.ctx.fillStyle = label.color;
         this.ctx.textAlign = label.align;
         this.ctx.fillText(label.text, label.x, label.y);
+    }
+
+    /**
+     * 
+     * @param {GPU_HUD} hud 
+     */
+    _DrawLoadingText(hud) {
+        if(hud.loadingText) {
+            console.log(hud.loadingText);
+            this.ctx.font = "bold 48px monospace";
+            this.ctx.fillStyle = "#ffffff";
+            this.ctx.textAlign = "right";
+            this.ctx.textBaseline = "bottom";
+            this.ctx.fillText(hud.loadingText, this.canvas.width, this.canvas.height);
+        }
     }
 
     /**

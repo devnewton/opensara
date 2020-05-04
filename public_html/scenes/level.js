@@ -52,7 +52,6 @@ export default class Level extends Scene {
     async InitSara() {
         await Sara.Preload();
         this.sara = new Sara();
-        this.poison = new Poison(this.sara);
     }
 
     async InitCollectibles(map) {
@@ -128,21 +127,29 @@ export default class Level extends Scene {
         Playnewton.GPU.EnableHUD(hud, true);
     }
 
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
     async Start() {
+        this.progress = 0;
+
         for (let z = 0; z < 16; ++z) {
             let layer = Playnewton.GPU.GetLayer(z);
             Playnewton.GPU.EnableLayer(layer);
         }
-
-        this.progress = 0;
+        this.progress = 20;
 
         await this.InitSara();
-        this.progress = 33;
+        this.progress = 40;
 
         await this.InitMoutainLevels();
-        this.progress = 66;
+        this.progress = 80;
 
         await this.InitHUD();
+        this.progress = 90;
+
+        this.poison = new Poison(this.sara);
         this.progress = 100;
     }
 
