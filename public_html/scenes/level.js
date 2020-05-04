@@ -129,6 +129,11 @@ export default class Level extends Scene {
     }
 
     async Start() {
+        for (let z = 0; z < 16; ++z) {
+            let layer = Playnewton.GPU.GetLayer(z);
+            Playnewton.GPU.EnableLayer(layer);
+        }
+
         this.progress = 0;
 
         await this.InitSara();

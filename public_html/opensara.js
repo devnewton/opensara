@@ -1,6 +1,6 @@
 import Playnewton from "./playnewton.js"
-import Sara from "./entities/sara.js"
 import Level from "./scenes/level.js"
+import Title from "./scenes/title.js"
 
 export default class OpenSara {
 
@@ -24,13 +24,7 @@ export default class OpenSara {
 
         Playnewton.GPU.SetVideoOutput(document.getElementById('game'));
 
-
-        for (let z = 0; z < 16; ++z) {
-            let layer = Playnewton.GPU.GetLayer(z);
-            Playnewton.GPU.EnableLayer(layer);
-        }
-
-        let scene = new Level();
+        let scene = new Title();
         scene.Start();
 
         let redraw = (timestamp) => {
@@ -42,6 +36,7 @@ export default class OpenSara {
                 Playnewton.PPU.Update();
                 scene.UpdateSprites();
                 Playnewton.GPU.DrawFrame(timestamp);
+                scene = scene.nextScene;
             } else {
                 progress.style.visibility = "visible";
                 progress.innerText = `Loading ${scene.progress}%`;

@@ -3,6 +3,11 @@ import Playnewton from "../playnewton.js"
 export default class Scene {
 
     /**
+     * @type Scene
+     */
+    nextScene;
+    
+    /**
      * @type number
      */
     progress = -1;
@@ -23,8 +28,16 @@ export default class Scene {
         return this.progress >= 100;
     }
 
+    constructor() {
+        this.nextScene = this;
+    }
+
     async Start() {
         this.progress = 0;
+    }
+
+    Stop() {
+        Playnewton.GPU.Reset();
     }
 
     /**

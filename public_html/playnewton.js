@@ -1454,6 +1454,11 @@ class GPU_HUD {
      */
     enabled = false;
 
+    Reset() {
+        this.bars = [];
+        this.labels = [];
+    }
+
     /**
      * Finds an available (unused) label. 
      * @returns {GPU_Label} label
@@ -1654,6 +1659,12 @@ class Playnewton_GPU {
      */
     constructor() {
         this.fpsLimiter = new GPU_FpsLimiter();
+    }
+
+    Reset() {
+        this.layers = [];
+        this.sprites = [];
+        this.hud.Reset();
     }
 
     /**
