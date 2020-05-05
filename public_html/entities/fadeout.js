@@ -32,14 +32,13 @@ export default class Fadeout {
                 layer.filter = `brightness(${this.brightnessPercentage}%)`;
             }
         }else {
-            let hud = Playnewton.GPU.GetHUD();
-            let gameoverLabel = hud.GetAvailableLabel();
-            hud.SetLabelFont(gameoverLabel, "bold 48px monospace");
-            hud.SetLabelColor(gameoverLabel, "#ff0000");
-            hud.SetLabelAlign(gameoverLabel, "center");
-            hud.SetLabelPosition(gameoverLabel, 512, 288);
-            hud.SetLabelText(gameoverLabel, "Game over");
-            hud.EnableLabel(gameoverLabel);
+            let gameoverLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+            Playnewton.GPU.HUD.SetLabelFont(gameoverLabel, "bold 48px monospace");
+            Playnewton.GPU.HUD.SetLabelColor(gameoverLabel, "#ff0000");
+            Playnewton.GPU.HUD.SetLabelAlign(gameoverLabel, "center");
+            Playnewton.GPU.HUD.SetLabelPosition(gameoverLabel, 512, 288);
+            Playnewton.GPU.HUD.SetLabelText(gameoverLabel, "Game over");
+            Playnewton.GPU.HUD.EnableLabel(gameoverLabel);
             clearInterval(this.intervalId);
         }
 

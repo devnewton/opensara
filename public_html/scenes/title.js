@@ -14,15 +14,13 @@ export default class Title extends Scene {
     }
 
     async InitHUD() {
-        let hud = Playnewton.GPU.GetHUD();
+        let startLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+        Playnewton.GPU.HUD.SetLabelPosition(startLabel, 512, 288);
+        Playnewton.GPU.HUD.SetLabelText(startLabel, "Press ⌨️F1 or 🎮start");
+        Playnewton.GPU.HUD.SetLabelAlign(startLabel, "center");
+        Playnewton.GPU.HUD.EnableLabel(startLabel);
 
-        let startLabel = hud.GetAvailableLabel();
-        hud.SetLabelPosition(startLabel, 512, 288);
-        hud.SetLabelText(startLabel, "Press ⌨️F1 or 🎮start");
-        hud.SetLabelAlign(startLabel, "center");
-        hud.EnableLabel(startLabel);
-
-        Playnewton.GPU.EnableHUD(hud, true);
+        Playnewton.GPU.EnableHUD(true);
     }
 
     async Start() {

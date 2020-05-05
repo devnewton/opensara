@@ -1654,7 +1654,7 @@ class Playnewton_GPU {
     /**
      * @type GPU_Hud
      */
-    hud = new GPU_HUD();
+    HUD = new GPU_HUD();
 
     /**
      * Time elapsed since last frame for animation control
@@ -1687,21 +1687,14 @@ class Playnewton_GPU {
     Reset() {
         this.layers = [];
         this.sprites = [];
-        this.hud.Reset();
-    }
-
-    /**
-     * @returns {GPU_HUD}
-     */
-    GetHUD() {
-        return this.hud;
+        this.HUD.Reset();
     }
 
     /**
      * @param {boolean} enabled 
      */
     EnableHUD(enabled) {
-        this.hud.enabled = enabled;
+        this.HUD.enabled = enabled;
     }
 
     /**
@@ -1943,7 +1936,7 @@ class Playnewton_GPU {
             if (this.ctx) {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this._DrawSprites();
-                this._DrawHUD(this.hud);
+                this._DrawHUD(this.HUD);
             }
         }
     }

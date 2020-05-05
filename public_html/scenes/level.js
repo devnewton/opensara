@@ -106,25 +106,23 @@ export default class Level extends Scene {
     }
 
     async InitHUD() {
-        let hud = Playnewton.GPU.GetHUD();
+        this.healthBar = Playnewton.GPU.HUD.GetAvailableBar();
+        Playnewton.GPU.HUD.SetBarPosition(this.healthBar, 10, 10);
+        Playnewton.GPU.HUD.SetBarSize(this.healthBar, this.sara.maxHealth);
+        Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
+        Playnewton.GPU.HUD.EnableBar(this.healthBar, true);
 
-        this.healthBar = hud.GetAvailableBar();
-        hud.SetBarPosition(this.healthBar, 10, 10);
-        hud.SetBarSize(this.healthBar, this.sara.maxHealth);
-        hud.SetBarLevel(this.healthBar, this.sara.health);
-        hud.EnableBar(this.healthBar, true);
+        this.poisonCounterLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+        Playnewton.GPU.HUD.SetLabelPosition(this.poisonCounterLabel, 150, 22);
+        Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, "16💀");
+        Playnewton.GPU.HUD.EnableLabel(this.poisonCounterLabel);
 
-        this.poisonCounterLabel = hud.GetAvailableLabel();
-        hud.SetLabelPosition(this.poisonCounterLabel, 150, 22);
-        hud.SetLabelText(this.poisonCounterLabel, "16💀");
-        hud.EnableLabel(this.poisonCounterLabel);
+        this.itemsLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+        Playnewton.GPU.HUD.SetLabelPosition(this.itemsLabel, 200, 22);
+        Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "");
+        Playnewton.GPU.HUD.EnableLabel(this.itemsLabel);
 
-        this.itemsLabel = hud.GetAvailableLabel();
-        hud.SetLabelPosition(this.itemsLabel, 200, 22);
-        hud.SetLabelText(this.itemsLabel, "");
-        hud.EnableLabel(this.itemsLabel);
-
-        Playnewton.GPU.EnableHUD(hud, true);
+        Playnewton.GPU.EnableHUD(true);
     }
 
     sleep(ms) {
@@ -159,10 +157,9 @@ export default class Level extends Scene {
 
     UpdateSprites() {
         this.sara.UpdateSprite();
-        let hud = Playnewton.GPU.GetHUD();
-        hud.SetBarLevel(this.healthBar, this.sara.health);
-        hud.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
-        hud.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
+        Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
+        Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
+        Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
         
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {

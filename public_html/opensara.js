@@ -28,13 +28,13 @@ export default class OpenSara {
 
         let redraw = (timestamp) => {
             if(scene.ready) {
-                Playnewton.GPU.GetHUD().SetLoadingText("");
+                Playnewton.GPU.HUD.SetLoadingText("");
                 Playnewton.CTRL.Poll();
                 scene.UpdateBodies();
                 Playnewton.PPU.Update();
                 scene.UpdateSprites();
             } else {
-                Playnewton.GPU.GetHUD().SetLoadingText(`Loading ${scene.progress}%`);
+                Playnewton.GPU.HUD.SetLoadingText(`Loading ${scene.progress}%`);
             }
             Playnewton.GPU.DrawFrame(timestamp);
             scene = scene.nextScene;
