@@ -6,6 +6,8 @@ import Exit from "../entities/exit.js"
 import Heart from "../entities/heart.js"
 import Key from "../entities/key.js"
 import Poison from "../entities/poison.js"
+import Tatou from "../entities/tatou.js"
+import Enemy from "../entities/enemy.js"
 
 export default class Level extends Scene {
 
@@ -49,9 +51,20 @@ export default class Level extends Scene {
      */
     poison;
 
+    /**
+     * @type Array<Enemy>
+     */
+    enemies = [];
+
     async InitSara() {
         await Sara.Preload();
         this.sara = new Sara();
+    }
+
+    async InitEnemies() {
+        await Tatou.Preload();
+        let tatou = new Tatou();
+        this.enemies.push(tatou);
     }
 
     async InitCollectibles(map) {
@@ -141,6 +154,9 @@ export default class Level extends Scene {
         await this.InitSara();
         this.progress = 40;
 
+        await this.InitEnemies();
+        this.progress = 50;
+
         await this.InitMoutainLevels();
         this.progress = 80;
 
@@ -153,10 +169,12 @@ export default class Level extends Scene {
 
     UpdateBodies() {
         this.sara.UpdateBody();
+        this.enemies.forEach((enemy) => enemy.UpdateBody());
     }
 
     UpdateSprites() {
         this.sara.UpdateSprite();
+        this.enemies.forEach((enemy) => enemy.UpdateSprite());
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
         Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
         Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));

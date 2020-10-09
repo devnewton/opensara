@@ -1,3 +1,4 @@
+import Enemy from "./enemy.js"
 import Playnewton from "../playnewton.js"
 
 /**
@@ -42,7 +43,7 @@ class TatouAnimations {
     dying;
 }
 
-export default class Tatou {
+export default class Tatou extends Enemy {
     /**
      * 
      * @type GPU_Sprite
@@ -92,7 +93,19 @@ export default class Tatou {
             { name: "roll-left2", x: 128, y: 32, w: 64, h: 32 },
             { name: "roll-left3", x: 160, y: 32, w: 64, h: 32 },
             { name: "dying-left0", x: 192, y: 0, w: 64, h: 32 },
-            { name: "dying-left1", x: 192, y: 32, w: 64, h: 32 }
+            { name: "dying-left1", x: 192, y: 32, w: 64, h: 32 },
+
+            { name: "walk-right0", x: 0, y: 64, w: 64, h: 32 },
+            { name: "walk-right1", x: 64, y: 64, w: 64, h: 32 },
+            { name: "walk-right2", x: 128, y: 64, w: 64, h: 32 },
+            { name: "surprised-right0", x: 0, y: 96, w: 64, h: 32 },
+            { name: "roll-right0", x: 64, y: 64, w: 32, h: 32 },
+            { name: "roll-right1", x: 96, y: 96, w: 32, h: 32 },
+            { name: "roll-right2", x: 128, y: 96, w: 64, h: 32 },
+            { name: "roll-right3", x: 160, y: 96, w: 64, h: 32 },
+            { name: "dying-right0", x: 192, y: 64, w: 64, h: 32 },
+            { name: "dying-right1", x: 192, y: 96, w: 64, h: 32 }
+
         ]);
 
         /**
@@ -102,6 +115,14 @@ export default class Tatou {
         Tatou.animations = [];
         Tatou.animations[TatouDirection.LEFT] = new TatouAnimations();
         Tatou.animations[TatouDirection.RIGHT] = new TatouAnimations();
+
+        Tatou.animations[TatouDirection.LEFT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "walk-left0", delay: 100 }
+        ]);
+
+        Tatou.animations[TatouDirection.RIGHT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "walk-right0", delay: 100 }
+        ]);
 
         Tatou.animations[TatouDirection.LEFT].walk = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "walk-left0", delay: 100 },
@@ -155,14 +176,15 @@ export default class Tatou {
     }
 
     constructor() {
+        super();
         this.sprite = Playnewton.GPU.GetAvailableSprite();
-        Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.standAnimation);
+        Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[TatouDirection.LEFT].stand);
         Playnewton.GPU.SetSpriteZ(this.sprite, 15);
         Playnewton.GPU.EnableSprite(this.sprite);
 
         this.body = Playnewton.PPU.GetAvailableBody();
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 48);
-        Playnewton.PPU.SetBodyPosition(this.body, 320, 180);
+        Playnewton.PPU.SetBodyPosition(this.body, 160, 180);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);
         Playnewton.PPU.SetBodyVelocityBounds(this.body, -10, 10, -20, 10);
         Playnewton.PPU.EnableBody(this.body);

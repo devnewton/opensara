@@ -1631,7 +1631,6 @@ class GPU_HUD {
         if(text) {
             this.currentLoadingFrame =  (this.currentLoadingFrame + 1) % this.loadingFrames.length;
             this.loadingText = `${this.loadingFrames[this.currentLoadingFrame]}${text}`;
-            console.log(this.loadingText);
         } else {
             this.loadingText = null;
         }
@@ -2075,7 +2074,6 @@ class Playnewton_GPU {
      */
     _DrawLoadingText(hud) {
         if(hud.loadingText) {
-            console.log(hud.loadingText);
             this.ctx.font = "bold 48px monospace";
             this.ctx.fillStyle = "#ffffff";
             this.ctx.textAlign = "right";

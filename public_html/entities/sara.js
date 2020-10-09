@@ -225,7 +225,7 @@ export default class Sara {
 
     constructor() {
         this.sprite = Playnewton.GPU.GetAvailableSprite();
-        Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.standAnimation);
+        Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[SaraDirection.LEFT].stand);
         Playnewton.GPU.SetSpriteZ(this.sprite, 15);
         Playnewton.GPU.EnableSprite(this.sprite);
 
