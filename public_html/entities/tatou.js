@@ -1,6 +1,7 @@
 import Enemy from "./enemy.js"
 import Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
+import Sara from "./sara.js";
 
 /**
  * @readonly
@@ -45,6 +46,7 @@ class TatouAnimations {
 }
 
 export default class Tatou extends Enemy {
+
     /**
      * 
      * @type GPU_Sprite
@@ -60,7 +62,12 @@ export default class Tatou extends Enemy {
     /**
      *  @type number
      */
-    walkSpeed = 1
+    walkSpeed = 1;
+
+    /**
+     *  @type number
+     */
+    rollSpeed = 2;
 
     /**
      *  @type TatouState
@@ -89,10 +96,10 @@ export default class Tatou extends Enemy {
             { name: "walk-left1", x: 64, y: 0, w: 64, h: 32 },
             { name: "walk-left2", x: 128, y: 0, w: 64, h: 32 },
             { name: "surprised-left0", x: 0, y: 32, w: 64, h: 32 },
-            { name: "roll-left0", x: 64, y: 0, w: 32, h: 32 },
+            { name: "roll-left0", x: 64, y: 32, w: 32, h: 32 },
             { name: "roll-left1", x: 96, y: 32, w: 32, h: 32 },
-            { name: "roll-left2", x: 128, y: 32, w: 64, h: 32 },
-            { name: "roll-left3", x: 160, y: 32, w: 64, h: 32 },
+            { name: "roll-left2", x: 128, y: 32, w: 32, h: 32 },
+            { name: "roll-left3", x: 160, y: 32, w: 32, h: 32 },
             { name: "dying-left0", x: 192, y: 0, w: 64, h: 32 },
             { name: "dying-left1", x: 192, y: 32, w: 64, h: 32 },
 
@@ -100,10 +107,10 @@ export default class Tatou extends Enemy {
             { name: "walk-right1", x: 64, y: 64, w: 64, h: 32 },
             { name: "walk-right2", x: 128, y: 64, w: 64, h: 32 },
             { name: "surprised-right0", x: 0, y: 96, w: 64, h: 32 },
-            { name: "roll-right0", x: 64, y: 64, w: 32, h: 32 },
+            { name: "roll-right0", x: 64, y: 96, w: 32, h: 32 },
             { name: "roll-right1", x: 96, y: 96, w: 32, h: 32 },
-            { name: "roll-right2", x: 128, y: 96, w: 64, h: 32 },
-            { name: "roll-right3", x: 160, y: 96, w: 64, h: 32 },
+            { name: "roll-right2", x: 128, y: 96, w: 32, h: 32 },
+            { name: "roll-right3", x: 160, y: 96, w: 32, h: 32 },
             { name: "dying-right0", x: 192, y: 64, w: 64, h: 32 },
             { name: "dying-right1", x: 192, y: 96, w: 64, h: 32 }
 
@@ -202,20 +209,27 @@ export default class Tatou extends Enemy {
             this.isOnGround = true;
             velocityX /= 2;
         }
-        switch(this.state) {
+        const WalkBackAndForth = () => {
+            if ((this.body.right >= Playnewton.PPU.world.bounds.right || this.body.touches.right) && this.direction === TatouDirection.RIGHT) {
+                this.direction = TatouDirection.LEFT;
+            } else if ((this.body.left <= Playnewton.PPU.world.bounds.left || this.body.touches.left) && this.direction === TatouDirection.LEFT) {
+                this.direction = TatouDirection.RIGHT;
+            }
+            let speed = this.state === TatouState.ROLL ? this.rollSpeed : this.walkSpeed;
+            if (this.direction === TatouDirection.LEFT) {
+                velocityX -= speed;
+            } else {
+                velocityX += speed;
+            }
+        }
+
+        switch (this.state) {
             case TatouState.WALK:
-                if((this.body.right >= Playnewton.PPU.world.bounds.right || this.body.touches.right) && this.direction === TatouDirection.RIGHT) {
-                    this.direction = TatouDirection.LEFT;
-                } else if((this.body.left <= Playnewton.PPU.world.bounds.left || this.body.touches.left)  && this.direction === TatouDirection.LEFT) {
-                    this.direction = TatouDirection.RIGHT;
-                }
-                if(this.direction === TatouDirection.LEFT) {
-                    velocityX -= this.walkSpeed;
-                } else {
-                    velocityX += this.walkSpeed;
-                }
+            case TatouState.ROLL:
+                WalkBackAndForth();
                 break;
         }
+
         Playnewton.PPU.SetBodyVelocity(this.body, velocityX, velocityY);
     }
 
@@ -236,6 +250,25 @@ export default class Tatou extends Enemy {
                 break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
+    }
+
+    /**
+     * 
+     * @param {Sara} sara 
+     */
+    Pursue(sara) {
+        if (this.state !== TatouState.ROLL) {
+            let dx = sara.body.centerX - this.body.centerX;
+            let dy = sara.body.centerY - this.body.centerY;
+            if (dx < (this.body.height * 4) && dy < (this.body.height)) {
+                this.state = TatouState.ROLL;
+                Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 32);
+                setTimeout(() => {
+                    this.state = TatouState.WALK;
+                    Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
+                }, 5000);
+            }
+        }
     }
 
     Hurt() {

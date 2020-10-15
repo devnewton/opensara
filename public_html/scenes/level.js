@@ -139,10 +139,6 @@ export default class Level extends Scene {
         Playnewton.GPU.EnableHUD(true);
     }
 
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
-
     async Start() {
         this.progress = 0;
 
@@ -182,6 +178,8 @@ export default class Level extends Scene {
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
         Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
         Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
+
+        this.enemies.forEach((enemy) => enemy.Pursue(this.sara));
         
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {

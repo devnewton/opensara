@@ -232,7 +232,7 @@ export default class Sara {
 
         this.body = Playnewton.PPU.GetAvailableBody();
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 48);
-        Playnewton.PPU.SetBodyPosition(this.body, 320, 180);
+        Playnewton.PPU.SetBodyPosition(this.body, 720, 279);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);
         Playnewton.PPU.SetBodyVelocityBounds(this.body, -10, 10, -20, 10);
         Playnewton.PPU.EnableBody(this.body);
