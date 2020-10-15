@@ -1,4 +1,5 @@
 import Playnewton from "../playnewton.js"
+import Z_ORDER from "../utils/z_order.js";
 import Collectible from "./collectible.js"
 
 /**
@@ -89,7 +90,7 @@ export default class Exit {
         this.sprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Exit.animations.inactive);
         Playnewton.GPU.SetSpritePosition(this.sprite, 200, 200);
-        Playnewton.GPU.SetSpriteZ(this.sprite, 14);
+        Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.DOORS);
         Playnewton.GPU.EnableSprite(this.sprite);
     }
 

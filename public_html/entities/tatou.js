@@ -1,5 +1,6 @@
 import Enemy from "./enemy.js"
 import Playnewton from "../playnewton.js"
+import Z_ORDER from "../utils/z_order.js";
 
 /**
  * @readonly
@@ -179,11 +180,11 @@ export default class Tatou extends Enemy {
         super();
         this.sprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[TatouDirection.LEFT].stand);
-        Playnewton.GPU.SetSpriteZ(this.sprite, 15);
+        Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.ENEMIES);
         Playnewton.GPU.EnableSprite(this.sprite);
 
         this.body = Playnewton.PPU.GetAvailableBody();
-        Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 48);
+        Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
         Playnewton.PPU.SetBodyPosition(this.body, 160, 180);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);
         Playnewton.PPU.SetBodyVelocityBounds(this.body, -10, 10, -20, 10);
@@ -194,8 +195,6 @@ export default class Tatou extends Enemy {
         if (this.state === TatouState.DYING) {
             return;
         }
-
-        let pad = Playnewton.CTRL.GetPad(0);
         this.isOnGround = false;
         let velocityX = this.body.velocity.x;
         let velocityY = this.body.velocity.y;
@@ -203,46 +202,17 @@ export default class Tatou extends Enemy {
             this.isOnGround = true;
             velocityX /= 2;
         }
-
-        if (pad.left) {
-            this.direction = TatouDirection.LEFT;
-            velocityX -= this.walkSpeed;
-        } else if (pad.right) {
-            this.direction = TatouDirection.RIGHT;
-            velocityX += this.walkSpeed;
-        } else {
-            velocityX = 0;
-        }
-
-        switch (this.state) {
+        switch(this.state) {
             case TatouState.WALK:
-                if (pad.A) {
-                    if (this.canJump && this.isOnGround) {
-                        velocityY = -this.jumpImpulse;
-                        this.canJump = false;
-                        this.state = TatouState.ROLL;
-                    }
+                if((this.body.right >= Playnewton.PPU.world.bounds.right || this.body.touches.right) && this.direction === TatouDirection.RIGHT) {
+                    this.direction = TatouDirection.LEFT;
+                } else if((this.body.left <= Playnewton.PPU.world.bounds.left || this.body.touches.left)  && this.direction === TatouDirection.LEFT) {
+                    this.direction = TatouDirection.RIGHT;
+                }
+                if(this.direction === TatouDirection.LEFT) {
+                    velocityX -= this.walkSpeed;
                 } else {
-                    this.canJump = true;
-                }
-                break;
-            case TatouState.ROLL:
-                if (pad.A) {
-                    if (this.canJump) {
-                        velocityY = -this.jumpImpulse;
-                        this.canJump = false;
-                        this.state = TatouState.DOUBLE_JUMP;
-                    }
-                } else {
-                    this.canJump = true;
-                }
-                if (this.isOnGround) {
-                    this.state = TatouState.WALK;
-                }
-                break;
-            case TatouState.DOUBLE_JUMP:
-                if (this.isOnGround) {
-                    this.state = TatouState.WALK;
+                    velocityX += this.walkSpeed;
                 }
                 break;
         }
@@ -259,16 +229,7 @@ export default class Tatou extends Enemy {
                 }
                 break;
             case TatouState.ROLL:
-                if (this.body.velocity.y > 5) {
-                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].jumpDescend);
-                } else if (this.body.velocity.y < -5) {
-                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].jumpAscend);
-                } else {
-                    Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].jumpFloat);
-                }
-                break;
-            case TatouState.DOUBLE_JUMP:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].doubleJump);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].roll);
                 break;
             case TatouState.DYING:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].dying, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
@@ -277,20 +238,11 @@ export default class Tatou extends Enemy {
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
     }
 
-    CollectOneHeart() {
-        this.health = Math.min(this.health + 1, this.maxHealth);
-    }
-
-    CollectOneKey() {
-        ++this.nbKeys;
-    }
-
-    HurtByPoison() {
+    Hurt() {
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {
             this.state = TatouState.DYING;
             Playnewton.PPU.SetBodyImmovable(this.body, true);
-            new Fadeout(1000, Array.from({ length: 15 }, (v, i) => i));
         }
     }
 }

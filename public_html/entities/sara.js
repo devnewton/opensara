@@ -1,4 +1,5 @@
 import Playnewton from "../playnewton.js"
+import Z_ORDER from "../utils/z_order.js";
 import Fadeout from "./fadeout.js";
 
 /**
@@ -226,7 +227,7 @@ export default class Sara {
     constructor() {
         this.sprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[SaraDirection.LEFT].stand);
-        Playnewton.GPU.SetSpriteZ(this.sprite, 15);
+        Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.SARA);
         Playnewton.GPU.EnableSprite(this.sprite);
 
         this.body = Playnewton.PPU.GetAvailableBody();

@@ -1,4 +1,5 @@
 import Playnewton from "../playnewton.js"
+import Z_ORDER from "../utils/z_order.js";
 import Collectible from "./collectible.js"
 
 /**
@@ -70,7 +71,7 @@ export default class Key {
         this.sprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Key.animations.idle);
         Playnewton.GPU.SetSpritePosition(this.sprite, 200, 200);
-        Playnewton.GPU.SetSpriteZ(this.sprite, 14);
+        Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.COLLECTIBLES);
         Playnewton.GPU.EnableSprite(this.sprite);
     }
 

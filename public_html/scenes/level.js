@@ -8,6 +8,7 @@ import Key from "../entities/key.js"
 import Poison from "../entities/poison.js"
 import Tatou from "../entities/tatou.js"
 import Enemy from "../entities/enemy.js"
+import Z_ORDER from "../utils/z_order.js"
 
 export default class Level extends Scene {
 
@@ -111,7 +112,7 @@ export default class Level extends Scene {
         Playnewton.PPU.SetWorldBounds(0, 0, 1024, 576);
         Playnewton.PPU.SetWorldGravity(0, 1);
 
-        Playnewton.DRIVE.ConvertTmxMapToGPUSprites(Playnewton.GPU, map, 0, 0, 0);
+        Playnewton.DRIVE.ConvertTmxMapToGPUSprites(Playnewton.GPU, map, 0, 0, Z_ORDER.BACKGROUND);
         Playnewton.DRIVE.ConvertTmxMapToPPUBodies(Playnewton.PPU, map, 0, 0);
 
         await this.InitCollectibles(map);
@@ -145,7 +146,10 @@ export default class Level extends Scene {
     async Start() {
         this.progress = 0;
 
-        for (let z = 0; z < 16; ++z) {
+        let zValues = Object.values(Z_ORDER);
+        let zMin = zValues.reduce((z1, z2) => Math.min(z1, z2));
+        let zMax = zValues.reduce((z1, z2) => Math.max(z1, z2));
+        for (let z = zMin; z <= zMax; ++z) {
             let layer = Playnewton.GPU.GetLayer(z);
             Playnewton.GPU.EnableLayer(layer);
         }
