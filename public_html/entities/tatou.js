@@ -67,17 +67,30 @@ export default class Tatou extends Enemy {
     /**
      *  @type number
      */
-    rollSpeed = 2;
+    rollSpeed = 4;
 
     /**
      *  @type TatouState
      */
-    state = TatouState.WALK;
+    state;
 
     /**
      * @type TatouDirection
      */
     direction = TatouDirection.LEFT;
+
+    /**
+     * @type number
+     */
+    stateStartTime;
+
+    /**
+     * 
+     * @returns {number}
+     */
+    get stateElapsedTime() {
+        return performance.now() - this.stateStartTime;
+    }
 
     /**
      * @type number
@@ -196,6 +209,8 @@ export default class Tatou extends Enemy {
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);
         Playnewton.PPU.SetBodyVelocityBounds(this.body, -10, 10, -20, 10);
         Playnewton.PPU.EnableBody(this.body);
+
+        this.ChangeState(TatouState.WALK);
     }
 
     UpdateBody() {
@@ -225,8 +240,14 @@ export default class Tatou extends Enemy {
 
         switch (this.state) {
             case TatouState.WALK:
+                WalkBackAndForth();
+                break;
             case TatouState.ROLL:
                 WalkBackAndForth();
+                if(this.stateElapsedTime >= 5000 ) {
+                    this.ChangeState(TatouState.WALK);
+                    Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
+                }
                 break;
         }
 
@@ -258,23 +279,28 @@ export default class Tatou extends Enemy {
      */
     Pursue(sara) {
         if (this.state !== TatouState.ROLL) {
-            let dx = sara.body.centerX - this.body.centerX;
-            let dy = sara.body.centerY - this.body.centerY;
-            if (dx < (this.body.height * 4) && dy < (this.body.height)) {
-                this.state = TatouState.ROLL;
+            let dx = Math.abs( this.body.centerX - sara.body.centerX);
+            let dy = this.body.centerY - sara.body.centerY;
+            if (dx < (this.body.width * 2) && dy > 0 && dy < this.body.height) {
+                this.ChangeState(TatouState.ROLL);
                 Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 32);
-                setTimeout(() => {
-                    this.state = TatouState.WALK;
-                    Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
-                }, 5000);
             }
         }
+    }
+
+    /**
+     * 
+     * @param {TatouState} s 
+     */
+    ChangeState(s) {
+        this.state = s;
+        this.stateStartTime = performance.now();
     }
 
     Hurt() {
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {
-            this.state = TatouState.DYING;
+            this.ChangeState(TatouState.DYING);
             Playnewton.PPU.SetBodyImmovable(this.body, true);
         }
     }
