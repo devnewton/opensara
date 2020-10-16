@@ -10,7 +10,8 @@ import Sara from "./sara.js";
 const TatouState = {
     WALK: 1,
     ROLL: 2,
-    DYING: 3
+    SURPRISED: 3,
+    DYING: 4
 };
 
 /**
@@ -242,9 +243,11 @@ export default class Tatou extends Enemy {
             case TatouState.WALK:
                 WalkBackAndForth();
                 break;
+            case TatouState.SURPRISED:
+                break;
             case TatouState.ROLL:
                 WalkBackAndForth();
-                if(this.stateElapsedTime >= 5000 ) {
+                if (this.stateElapsedTime >= 5000) {
                     this.ChangeState(TatouState.WALK);
                     Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
                 }
@@ -263,6 +266,9 @@ export default class Tatou extends Enemy {
                     Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].walk);
                 }
                 break;
+            case TatouState.SURPRISED:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].surprised);
+                break;
             case TatouState.ROLL:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].roll);
                 break;
@@ -278,14 +284,35 @@ export default class Tatou extends Enemy {
      * @param {Sara} sara 
      */
     Pursue(sara) {
-        if (this.state !== TatouState.ROLL) {
-            let dx = Math.abs( this.body.centerX - sara.body.centerX);
-            let dy = this.body.centerY - sara.body.centerY;
-            if (dx < (this.body.width * 2) && dy > 0 && dy < this.body.height) {
-                this.ChangeState(TatouState.ROLL);
-                Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 32);
-            }
+        switch (this.state) {
+            case TatouState.WALK:
+                if (this.IsSaraNear(sara)) {
+                    this.ChangeState(TatouState.SURPRISED);
+                    Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
+                }
+                break;
+            case TatouState.SURPRISED:
+                if (this.stateElapsedTime > 500) {
+                    if (this.IsSaraNear(sara)) {
+                        this.ChangeState(TatouState.ROLL);
+                        Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 32);
+                    } else {
+                        this.ChangeState(TatouState.WALK);
+                        Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
+                    }
+                }
+                break;
         }
+    }
+
+    /**
+     *
+     * @param {Sara} sara 
+     */
+    IsSaraNear(sara) {
+        let dx = Math.abs(this.body.centerX - sara.body.centerX);
+        let dy = this.body.centerY - sara.body.centerY;
+        return dx < (this.body.width * 2) && dy > 0 && dy < this.body.height;
     }
 
     /**
