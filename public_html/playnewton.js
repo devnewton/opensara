@@ -114,6 +114,18 @@ class GPU_Sprite {
 
     /**
      * 
+     * @type number
+     */
+    lastBlinkTime = 0;
+
+    /**
+     * 
+     * @type number
+     */
+    blinkUntilTime = 0;
+
+    /**
+     * 
      * @returns {number}
      */
     get width() {
@@ -1786,6 +1798,17 @@ class Playnewton_GPU {
     }
 
     /**
+     * A sprite blink
+     * @param {GPU_Sprite} sprite
+     * @param {number} duration
+     */
+    MakeSpriteBlink(sprite, duration) {
+        let now = this.fpsLimiter.now;
+        sprite.lastBlinkTime = now;
+        sprite.blinkUntilTime = now + duration;
+    }
+
+    /**
      *  Set sprite animation
      * @param {GPU_Sprite} sprite
      * @param {GPU_SpriteAnimation} animation
@@ -2025,6 +2048,13 @@ class Playnewton_GPU {
      * @param {GPU_Sprite} sprite
      */
     _DrawSprite(sprite) {
+        const now = this.fpsLimiter.now;
+        if(sprite.blinkUntilTime > now) {
+            if((now - sprite.lastBlinkTime) > 100) {
+                sprite.lastBlinkTime = now;
+                return;
+            }             
+        }
         if (sprite.scale !== 1 || sprite.angle !== 0) {
             this.ctx.save();
             this.ctx.translate(sprite.x, sprite.y);
