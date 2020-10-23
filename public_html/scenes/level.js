@@ -142,10 +142,7 @@ export default class Level extends Scene {
     async Start() {
         this.progress = 0;
 
-        let zValues = Object.values(Z_ORDER);
-        let zMin = zValues.reduce((z1, z2) => Math.min(z1, z2));
-        let zMax = zValues.reduce((z1, z2) => Math.max(z1, z2));
-        for (let z = zMin; z <= zMax; ++z) {
+        for (let z = Z_ORDER.MIN; z <= Z_ORDER.MAX; ++z) {
             let layer = Playnewton.GPU.GetLayer(z);
             Playnewton.GPU.EnableLayer(layer);
         }

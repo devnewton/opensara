@@ -334,11 +334,18 @@ export default class Sara {
     }
 
     HurtByPoison() {
+        Playnewton.GPU.MakeSpriteBlink(this.sprite, 1000);
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {
             this.state = SaraState.DYING;
             Playnewton.PPU.SetBodyImmovable(this.body, true);
-            new Fadeout(1000, Array.from({ length: 15 }, (v, i) => i));
+            let layers = [];
+            for(let i=Z_ORDER.MIN; i<Z_ORDER.MAX; ++i) {
+                if( i !== Z_ORDER.SARA) {
+                    layers.push(i);
+                }
+            }
+            new Fadeout(1000, layers);
         }
     }
 }
