@@ -10,6 +10,9 @@ export default class OpenSara {
                 case "ArrowUp":
                     pad.A = down;
                     break;
+                case "ArrowDown":
+                    pad.down = down;
+                    break;
                 case "ArrowLeft":
                     pad.left = down;
                     break;

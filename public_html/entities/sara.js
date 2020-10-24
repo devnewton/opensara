@@ -10,7 +10,8 @@ const SaraState = {
     WALK: 1,
     JUMP: 2,
     DOUBLE_JUMP: 3,
-    DYING: 4
+    STOMP: 4,
+    DYING: 5
 };
 
 /**
@@ -145,6 +146,10 @@ export default class Sara {
             { name: "doublejump-right1", x: 136, y: 150, w: 32, h: 48 },
             { name: "doublejump-right2", x: 170, y: 150, w: 32, h: 48 },
             { name: "doublejump-right3", x: 204, y: 150, w: 32, h: 48 },
+            { name: "stomp-left0", x: 136, y: 1, w: 32, h: 48 },
+            { name: "stomp-left1", x: 170, y: 1, w: 32, h: 48 },
+            { name: "stomp-right0", x: 136, y: 50, w: 32, h: 48 },
+            { name: "stomp-right1", x: 170, y: 50, w: 32, h: 48 },
             { name: "dying0", x: 1, y: 1, w: 32, h: 48 },
             { name: "dying1", x: 35, y: 200, w: 32, h: 48 },
             { name: "dying2", x: 70, y: 200, w: 32, h: 48 },
@@ -213,6 +218,16 @@ export default class Sara {
             { name: "doublejump-right0", delay: 100 },
             { name: "doublejump-right1", delay: 100 },
             { name: "doublejump-right2", delay: 100 }
+        ]);
+        
+        Sara.animations[SaraDirection.LEFT].stomp = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "stomp-left0", delay: 100 },
+            { name: "stomp-left1", delay: 100 }
+        ]);
+        
+        Sara.animations[SaraDirection.RIGHT].stomp = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "stomp-right0", delay: 100 },
+            { name: "stomp-right1", delay: 100 }
         ]);
 
         Sara.animations[SaraDirection.LEFT].dying =
@@ -286,9 +301,19 @@ export default class Sara {
                 }
                 if (this.isOnGround) {
                     this.state = SaraState.WALK;
+                } else if(pad.down){
+                    this.state = SaraState.STOMP;
+                    this.canJump = false;
                 }
                 break;
             case SaraState.DOUBLE_JUMP:
+                if (this.isOnGround) {
+                    this.state = SaraState.WALK;
+                } else if(pad.down){
+                    this.state = SaraState.STOMP;
+                }
+                break;
+            case SaraState.STOMP:
                 if (this.isOnGround) {
                     this.state = SaraState.WALK;
                 }
@@ -317,6 +342,9 @@ export default class Sara {
                 break;
             case SaraState.DOUBLE_JUMP:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].doubleJump);
+                break;
+            case SaraState.STOMP:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].stomp);
                 break;
             case SaraState.DYING:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].dying, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
