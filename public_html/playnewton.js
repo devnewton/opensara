@@ -1798,7 +1798,7 @@ class Playnewton_GPU {
     }
 
     /**
-     * A sprite blink
+     * Make sprite blinking for some time
      * @param {GPU_Sprite} sprite
      * @param {number} duration
      */
@@ -1807,7 +1807,15 @@ class Playnewton_GPU {
         sprite.lastBlinkTime = now;
         sprite.blinkUntilTime = now + duration;
     }
-
+    
+    /**
+     * Check if sprite is blinking
+     * @param {GPU_Sprite} sprite
+     */
+    IsSpriteBlinking(sprite) {
+        return sprite.blinkUntilTime > this.fpsLimiter.now;
+    
+    }
     /**
      *  Set sprite animation
      * @param {GPU_Sprite} sprite
@@ -2769,6 +2777,36 @@ class Playnewton_PPU {
     SetBodyCollideWorldBounds(body, collide) {
         body.collideWorldBounds = collide;
     }
+    
+        /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    CheckIfBodiesIntersects(bodyA, bodyB) {
+        if (bodyA.right <= bodyB.left) {
+            return false;
+        }
+        if (bodyA.left >= bodyB.right) {
+            return false;
+        }
+        if (bodyA.bottom <= bodyB.top) {
+            return false;
+        }
+        if (bodyA.top >= bodyB.bottom) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * 
+     * @param {PPU_Body} stomper
+     * @param {PPU_Body} stomped
+     */
+    CheckIfBodyStompOther(stomper, stomped) {
+        return this.CheckIfBodiesIntersects(stomper, stomped) && stomper.bottom > stomped.top && stomper.isGoingDown;
+    }
 
     Update() {
         for (let body of this.bodies) {
@@ -2845,7 +2883,7 @@ class Playnewton_PPU {
      * 
      * @param {PPU_Body} movableBody
      * @param {PPU_Body} immovableBody
-     * @returns {PPU_Intersection} 
+     * @returns {PPU_Intersection}
      */
     _CheckIfMovableBodyIntersectsImmovableBody(movableBody, immovableBody) {
         if (movableBody.right <= immovableBody.left) {

@@ -96,7 +96,7 @@ export default class Tatou extends Enemy {
     /**
      * @type number
      */
-    health = 5;
+    health = 2;
 
     get dead() {
         return this.health <= 0;
@@ -106,27 +106,27 @@ export default class Tatou extends Enemy {
         let tatouBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/tatou.png");
 
         let spriteset = Playnewton.GPU.CreateSpriteset(tatouBitmap, [
-            { name: "walk-left0", x: 0, y: 0, w: 64, h: 32 },
-            { name: "walk-left1", x: 64, y: 0, w: 64, h: 32 },
-            { name: "walk-left2", x: 128, y: 0, w: 64, h: 32 },
-            { name: "surprised-left0", x: 0, y: 32, w: 64, h: 32 },
-            { name: "roll-left0", x: 64, y: 32, w: 32, h: 32 },
-            { name: "roll-left1", x: 96, y: 32, w: 32, h: 32 },
-            { name: "roll-left2", x: 128, y: 32, w: 32, h: 32 },
-            { name: "roll-left3", x: 160, y: 32, w: 32, h: 32 },
-            { name: "dying-left0", x: 192, y: 0, w: 64, h: 32 },
-            { name: "dying-left1", x: 192, y: 32, w: 64, h: 32 },
+            {name: "walk-left0", x: 0, y: 0, w: 64, h: 32},
+            {name: "walk-left1", x: 64, y: 0, w: 64, h: 32},
+            {name: "walk-left2", x: 128, y: 0, w: 64, h: 32},
+            {name: "surprised-left0", x: 0, y: 32, w: 64, h: 32},
+            {name: "roll-left0", x: 64, y: 32, w: 32, h: 32},
+            {name: "roll-left1", x: 96, y: 32, w: 32, h: 32},
+            {name: "roll-left2", x: 128, y: 32, w: 32, h: 32},
+            {name: "roll-left3", x: 160, y: 32, w: 32, h: 32},
+            {name: "dying-left0", x: 192, y: 0, w: 64, h: 32},
+            {name: "dying-left1", x: 192, y: 32, w: 64, h: 32},
 
-            { name: "walk-right0", x: 0, y: 64, w: 64, h: 32 },
-            { name: "walk-right1", x: 64, y: 64, w: 64, h: 32 },
-            { name: "walk-right2", x: 128, y: 64, w: 64, h: 32 },
-            { name: "surprised-right0", x: 0, y: 96, w: 64, h: 32 },
-            { name: "roll-right0", x: 64, y: 96, w: 32, h: 32 },
-            { name: "roll-right1", x: 96, y: 96, w: 32, h: 32 },
-            { name: "roll-right2", x: 128, y: 96, w: 32, h: 32 },
-            { name: "roll-right3", x: 160, y: 96, w: 32, h: 32 },
-            { name: "dying-right0", x: 192, y: 64, w: 64, h: 32 },
-            { name: "dying-right1", x: 192, y: 96, w: 64, h: 32 }
+            {name: "walk-right0", x: 0, y: 64, w: 64, h: 32},
+            {name: "walk-right1", x: 64, y: 64, w: 64, h: 32},
+            {name: "walk-right2", x: 128, y: 64, w: 64, h: 32},
+            {name: "surprised-right0", x: 0, y: 96, w: 64, h: 32},
+            {name: "roll-right0", x: 64, y: 96, w: 32, h: 32},
+            {name: "roll-right1", x: 96, y: 96, w: 32, h: 32},
+            {name: "roll-right2", x: 128, y: 96, w: 32, h: 32},
+            {name: "roll-right3", x: 160, y: 96, w: 32, h: 32},
+            {name: "dying-right0", x: 192, y: 64, w: 64, h: 32},
+            {name: "dying-right1", x: 192, y: 96, w: 64, h: 32}
 
         ]);
 
@@ -139,62 +139,58 @@ export default class Tatou extends Enemy {
         Tatou.animations[TatouDirection.RIGHT] = new TatouAnimations();
 
         Tatou.animations[TatouDirection.LEFT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "walk-left0", delay: 100 }
+            {name: "walk-left0", delay: 100}
         ]);
 
         Tatou.animations[TatouDirection.RIGHT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "walk-right0", delay: 100 }
+            {name: "walk-right0", delay: 100}
         ]);
 
         Tatou.animations[TatouDirection.LEFT].walk = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "walk-left0", delay: 100 },
-            { name: "walk-left1", delay: 100 },
-            { name: "walk-left2", delay: 100 }
+            {name: "walk-left0", delay: 100},
+            {name: "walk-left1", delay: 100},
+            {name: "walk-left2", delay: 100}
         ]);
 
         Tatou.animations[TatouDirection.RIGHT].walk = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "walk-right0", delay: 100 },
-            { name: "walk-right1", delay: 100 },
-            { name: "walk-right2", delay: 100 }
+            {name: "walk-right0", delay: 100},
+            {name: "walk-right1", delay: 100},
+            {name: "walk-right2", delay: 100}
         ]);
 
         Tatou.animations[TatouDirection.LEFT].surprised = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "surprised-left0", delay: 1000 },
+            {name: "surprised-left0", delay: 1000},
         ]);
 
         Tatou.animations[TatouDirection.RIGHT].surprised = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "surprised-right0", delay: 1000 },
+            {name: "surprised-right0", delay: 1000},
         ]);
 
         Tatou.animations[TatouDirection.LEFT].roll = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "roll-left0", delay: 100 },
-            { name: "roll-left1", delay: 100 },
-            { name: "roll-left2", delay: 100 },
-            { name: "roll-left3", delay: 100 }
+            {name: "roll-left0", delay: 100},
+            {name: "roll-left1", delay: 100},
+            {name: "roll-left2", delay: 100},
+            {name: "roll-left3", delay: 100}
         ]);
 
         Tatou.animations[TatouDirection.RIGHT].roll = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "roll-right0", delay: 100 },
-            { name: "roll-right1", delay: 100 },
-            { name: "roll-right2", delay: 100 },
-            { name: "roll-right3", delay: 100 }
+            {name: "roll-right0", delay: 100},
+            {name: "roll-right1", delay: 100},
+            {name: "roll-right2", delay: 100},
+            {name: "roll-right3", delay: 100}
         ]);
 
         Tatou.animations[TatouDirection.LEFT].dying =
-            Playnewton.GPU.CreateAnimation(spriteset, [
-                { name: "dying-left0", delay: 1000 },
-                { name: "dying-left1", delay: 1000 },
-                { name: "dying-left2", delay: 1000 },
-                { name: "dying-left3", delay: 1000 }
-            ]);
+                Playnewton.GPU.CreateAnimation(spriteset, [
+                    {name: "dying-left0", delay: 1000},
+                    {name: "dying-left1", delay: 1000},
+                ]);
 
         Tatou.animations[TatouDirection.RIGHT].dying =
-            Playnewton.GPU.CreateAnimation(spriteset, [
-                { name: "dying-right0", delay: 1000 },
-                { name: "dying-right1", delay: 1000 },
-                { name: "dying-right2", delay: 1000 },
-                { name: "dying-right3", delay: 1000 }
-            ]);
+                Playnewton.GPU.CreateAnimation(spriteset, [
+                    {name: "dying-right0", delay: 1000},
+                    {name: "dying-right1", delay: 1000},
+                ]);
     }
 
     constructor() {
@@ -328,7 +324,13 @@ export default class Tatou extends Enemy {
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {
             this.ChangeState(TatouState.DYING);
-            Playnewton.PPU.SetBodyImmovable(this.body, true);
+            Playnewton.PPU.DisableBody(this.body);
+        } else {
+            Playnewton.GPU.MakeSpriteBlink(this.sprite, 1000);
         }
+    }
+    
+    get stompable() {
+        return this.state === TatouState.WALK && !Playnewton.GPU.IsSpriteBlinking(this.sprite);
     }
 }

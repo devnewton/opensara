@@ -4,4 +4,8 @@ export default class Enemy {
      */
     Pursue(sara) {
     }
+
+    get stompable() {
+        return false;
+    }
 }

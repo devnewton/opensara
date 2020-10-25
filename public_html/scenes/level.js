@@ -176,7 +176,10 @@ export default class Level extends Scene {
         Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
         Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
 
-        this.enemies.forEach((enemy) => enemy.Pursue(this.sara));
+        this.enemies.forEach((enemy) => {
+            this.sara.Stomp(enemy);
+            enemy.Pursue(this.sara);
+        });
         
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {
