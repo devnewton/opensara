@@ -395,6 +395,18 @@ export default class Sara {
     }
 
     HurtByPoison() {
+        this.Hurt();
+    }
+    
+    HurtByEnemy() {
+        this.Hurt();
+        //TODO add hurted animation / movement?
+    }
+    
+    Hurt() {
+        if(this.dead || Playnewton.GPU.IsSpriteBlinking(this.sprite)) {
+            return;
+        }
         Playnewton.GPU.MakeSpriteBlink(this.sprite, 1000);
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {

@@ -298,6 +298,11 @@ export default class Tatou extends Enemy {
                     }
                 }
                 break;
+            case TatouState.ROLL:
+                if (Playnewton.PPU.CheckIfBodyRunIntoOther(this.body, sara.body)) {
+                    sara.HurtByEnemy();
+                }
+                break;
         }
     }
 

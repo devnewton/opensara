@@ -1466,7 +1466,7 @@ class GPU_HUD {
      */
     enabled = false;
 
-    loadingFrames = [ '⣾', '⣽', '⣻', '⢿', '⡿', '⣟','⣯', '⣷' ];
+    loadingFrames = ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'];
 
     currentLoadingFrame = 0;
 
@@ -1640,8 +1640,8 @@ class GPU_HUD {
      * @param {string} text 
      */
     SetLoadingText(text) {
-        if(text) {
-            this.currentLoadingFrame =  (this.currentLoadingFrame + 1) % this.loadingFrames.length;
+        if (text) {
+            this.currentLoadingFrame = (this.currentLoadingFrame + 1) % this.loadingFrames.length;
             this.loadingText = `${this.loadingFrames[this.currentLoadingFrame]}${text}`;
         } else {
             this.loadingText = null;
@@ -1807,14 +1807,14 @@ class Playnewton_GPU {
         sprite.lastBlinkTime = now;
         sprite.blinkUntilTime = now + duration;
     }
-    
+
     /**
      * Check if sprite is blinking
      * @param {GPU_Sprite} sprite
      */
     IsSpriteBlinking(sprite) {
         return sprite.blinkUntilTime > this.fpsLimiter.now;
-    
+
     }
     /**
      *  Set sprite animation
@@ -2057,11 +2057,11 @@ class Playnewton_GPU {
      */
     _DrawSprite(sprite) {
         const now = this.fpsLimiter.now;
-        if(sprite.blinkUntilTime > now) {
-            if((now - sprite.lastBlinkTime) > 100) {
+        if (sprite.blinkUntilTime > now) {
+            if ((now - sprite.lastBlinkTime) > 100) {
                 sprite.lastBlinkTime = now;
                 return;
-            }             
+            }
         }
         if (sprite.scale !== 1 || sprite.angle !== 0) {
             this.ctx.save();
@@ -2111,7 +2111,7 @@ class Playnewton_GPU {
      * @param {GPU_HUD} hud 
      */
     _DrawLoadingText(hud) {
-        if(hud.loadingText) {
+        if (hud.loadingText) {
             this.ctx.font = "bold 48px monospace";
             this.ctx.fillStyle = "#ffffff";
             this.ctx.textAlign = "right";
@@ -2777,8 +2777,8 @@ class Playnewton_PPU {
     SetBodyCollideWorldBounds(body, collide) {
         body.collideWorldBounds = collide;
     }
-    
-        /**
+
+    /**
      * 
      * @param {PPU_Body} bodyA
      * @param {PPU_Body} bodyB
@@ -2798,7 +2798,7 @@ class Playnewton_PPU {
         }
         return true;
     }
-    
+
     /**
      * 
      * @param {PPU_Body} stomper
@@ -2806,6 +2806,18 @@ class Playnewton_PPU {
      */
     CheckIfBodyStompOther(stomper, stomped) {
         return this.CheckIfBodiesIntersects(stomper, stomped) && stomper.bottom > stomped.top && stomper.isGoingDown;
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} runner
+     * @param {PPU_Body} runned
+     */
+    CheckIfBodyRunIntoOther(runner, runned) {
+        return this.CheckIfBodiesIntersects(runner, runned)
+                && ((runner.right > runned.left && runner.isGoingRight)
+                        || (runner.left < runned.right && runner.isGoingLeft)
+                        );
     }
 
     Update() {
