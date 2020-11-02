@@ -10,7 +10,9 @@ const SaraState = {
     WALK: 1,
     JUMP: 2,
     DOUBLE_JUMP: 3,
-    DYING: 4
+    STOMP: 4,
+    BOUNCE: 5,
+    DYING: 6
 };
 
 /**
@@ -79,6 +81,11 @@ export default class Sara {
      *  @type number
      */
     jumpImpulse = 18;
+    
+    /**
+     *  @type number
+     */
+    bounceImpulse = 9;
 
     /**
      * @type boolean
@@ -99,6 +106,11 @@ export default class Sara {
      * @type boolean
      */
     canJump = true;
+    
+    /**
+     * @type boolean
+     */
+    canStomp = false;
 
     /**
      * @type number
@@ -123,32 +135,36 @@ export default class Sara {
         let saraBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
 
         let spriteset = Playnewton.GPU.CreateSpriteset(saraBitmap, [
-            { name: "stand-left", x: 1, y: 1, w: 32, h: 48 },
-            { name: "stand-right", x: 1, y: 50, w: 32, h: 48 },
-            { name: "walk-left0", x: 35, y: 1, w: 32, h: 48 },
-            { name: "walk-left1", x: 70, y: 1, w: 32, h: 48 },
-            { name: "walk-left2", x: 104, y: 1, w: 32, h: 48 },
-            { name: "walk-right0", x: 35, y: 50, w: 32, h: 48 },
-            { name: "walk-right1", x: 70, y: 50, w: 32, h: 48 },
-            { name: "walk-right2", x: 104, y: 50, w: 32, h: 48 },
-            { name: "jump-descend-left", x: 1, y: 100, w: 32, h: 48 },
-            { name: "jump-float-left", x: 35, y: 100, w: 32, h: 48 },
-            { name: "jump-ascend-left", x: 70, y: 100, w: 32, h: 48 },
-            { name: "jump-ascend-right", x: 1, y: 150, w: 32, h: 48 },
-            { name: "jump-float-right", x: 35, y: 150, w: 32, h: 48 },
-            { name: "jump-descend-right", x: 70, y: 150, w: 32, h: 48 },
-            { name: "doublejump-left0", x: 102, y: 100, w: 32, h: 48 },
-            { name: "doublejump-left1", x: 136, y: 100, w: 32, h: 48 },
-            { name: "doublejump-left2", x: 170, y: 100, w: 32, h: 48 },
-            { name: "doublejump-left3", x: 204, y: 100, w: 32, h: 48 },
-            { name: "doublejump-right0", x: 102, y: 150, w: 32, h: 48 },
-            { name: "doublejump-right1", x: 136, y: 150, w: 32, h: 48 },
-            { name: "doublejump-right2", x: 170, y: 150, w: 32, h: 48 },
-            { name: "doublejump-right3", x: 204, y: 150, w: 32, h: 48 },
-            { name: "dying0", x: 1, y: 1, w: 32, h: 48 },
-            { name: "dying1", x: 35, y: 200, w: 32, h: 48 },
-            { name: "dying2", x: 70, y: 200, w: 32, h: 48 },
-            { name: "dying3", x: 104, y: 200, w: 32, h: 48 }
+            {name: "stand-left", x: 1, y: 1, w: 32, h: 48},
+            {name: "stand-right", x: 1, y: 50, w: 32, h: 48},
+            {name: "walk-left0", x: 35, y: 1, w: 32, h: 48},
+            {name: "walk-left1", x: 70, y: 1, w: 32, h: 48},
+            {name: "walk-left2", x: 104, y: 1, w: 32, h: 48},
+            {name: "walk-right0", x: 35, y: 50, w: 32, h: 48},
+            {name: "walk-right1", x: 70, y: 50, w: 32, h: 48},
+            {name: "walk-right2", x: 104, y: 50, w: 32, h: 48},
+            {name: "jump-descend-left", x: 1, y: 100, w: 32, h: 48},
+            {name: "jump-float-left", x: 35, y: 100, w: 32, h: 48},
+            {name: "jump-ascend-left", x: 70, y: 100, w: 32, h: 48},
+            {name: "jump-ascend-right", x: 1, y: 150, w: 32, h: 48},
+            {name: "jump-float-right", x: 35, y: 150, w: 32, h: 48},
+            {name: "jump-descend-right", x: 70, y: 150, w: 32, h: 48},
+            {name: "doublejump-left0", x: 102, y: 100, w: 32, h: 48},
+            {name: "doublejump-left1", x: 136, y: 100, w: 32, h: 48},
+            {name: "doublejump-left2", x: 170, y: 100, w: 32, h: 48},
+            {name: "doublejump-left3", x: 204, y: 100, w: 32, h: 48},
+            {name: "doublejump-right0", x: 102, y: 150, w: 32, h: 48},
+            {name: "doublejump-right1", x: 136, y: 150, w: 32, h: 48},
+            {name: "doublejump-right2", x: 170, y: 150, w: 32, h: 48},
+            {name: "doublejump-right3", x: 204, y: 150, w: 32, h: 48},
+            {name: "stomp-left0", x: 136, y: 1, w: 32, h: 48},
+            {name: "stomp-left1", x: 170, y: 1, w: 32, h: 48},
+            {name: "stomp-right0", x: 136, y: 50, w: 32, h: 48},
+            {name: "stomp-right1", x: 170, y: 50, w: 32, h: 48},
+            {name: "dying0", x: 1, y: 1, w: 32, h: 48},
+            {name: "dying1", x: 35, y: 200, w: 32, h: 48},
+            {name: "dying2", x: 70, y: 200, w: 32, h: 48},
+            {name: "dying3", x: 104, y: 200, w: 32, h: 48}
         ]);
 
         /**
@@ -160,68 +176,78 @@ export default class Sara {
         Sara.animations[SaraDirection.RIGHT] = new SaraAnimations();
 
         Sara.animations[SaraDirection.LEFT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "stand-left", delay: 1000 }
+            {name: "stand-left", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.RIGHT].stand = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "stand-right", delay: 1000 }
+            {name: "stand-right", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.LEFT].walk = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "walk-left0", delay: 100 },
-            { name: "walk-left1", delay: 100 },
-            { name: "walk-left2", delay: 100 }
+            {name: "walk-left0", delay: 100},
+            {name: "walk-left1", delay: 100},
+            {name: "walk-left2", delay: 100}
         ]);
 
         Sara.animations[SaraDirection.RIGHT].walk = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "walk-right0", delay: 100 },
-            { name: "walk-right1", delay: 100 },
-            { name: "walk-right2", delay: 100 }
+            {name: "walk-right0", delay: 100},
+            {name: "walk-right1", delay: 100},
+            {name: "walk-right2", delay: 100}
         ]);
 
         Sara.animations[SaraDirection.LEFT].jumpAscend = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "jump-ascend-left", delay: 1000 }
+            {name: "jump-ascend-left", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.LEFT].jumpFloat = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "jump-float-left", delay: 1000 }
+            {name: "jump-float-left", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.LEFT].jumpDescend = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "jump-descend-left", delay: 1000 }
+            {name: "jump-descend-left", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.RIGHT].jumpAscend = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "jump-ascend-right", delay: 1000 }
+            {name: "jump-ascend-right", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.RIGHT].jumpFloat = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "jump-float-right", delay: 1000 }
+            {name: "jump-float-right", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.RIGHT].jumpDescend = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "jump-descend-right", delay: 1000 }
+            {name: "jump-descend-right", delay: 1000}
         ]);
 
         Sara.animations[SaraDirection.LEFT].doubleJump = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "doublejump-left0", delay: 100 },
-            { name: "doublejump-left1", delay: 100 },
-            { name: "doublejump-left2", delay: 100 }
+            {name: "doublejump-left0", delay: 100},
+            {name: "doublejump-left1", delay: 100},
+            {name: "doublejump-left2", delay: 100}
         ]);
 
         Sara.animations[SaraDirection.RIGHT].doubleJump = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "doublejump-right0", delay: 100 },
-            { name: "doublejump-right1", delay: 100 },
-            { name: "doublejump-right2", delay: 100 }
+            {name: "doublejump-right0", delay: 100},
+            {name: "doublejump-right1", delay: 100},
+            {name: "doublejump-right2", delay: 100}
+        ]);
+
+        Sara.animations[SaraDirection.LEFT].stomp = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "stomp-left0", delay: 100},
+            {name: "stomp-left1", delay: 100}
+        ]);
+
+        Sara.animations[SaraDirection.RIGHT].stomp = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "stomp-right0", delay: 100},
+            {name: "stomp-right1", delay: 100}
         ]);
 
         Sara.animations[SaraDirection.LEFT].dying =
-            Sara.animations[SaraDirection.RIGHT].dying = Playnewton.GPU.CreateAnimation(spriteset, [
-                { name: "dying0", delay: 1000 },
-                { name: "dying1", delay: 1000 },
-                { name: "dying2", delay: 1000 },
-                { name: "dying3", delay: 1000 }
-            ]);
+                Sara.animations[SaraDirection.RIGHT].dying = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "dying0", delay: 1000},
+            {name: "dying1", delay: 1000},
+            {name: "dying2", delay: 1000},
+            {name: "dying3", delay: 1000}
+        ]);
     }
 
     constructor() {
@@ -273,6 +299,15 @@ export default class Sara {
                 } else {
                     this.canJump = true;
                 }
+                
+                if (pad.down) {
+                    if (this.canStomp && !this.isOnGround) {
+                        this.state = SaraState.STOMP;
+                        this.canJump = false;
+                    }
+                } else if(this.body.isGoingDown) {
+                    this.canStomp = true;
+                }
                 break;
             case SaraState.JUMP:
                 if (pad.A) {
@@ -286,12 +321,35 @@ export default class Sara {
                 }
                 if (this.isOnGround) {
                     this.state = SaraState.WALK;
+                } else if (pad.down) {
+                    if (this.canStomp) {
+                        this.state = SaraState.STOMP;
+                        this.canJump = false;
+                    }
+                } else {
+                    this.canStomp = true;
                 }
                 break;
             case SaraState.DOUBLE_JUMP:
                 if (this.isOnGround) {
                     this.state = SaraState.WALK;
+                } else if (pad.down) {
+                    if (this.canStomp) {
+                        this.state = SaraState.STOMP;
+                        this.canJump = false;
+                    }
+                } else {
+                    this.canStomp = true;
                 }
+                break;
+            case SaraState.STOMP:
+                if (this.isOnGround) {
+                    this.state = SaraState.WALK;
+                }
+                break;
+            case SaraState.BOUNCE:
+                velocityY = -this.bounceImpulse;
+                this.state = SaraState.JUMP;
                 break;
         }
         Playnewton.PPU.SetBodyVelocity(this.body, velocityX, velocityY);
@@ -318,6 +376,9 @@ export default class Sara {
             case SaraState.DOUBLE_JUMP:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].doubleJump);
                 break;
+            case SaraState.STOMP:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].stomp);
+                break;
             case SaraState.DYING:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].dying, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
                 break;
@@ -334,18 +395,43 @@ export default class Sara {
     }
 
     HurtByPoison() {
+        this.Hurt();
+    }
+    
+    HurtByEnemy() {
+        this.Hurt();
+        //TODO add hurted animation / movement?
+    }
+    
+    Hurt() {
+        if(this.dead || Playnewton.GPU.IsSpriteBlinking(this.sprite)) {
+            return;
+        }
         Playnewton.GPU.MakeSpriteBlink(this.sprite, 1000);
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {
             this.state = SaraState.DYING;
             Playnewton.PPU.SetBodyImmovable(this.body, true);
             let layers = [];
-            for(let i=Z_ORDER.MIN; i<Z_ORDER.MAX; ++i) {
-                if( i !== Z_ORDER.SARA) {
+            for (let i = Z_ORDER.MIN; i < Z_ORDER.MAX; ++i) {
+                if (i !== Z_ORDER.SARA) {
                     layers.push(i);
                 }
             }
             new Fadeout(1000, layers);
         }
     }
+    
+        /**
+     * @param {Enemy} enemy 
+     */
+    Stomp(enemy) {
+        if (this.state === SaraState.STOMP 
+                && enemy.stompable
+                && Playnewton.PPU.CheckIfBodyStompOther(this.body, enemy.body)
+                ) {
+            this.state = SaraState.BOUNCE;
+            enemy.Hurt();
+        }
+    }  
 }

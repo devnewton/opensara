@@ -1466,7 +1466,7 @@ class GPU_HUD {
      */
     enabled = false;
 
-    loadingFrames = [ '⣾', '⣽', '⣻', '⢿', '⡿', '⣟','⣯', '⣷' ];
+    loadingFrames = ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'];
 
     currentLoadingFrame = 0;
 
@@ -1640,8 +1640,8 @@ class GPU_HUD {
      * @param {string} text 
      */
     SetLoadingText(text) {
-        if(text) {
-            this.currentLoadingFrame =  (this.currentLoadingFrame + 1) % this.loadingFrames.length;
+        if (text) {
+            this.currentLoadingFrame = (this.currentLoadingFrame + 1) % this.loadingFrames.length;
             this.loadingText = `${this.loadingFrames[this.currentLoadingFrame]}${text}`;
         } else {
             this.loadingText = null;
@@ -1798,7 +1798,7 @@ class Playnewton_GPU {
     }
 
     /**
-     * A sprite blink
+     * Make sprite blinking for some time
      * @param {GPU_Sprite} sprite
      * @param {number} duration
      */
@@ -1808,6 +1808,14 @@ class Playnewton_GPU {
         sprite.blinkUntilTime = now + duration;
     }
 
+    /**
+     * Check if sprite is blinking
+     * @param {GPU_Sprite} sprite
+     */
+    IsSpriteBlinking(sprite) {
+        return sprite.blinkUntilTime > this.fpsLimiter.now;
+
+    }
     /**
      *  Set sprite animation
      * @param {GPU_Sprite} sprite
@@ -2049,11 +2057,11 @@ class Playnewton_GPU {
      */
     _DrawSprite(sprite) {
         const now = this.fpsLimiter.now;
-        if(sprite.blinkUntilTime > now) {
-            if((now - sprite.lastBlinkTime) > 100) {
+        if (sprite.blinkUntilTime > now) {
+            if ((now - sprite.lastBlinkTime) > 100) {
                 sprite.lastBlinkTime = now;
                 return;
-            }             
+            }
         }
         if (sprite.scale !== 1 || sprite.angle !== 0) {
             this.ctx.save();
@@ -2103,7 +2111,7 @@ class Playnewton_GPU {
      * @param {GPU_HUD} hud 
      */
     _DrawLoadingText(hud) {
-        if(hud.loadingText) {
+        if (hud.loadingText) {
             this.ctx.font = "bold 48px monospace";
             this.ctx.fillStyle = "#ffffff";
             this.ctx.textAlign = "right";
@@ -2770,6 +2778,48 @@ class Playnewton_PPU {
         body.collideWorldBounds = collide;
     }
 
+    /**
+     * 
+     * @param {PPU_Body} bodyA
+     * @param {PPU_Body} bodyB
+     */
+    CheckIfBodiesIntersects(bodyA, bodyB) {
+        if (bodyA.right <= bodyB.left) {
+            return false;
+        }
+        if (bodyA.left >= bodyB.right) {
+            return false;
+        }
+        if (bodyA.bottom <= bodyB.top) {
+            return false;
+        }
+        if (bodyA.top >= bodyB.bottom) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} stomper
+     * @param {PPU_Body} stomped
+     */
+    CheckIfBodyStompOther(stomper, stomped) {
+        return this.CheckIfBodiesIntersects(stomper, stomped) && stomper.bottom > stomped.top && stomper.isGoingDown;
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} runner
+     * @param {PPU_Body} runned
+     */
+    CheckIfBodyRunIntoOther(runner, runned) {
+        return this.CheckIfBodiesIntersects(runner, runned)
+                && ((runner.right > runned.left && runner.isGoingRight)
+                        || (runner.left < runned.right && runner.isGoingLeft)
+                        );
+    }
+
     Update() {
         for (let body of this.bodies) {
             this._MoveBody(body);
@@ -2845,7 +2895,7 @@ class Playnewton_PPU {
      * 
      * @param {PPU_Body} movableBody
      * @param {PPU_Body} immovableBody
-     * @returns {PPU_Intersection} 
+     * @returns {PPU_Intersection}
      */
     _CheckIfMovableBodyIntersectsImmovableBody(movableBody, immovableBody) {
         if (movableBody.right <= immovableBody.left) {
