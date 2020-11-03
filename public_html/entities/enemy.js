@@ -5,6 +5,9 @@ export default class Enemy {
     Pursue(sara) {
     }
 
+    UpdateBody() {
+    }
+
     get stompable() {
         return false;
     }

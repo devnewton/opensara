@@ -114,6 +114,14 @@ class GPU_Sprite {
 
     /**
      * 
+     * @returns {boolean}
+     */
+    get animationStopped() {
+        return this.animationState === GPU_AnimationState.STOPPED;
+    }
+
+    /**
+     * 
      * @type number
      */
     lastBlinkTime = 0;
@@ -1830,11 +1838,12 @@ class Playnewton_GPU {
     SetSpriteAnimation(sprite, animation, mode = GPU_AnimationMode.LOOP) {
         sprite.animationMode = mode;
         if (sprite.animation !== animation) {
+            sprite.animationState = GPU_AnimationState.STARTED;
             sprite.animation = animation;
             sprite.animationCurrentFrameIndex = 0;
             sprite.animationCurrentTime = 0;
             sprite.picture = sprite.animation.frames[0].picture;
-    }
+        }
     }
 
     /**
@@ -1995,7 +2004,7 @@ class Playnewton_GPU {
      * @param {GPU_Sprite} sprite
      */
     _UpdateSpriteAnimation(sprite) {
-        if (sprite.animationState === GPU_AnimationState.STOPPED) {
+        if (sprite.animationStopped) {
             return;
         }
         let frames = sprite.animation.frames;
@@ -2789,16 +2798,16 @@ class Playnewton_PPU {
      * @param {PPU_Body} bodyB
      */
     CheckIfBodiesIntersects(bodyA, bodyB) {
-        if (bodyA.right <= bodyB.left) {
+        if (bodyA.right < bodyB.left) {
             return false;
         }
-        if (bodyA.left >= bodyB.right) {
+        if (bodyA.left > bodyB.right) {
             return false;
         }
-        if (bodyA.bottom <= bodyB.top) {
+        if (bodyA.bottom < bodyB.top) {
             return false;
         }
-        if (bodyA.top >= bodyB.bottom) {
+        if (bodyA.top > bodyB.bottom) {
             return false;
         }
         return true;
@@ -2810,7 +2819,7 @@ class Playnewton_PPU {
      * @param {PPU_Body} stomped
      */
     CheckIfBodyStompOther(stomper, stomped) {
-        return this.CheckIfBodiesIntersects(stomper, stomped) && stomper.bottom > stomped.top && stomper.isGoingDown;
+        return this.CheckIfBodiesIntersects(stomper, stomped) && stomper.bottom >= stomped.top && stomper.isGoingDown;
     }
 
     /**

@@ -59,7 +59,7 @@ export default class Cat extends Enemy {
     /**
      * @type number
      */
-    health = 5;
+    health = 3;
 
     get dead() {
         return this.health <= 0;
@@ -88,10 +88,10 @@ export default class Cat extends Enemy {
             { name: "hurt04", x: 181, y: 60, w: 30, h: 59 },
             { name: "hurt05", x: 211, y: 60, w: 30, h: 59 },
             { name: "hurt06", x: 1, y: 119, w: 30, h: 59 },
-            { name: "die01", x: 31, y: 119, w: 30, h: 59 },
-            { name: "die02", x: 61, y: 119, w: 30, h: 59 },
-            { name: "die03", x: 91, y: 119, w: 30, h: 59 },
-            { name: "die04", x: 121, y: 119, w: 30, h: 59 }
+            { name: "die00", x: 31, y: 119, w: 30, h: 59 },
+            { name: "die01", x: 61, y: 119, w: 30, h: 59 },
+            { name: "die02", x: 91, y: 119, w: 30, h: 59 },
+            { name: "die03", x: 121, y: 119, w: 30, h: 59 }
         ]);
 
         /**
@@ -127,11 +127,10 @@ export default class Cat extends Enemy {
         ]);
 
         Cat.animations.die = Playnewton.GPU.CreateAnimation(spriteset, [
-            { name: "die00", delay: 100 },
-            { name: "die01", delay: 100 },
-            { name: "die02", delay: 100 },
-            { name: "die03", delay: 100 },
-            { name: "die04", delay: 100 }
+            { name: "die00", delay: 500 },
+            { name: "die01", delay: 500 },
+            { name: "die02", delay: 500 },
+            { name: "die03", delay: 500 }
         ]);
     }
 
@@ -151,19 +150,26 @@ export default class Cat extends Enemy {
         this.state = CatState.IDLE;
     }
 
-    UpdateBody() {
-        if (this.state === CatState.DYING) {
-            return;
-        }
-    }
-
     UpdateSprite() {
         switch (this.state) {
             case CatState.IDLE:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.idle);
                 break;
+            case CatState.HURT:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.hurt, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                if(this.sprite.animationStopped) {
+                    this.state = CatState.IDLE;
+                }
+                break;
+            case CatState.DEAD:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.die, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
+    }
+
+    get stompable() {
+        return this.state === CatState.IDLE;
     }
 
     /**
@@ -179,10 +185,13 @@ export default class Cat extends Enemy {
     }
 
     Hurt() {
-        this.health = Math.max(this.health - 1, 0);
-        if (this.dead) {
-            this.state = CatState.DYING;
-            Playnewton.PPU.SetBodyImmovable(this.body, true);
+        if (this.state === CatState.IDLE) {
+            this.state = CatState.HURT;
+            this.health = Math.max(this.health - 1, 0);
+            if (this.dead) {
+                this.state = CatState.DEAD;
+                Playnewton.PPU.SetBodyImmovable(this.body, true);
+            }
         }
     }
 }
