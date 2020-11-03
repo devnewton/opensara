@@ -626,6 +626,8 @@ class TMX_Tileset {
      * @type Map<number, TMX_Tile>
      */
     tiles = new Map();
+
+    properties = new Map();
 }
 
 class TMX_Chunk {
@@ -1073,7 +1075,7 @@ class Playnewton_DRIVE {
     }
 
     _ParseBooleanProperty(name, objectProperties, groupProperties) {
-        let prop = objectProperties.get(name) || groupProperties.get(name);
+        let prop = objectProperties.get(name) || (groupProperties && groupProperties.get(name));
         return "true" === prop;
     }
 
@@ -1090,7 +1092,10 @@ class Playnewton_DRIVE {
         tileset.tileHeight = parseInt(tilesetElement.getAttribute("tileheight"), 10);
         tileset.spacing = parseInt(tilesetElement.getAttribute("spacing"), 10) || 0;
         tileset.margin = parseInt(tilesetElement.getAttribute("margin"), 10) || 0;
-        tileset.bitmap = await this.LoadBitmap(baseUrl + tilesetElement.getElementsByTagName("image")[0].getAttribute("source"));
+        tileset.properties = this._LoadTmxProperties(tilesetElement);
+        if(!this._ParseBooleanProperty("doNotLoadBitmap", tileset.properties)) {
+            tileset.bitmap = await this.LoadBitmap(baseUrl + tilesetElement.getElementsByTagName("image")[0].getAttribute("source"));
+        }
 
         for (let tileElement of tilesetElement.getElementsByTagName("tile")) {
             let tile = new TMX_Tile();

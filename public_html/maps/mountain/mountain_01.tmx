@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="45">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="45">
  <tileset firstgid="1" source="mountain.tsx"/>
  <tileset firstgid="50" name="collectibles" tilewidth="32" tileheight="32" tilecount="64" columns="8">
   <image source="../../sprites/collectibles.png" width="256" height="256"/>
@@ -17,6 +17,36 @@
    <properties>
     <property name="type" value="exit"/>
    </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="114" name="icons" tilewidth="60" tileheight="57" tilecount="4" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <properties>
+   <property name="doNotLoadBitmap" value="true"/>
+  </properties>
+  <tile id="1">
+   <properties>
+    <property name="type" value="cat"/>
+   </properties>
+   <image width="28" height="57" source="../../icons/cat-icon.png"/>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="type" value="sara"/>
+   </properties>
+   <image width="31" height="47" source="../../icons/sara-icon.png"/>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="type" value="tatou"/>
+   </properties>
+   <image width="59" height="24" source="../../icons/tatou-icon.png"/>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="type" value="vautour"/>
+   </properties>
+   <image width="60" height="42" source="../../icons/vautour-icon.png"/>
   </tile>
  </tileset>
  <layer id="4" name="bg0" width="32" height="18">
@@ -110,4 +140,5 @@
   <object id="43" gid="58" x="252" y="546.667" width="32" height="32"/>
   <object id="44" gid="66" x="768" y="546" width="32" height="32"/>
  </objectgroup>
+ <objectgroup id="5" name="enemies"/>
 </map>
