@@ -148,7 +148,7 @@ export default class Cat extends Enemy {
         Playnewton.PPU.SetBodyImmovable(this.body, true);
         Playnewton.PPU.EnableBody(this.body);
 
-        this.ChangeState(CatState.IDLE);
+        this.state = CatState.IDLE;
     }
 
     UpdateBody() {
@@ -181,7 +181,7 @@ export default class Cat extends Enemy {
     Hurt() {
         this.health = Math.max(this.health - 1, 0);
         if (this.dead) {
-            this.ChangeState(CatState.DYING);
+            this.state = CatState.DYING;
             Playnewton.PPU.SetBodyImmovable(this.body, true);
         }
     }

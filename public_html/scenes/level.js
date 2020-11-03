@@ -9,6 +9,7 @@ import Poison from "../entities/poison.js"
 import Tatou from "../entities/tatou.js"
 import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
+import Cat from "../entities/cat.js"
 
 export default class Level extends Scene {
 
@@ -66,6 +67,10 @@ export default class Level extends Scene {
         await Tatou.Preload();
         let tatou = new Tatou();
         this.enemies.push(tatou);
+
+        await Cat.Preload();
+        let cat = new Cat();
+        this.enemies.push(cat);
     }
 
     async InitCollectibles(map) {
