@@ -135,7 +135,7 @@ export default class Cat extends Enemy {
         ]);
     }
 
-    constructor() {
+    constructor(x, y) {
         super();
         this.sprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.idle);
@@ -144,7 +144,7 @@ export default class Cat extends Enemy {
 
         this.body = Playnewton.PPU.GetAvailableBody();
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 30, 59);
-        Playnewton.PPU.SetBodyPosition(this.body, 80, 180);
+        Playnewton.PPU.SetBodyPosition(this.body, x, y - 59);
         Playnewton.PPU.SetBodyImmovable(this.body, true);
         Playnewton.PPU.EnableBody(this.body);
 

@@ -60,17 +60,11 @@ export default class Level extends Scene {
 
     async InitSara() {
         await Sara.Preload();
-        this.sara = new Sara();
     }
 
     async InitEnemies() {
         await Tatou.Preload();
-        let tatou = new Tatou();
-        this.enemies.push(tatou);
-
         await Cat.Preload();
-        let cat = new Cat();
-        this.enemies.push(cat);
     }
 
     async InitCollectibles(map) {
@@ -96,6 +90,19 @@ export default class Level extends Scene {
                         let key = new Key();
                         Playnewton.GPU.SetSpritePosition(key.sprite, x, y - key.sprite.height);
                         this.keys.push(key);
+                        break;
+                    case "cat":
+                        let cat = new Cat(x, y);
+                        this.enemies.push(cat);
+                        break;
+                    case "tatou":
+                        let tatou = new Tatou(x, y);
+                        this.enemies.push(tatou);
+                        break;
+                    case "sara":
+                        if(!this.sara) {
+                            this.sara = new Sara(x, y);
+                        }
                         break;
                 }
             }
