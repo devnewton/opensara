@@ -144,7 +144,7 @@ export default class Cat extends Enemy {
         this.body = Playnewton.PPU.GetAvailableBody();
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 30, 59);
         Playnewton.PPU.SetBodyPosition(this.body, x, y - 59);
-        Playnewton.PPU.SetBodyImmovable(this.body, true);
+        Playnewton.PPU.SetBodyVelocityBounds(this.body, 0, 0, 0, 0);
         Playnewton.PPU.EnableBody(this.body);
 
         this.state = CatState.IDLE;
@@ -190,7 +190,6 @@ export default class Cat extends Enemy {
             this.health = Math.max(this.health - 1, 0);
             if (this.dead) {
                 this.state = CatState.DEAD;
-                Playnewton.PPU.SetBodyImmovable(this.body, true);
             }
         }
     }
