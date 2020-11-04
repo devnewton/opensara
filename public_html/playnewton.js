@@ -91,9 +91,31 @@ class GPU_Sprite {
      * @type GPU_SpritePicture
      */
     picture;
+    
+    /**
+     * 
+     * @type number
+     */
     scale = 1;
+
+    /**
+     * 
+     * @type number
+     */
     angle = 0;
+    
+    /**
+     * 
+     * @type boolean
+     */
     enabled = false;
+
+    /**
+     * 
+     * @type boolean
+     */
+    visible = true;
+
     /**
      * 
      * @type GPU_SpriteAnimation
@@ -109,7 +131,17 @@ class GPU_Sprite {
      * @type GPU_AnimationState
      */
     animationState;
+
+    /**
+     * 
+     * @type number
+     */
     animationCurrentFrameIndex;
+
+    /**
+     * 
+     * @type number
+     */
     animationCurrentTime;
 
     /**
@@ -1849,6 +1881,15 @@ class Playnewton_GPU {
     /**
      * 
      * @param {GPU_Sprite} sprite
+     * @param {boolean} visible
+     */
+    SetSpriteVisible(sprite, visible) {
+        sprite.visible = visible;
+    }
+
+    /**
+     * 
+     * @param {GPU_Sprite} sprite
      * @param {number} x Horizontal position (0 = left margin)
      * @param {number} y Vertical position (0 = top margin)
      */
@@ -2063,7 +2104,7 @@ class Playnewton_GPU {
      * @returns {boolean} 
      */
     _IsSpriteVisible(sprite) {
-        return sprite.enabled && sprite.picture;
+        return sprite.enabled && sprite.picture && sprite.visible;
     }
     /**
      * 
@@ -2456,6 +2497,11 @@ class PPU_Body {
     /**
      * @type boolean 
      */
+    affectedByGravity = true;
+
+    /**
+     * @type boolean 
+     */
     immovable = false;
 
     /**
@@ -2758,6 +2804,15 @@ class Playnewton_PPU {
 
     /**
      * @param {PPU_Body} body
+     * @param {boolean} affectedByGravity 
+     */
+    SetBodyAffectedByGravity(body, affectedByGravity) {
+        body.affectedByGravity = affectedByGravity;
+    }
+    
+
+    /**
+     * @param {PPU_Body} body
      * @param {number} x 
      * @param {number} y 
      */
@@ -2832,6 +2887,26 @@ class Playnewton_PPU {
                 && ((runner.right > runned.left && runner.isGoingRight)
                         || (runner.left < runned.right && runner.isGoingLeft)
                         );
+    }
+
+    /**
+     * 
+     * @param {PPU_Body} body
+     */
+    CheckIfBodyIsInWorldBound(body) {
+        if (body.right < this.world.bounds.left) {
+            return false
+        }
+        if (body.bottom < this.world.bounds.top) {
+            return false;
+        }
+        if (body.left > this.world.bounds.right) {
+            return false;
+        }
+        if (body.top > this.world.bounds.bottom) {
+            return false;
+        }
+        return true;
     }
 
     Update() {
@@ -3041,7 +3116,9 @@ class Playnewton_PPU {
             body.previousPosition.x = body.position.x;
             body.previousPosition.y = body.position.y;
 
-            body.velocity.addForce(this.world.gravity);
+            if(body.affectedByGravity) {
+                body.velocity.addForce(this.world.gravity);
+            }
 
             if (body.velocity.x > body.maxXVelocity) {
                 body.velocity.x = body.maxXVelocity;

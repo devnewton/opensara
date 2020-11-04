@@ -2,6 +2,7 @@ import Enemy from "./enemy.js"
 import Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Sara from "./sara.js";
+import { Bullet, BulletAnimations } from "./bullet.js";
 
 /**
  * @readonly
@@ -66,9 +67,12 @@ export default class Cat extends Enemy {
     }
 
     /**
-     * @type CatAnimations[]
+     * @type Bullet
      */
+    bullet;
+
     static animations = new CatAnimations();
+    static bulletAnimations = new BulletAnimations();
 
     static async Preload() {
         let catBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/cat.png");
@@ -96,7 +100,27 @@ export default class Cat extends Enemy {
             { name: "die00", x: 31, y: 119, w: 30, h: 59 },
             { name: "die01", x: 61, y: 119, w: 30, h: 59 },
             { name: "die02", x: 91, y: 119, w: 30, h: 59 },
-            { name: "die03", x: 121, y: 119, w: 30, h: 59 }
+            { name: "die03", x: 121, y: 119, w: 30, h: 59 },
+            { name: "die03", x: 121, y: 119, w: 30, h: 59 },
+            { name: "bullet-grow00", x: 152, y: 120, w: 30, h: 29 },
+            { name: "bullet-fly00", x: 152, y: 120, w: 30, h: 29 },
+            { name: "bullet-fly01", x: 184, y: 120, w: 30, h: 29 },
+            { name: "bullet-fly02", x: 216, y: 120, w: 30, h: 29 },
+            { name: "bullet-fly03", x: 152, y: 151, w: 30, h: 29 },
+            { name: "bullet-fly04", x: 184, y: 151, w: 30, h: 29 },
+            { name: "bullet-explode00", x: 0, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode01", x: 32, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode02", x: 64, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode03", x: 96, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode04", x: 128, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode05", x: 160, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode06", x: 192, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode07", x: 224, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode08", x: 0, y: 214, w: 32, h: 32 }, 
+            { name: "bullet-explode09", x: 32, y: 214, w: 32, h: 32 }, 
+            { name: "bullet-explode10", x: 64, y: 214, w: 32, h: 32 }, 
+            { name: "bullet-explode11", x: 96, y: 214, w: 32, h: 32 }, 
+            { name: "bullet-explode12", x: 128, y: 214, w: 32, h: 32 }
         ]);
 
         Cat.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
@@ -131,6 +155,34 @@ export default class Cat extends Enemy {
             { name: "die02", delay: 500 },
             { name: "die03", delay: 500 }
         ]);
+
+        Cat.bulletAnimations.grow = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "bullet-grow00", delay: 1000 },
+        ]);
+
+        Cat.bulletAnimations.fly = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "bullet-fly00", delay: 100 },
+            { name: "bullet-fly01", delay: 100 },
+            { name: "bullet-fly02", delay: 100 },
+            { name: "bullet-fly03", delay: 100 },
+            { name: "bullet-fly04", delay: 100 }
+        ]);
+
+        Cat.bulletAnimations.explode = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "bullet-explode00", delay: 100 },
+            { name: "bullet-explode01", delay: 100 },
+            { name: "bullet-explode02", delay: 100 },
+            { name: "bullet-explode03", delay: 100 },
+            { name: "bullet-explode04", delay: 100 },
+            { name: "bullet-explode05", delay: 100 },
+            { name: "bullet-explode06", delay: 100 },
+            { name: "bullet-explode07", delay: 100 },
+            { name: "bullet-explode08", delay: 100 },
+            { name: "bullet-explode09", delay: 100 },
+            { name: "bullet-explode10", delay: 100 },
+            { name: "bullet-explode11", delay: 100 },
+            { name: "bullet-explode12", delay: 100 }
+        ]);
     }
 
     constructor(x, y) {
@@ -147,12 +199,20 @@ export default class Cat extends Enemy {
         Playnewton.PPU.EnableBody(this.body);
 
         this.state = CatState.IDLE;
+
+        this.bullet = new Bullet(Cat.bulletAnimations);
     }
 
     UpdateSprite() {
         switch (this.state) {
             case CatState.IDLE:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.idle);
+                break;
+            case CatState.ATTACK:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.attack, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                if(this.sprite.animationStopped) {
+                    this.state = CatState.IDLE;
+                }
                 break;
             case CatState.HURT:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.hurt, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
@@ -165,6 +225,11 @@ export default class Cat extends Enemy {
                 break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
+        this.bullet.UpdateSprite();
+    }
+
+    UpdateBody() {
+        this.bullet.UpdateBody();
     }
 
     get stompable() {
@@ -178,7 +243,14 @@ export default class Cat extends Enemy {
     Pursue(sara) {
         switch (this.state) {
             case CatState.IDLE:
-                //TODO
+                if(this.bullet.canBeFired) {
+                    let x = this.body.centerX;
+                    let y = this.body.centerY;
+                    let dx = sara.body.centerX - this.body.centerX;
+                    let dy = sara.body.centerY - this.body.centerY;
+                    this.bullet.fire(x, y, dx, dy);
+                    this.state = CatState.ATTACK;
+                }
                 break;
         }
     }

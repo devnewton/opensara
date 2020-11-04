@@ -10,7 +10,8 @@ const Z_ORDER = {
     ENEMIES: 16,
     DOORS: 17,
     SARA: 18,
-    MAX: 18
+    BULLETS: 19,
+    MAX: 19
 };
 
 export default Z_ORDER;

@@ -1,4 +1,5 @@
 export default class Enemy {
+
     /**
      * @param {Sara} sara 
      */
@@ -6,6 +7,9 @@ export default class Enemy {
     }
 
     UpdateBody() {
+    }
+
+    UpdateSprite() {
     }
 
     get stompable() {
