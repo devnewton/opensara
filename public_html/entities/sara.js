@@ -131,6 +131,11 @@ export default class Sara {
         return this.health <= 0;
     }
 
+    /**
+     * @type SaraAnimations[]
+     */
+    static animations = [];
+
     static async Preload() {
         let saraBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
 
@@ -167,11 +172,6 @@ export default class Sara {
             {name: "dying3", x: 104, y: 200, w: 32, h: 48}
         ]);
 
-        /**
-         * @type SaraAnimations[]
-         * @static
-         */
-        Sara.animations = [];
         Sara.animations[SaraDirection.LEFT] = new SaraAnimations();
         Sara.animations[SaraDirection.RIGHT] = new SaraAnimations();
 

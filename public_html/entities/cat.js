@@ -65,6 +65,11 @@ export default class Cat extends Enemy {
         return this.health <= 0;
     }
 
+    /**
+     * @type CatAnimations[]
+     */
+    static animations = new CatAnimations();
+
     static async Preload() {
         let catBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/cat.png");
 
@@ -93,12 +98,6 @@ export default class Cat extends Enemy {
             { name: "die02", x: 91, y: 119, w: 30, h: 59 },
             { name: "die03", x: 121, y: 119, w: 30, h: 59 }
         ]);
-
-        /**
-         * @type CatAnimations[]
-         * @static
-         */
-        Cat.animations = new CatAnimations();
 
         Cat.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "idle00", delay: 100 }

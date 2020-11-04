@@ -43,6 +43,8 @@ export default class Heart {
      */
     state = HeartState.IDLE;
 
+    static animations = new HeatAnimations();
+
     static async Preload() {
         let bitmap = Collectible.bitmap;
 
@@ -56,8 +58,6 @@ export default class Heart {
             {name: "heart7", x: 192, y: 0, w: 32, h: 32}
 
         ]);
-
-        Heart.animations = new HeatAnimations();
 
         Heart.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "heart1", delay: 100},

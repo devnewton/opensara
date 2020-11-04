@@ -48,6 +48,9 @@ export default class Exit {
      */
     nbLock = 1;
 
+    static animations = new ExitAnimations();
+
+
     static async Preload() {
         let bitmap = Collectible.bitmap;
 
@@ -62,8 +65,6 @@ export default class Exit {
             { name: "exit8", x: 224, y: 64, w: 32, h: 32 }
 
         ]);
-
-        Exit.animations = new ExitAnimations();
 
         Exit.animations.inactive = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "exit1", delay: 1000 },

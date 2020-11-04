@@ -102,6 +102,11 @@ export default class Tatou extends Enemy {
         return this.health <= 0;
     }
 
+    /**
+     * @type TatouAnimations[]
+     */
+    static animations = [];
+
     static async Preload() {
         let tatouBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/tatou.png");
 
@@ -130,11 +135,6 @@ export default class Tatou extends Enemy {
 
         ]);
 
-        /**
-         * @type TatouAnimations[]
-         * @static
-         */
-        Tatou.animations = [];
         Tatou.animations[TatouDirection.LEFT] = new TatouAnimations();
         Tatou.animations[TatouDirection.RIGHT] = new TatouAnimations();
 
