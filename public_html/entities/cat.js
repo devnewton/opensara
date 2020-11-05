@@ -108,14 +108,14 @@ export default class Cat extends Enemy {
             { name: "bullet-fly02", x: 216, y: 120, w: 30, h: 29 },
             { name: "bullet-fly03", x: 152, y: 151, w: 30, h: 29 },
             { name: "bullet-fly04", x: 184, y: 151, w: 30, h: 29 },
-            { name: "bullet-explode00", x: 0, y: 192, w: 32, h: 32 },
-            { name: "bullet-explode01", x: 32, y: 192, w: 32, h: 32 },
-            { name: "bullet-explode02", x: 64, y: 192, w: 32, h: 32 },
-            { name: "bullet-explode03", x: 96, y: 192, w: 32, h: 32 },
-            { name: "bullet-explode04", x: 128, y: 192, w: 32, h: 32 },
-            { name: "bullet-explode05", x: 160, y: 192, w: 32, h: 32 },
-            { name: "bullet-explode06", x: 192, y: 192, w: 32, h: 32 },
-            { name: "bullet-explode07", x: 224, y: 192, w: 32, h: 32 },
+            { name: "bullet-explode00", x: 0, y: 180, w: 32, h: 32 },
+            { name: "bullet-explode01", x: 32, y: 180, w: 32, h: 32 },
+            { name: "bullet-explode02", x: 64, y: 180, w: 32, h: 32 },
+            { name: "bullet-explode03", x: 96, y: 180, w: 32, h: 32 },
+            { name: "bullet-explode04", x: 128, y: 180, w: 32, h: 32 },
+            { name: "bullet-explode05", x: 160, y: 180, w: 32, h: 32 },
+            { name: "bullet-explode06", x: 192, y: 180, w: 32, h: 32 },
+            { name: "bullet-explode07", x: 224, y: 180, w: 32, h: 32 },
             { name: "bullet-explode08", x: 0, y: 214, w: 32, h: 32 }, 
             { name: "bullet-explode09", x: 32, y: 214, w: 32, h: 32 }, 
             { name: "bullet-explode10", x: 64, y: 214, w: 32, h: 32 }, 
@@ -244,15 +244,12 @@ export default class Cat extends Enemy {
         switch (this.state) {
             case CatState.IDLE:
                 if(this.bullet.canBeFired) {
-                    let x = this.body.centerX;
-                    let y = this.body.centerY;
-                    let dx = sara.body.centerX - this.body.centerX;
-                    let dy = sara.body.centerY - this.body.centerY;
-                    this.bullet.fire(x, y, dx, dy);
+                    this.bullet.fireAt(this.body.centerX, this.body.centerY - 12, sara.body.centerX, sara.body.centerY, 2);
                     this.state = CatState.ATTACK;
                 }
                 break;
         }
+        this.bullet.Pursue(sara);
     }
 
     Hurt() {

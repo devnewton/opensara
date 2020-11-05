@@ -2505,6 +2505,14 @@ class PPU_Body {
     immovable = false;
 
     /**
+     * PPU perform bitwise AND between 
+     * bodies collision masks to determin
+     * if they can collide
+     * @type number 
+     */
+    collisionMask = 1;
+
+    /**
      * 
      * @type PPU_Shape
      */
@@ -2804,6 +2812,14 @@ class Playnewton_PPU {
 
     /**
      * @param {PPU_Body} body
+     * @param {boolean} immovable 
+     */
+    SetBodyCollisionMask(body, collisionMask) {
+        body.collisionMask = collisionMask;
+    }
+
+    /**
+     * @param {PPU_Body} body
      * @param {boolean} affectedByGravity 
      */
     SetBodyAffectedByGravity(body, affectedByGravity) {
@@ -2948,7 +2964,7 @@ class Playnewton_PPU {
      * @param {PPU_Body} bodyB
      */
     _CollideBodies(bodyA, bodyB) {
-        if (bodyA !== bodyB && bodyA.enabled && bodyB.enabled) {
+        if (bodyA !== bodyB && bodyA.enabled && bodyB.enabled && (bodyA.collisionMask & bodyB.collisionMask)) {
             if (bodyA.movable && bodyB.immovable) {
                 this._CollideMovableAndImmovableBodies(bodyA, bodyB);
             } else if (bodyA.immovable && bodyB.movable) {

@@ -59,9 +59,14 @@ export class Bullet extends Enemy{
     scale = 0;
 
     /**
+     * @type number
+     */
+    growSpeed = 0.02
+
+    /**
      * @type BulletAnimations
      */
-    animations
+    animations;
 
     /**
      * 
@@ -77,6 +82,7 @@ export class Bullet extends Enemy{
 
         this.body = Playnewton.PPU.GetAvailableBody();
         Playnewton.PPU.SetBodyAffectedByGravity(this.body, false);
+        Playnewton.PPU.SetBodyCollisionMask(this.body, 0);
         Playnewton.PPU.EnableBody(this.body);
 
         this.state = BulletState.EXPLODED;
@@ -84,6 +90,16 @@ export class Bullet extends Enemy{
 
     get canBeFired() {
         return this.state === BulletState.EXPLODED;
+    }
+
+    fireAt(x, y, targetX, targetY, speed) {
+        let dx = targetX - x;
+        let dy = targetY - y;
+        let distance = Math.sqrt(dx ** 2 + dy ** 2);
+        let s = speed / distance;
+        dx *= s;
+        dy *= s;
+        this.fire(x, y, dx, dy);
     }
 
     fire(x, y, vx, vy) {
@@ -102,7 +118,7 @@ export class Bullet extends Enemy{
     UpdateBody() {
         switch(this.state) {
             case BulletState.GROW:
-                this.scale += 0.01;
+                this.scale += this.growSpeed;
                 if(this.scale >= 1) {
                     this.scale = 1;
                     this.state = BulletState.FLY;
@@ -134,7 +150,7 @@ export class Bullet extends Enemy{
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, this.animations.fly);
                 break;
             case BulletState.EXPLODE:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, this.animations.explode);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, this.animations.explode, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
                 if(this.sprite.animationStopped) {
                     Playnewton.GPU.SetSpriteVisible(this.sprite, false);
                     this.state = BulletState.EXPLODED;
@@ -144,6 +160,19 @@ export class Bullet extends Enemy{
                 break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
+    }
+
+    /**
+     * @param {Sara} sara 
+     */
+    Pursue(sara) {
+        if(this.state === BulletState.FLY) {
+            if(Playnewton.PPU.CheckIfBodiesIntersects(this.body, sara.body)) {
+                sara.HurtByEnemy();
+                Playnewton.PPU.SetBodyVelocityBounds(this.body, 0, 0, 0, 0);
+                this.state = BulletState.EXPLODE;
+            }
+        }
     }
 
 }
