@@ -18,7 +18,9 @@ nbproject/private/
 # Krita
 *.kra
 
+# Libresprite
+*.ase
+
 # Tiled
 *~
-public_html/sprites/cat.ase
-public_html/sprites/vautour.ase
+
