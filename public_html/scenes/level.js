@@ -10,6 +10,7 @@ import Tatou from "../entities/tatou.js"
 import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
 import Cat from "../entities/cat.js"
+import Vulture from "../entities/vulture.js"
 
 export default class Level extends Scene {
 
@@ -65,6 +66,7 @@ export default class Level extends Scene {
     async InitEnemies() {
         await Tatou.Preload();
         await Cat.Preload();
+        await Vulture.Preload();
     }
 
     async InitCollectibles(map) {
@@ -98,6 +100,10 @@ export default class Level extends Scene {
                     case "tatou":
                         let tatou = new Tatou(x, y);
                         this.enemies.push(tatou);
+                        break;
+                    case "vulture":
+                        let vulture = new Vulture(x, y);
+                        this.enemies.push(vulture);
                         break;
                     case "sara":
                         if(!this.sara) {
