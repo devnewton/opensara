@@ -227,6 +227,9 @@ export default class Vulture extends Enemy {
                 }
                 break;
             case VultureState.DYING:
+                if(!Playnewton.PPU.CheckIfBodyIsInWorldBound(this.body)) {
+                    Playnewton.PPU.DisableBody(this.body);
+                }
                 break;
         }
     }
@@ -246,7 +249,6 @@ export default class Vulture extends Enemy {
         if (this.dead) {
             this.state = VultureState.DYING;
             Playnewton.PPU.SetBodyAffectedByGravity(this.body, true);
-            Playnewton.PPU.DisableBody(this.body);
         } else {
             Playnewton.GPU.MakeSpriteBlink(this.sprite, 1000);
         }
