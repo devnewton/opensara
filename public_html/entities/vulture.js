@@ -246,6 +246,7 @@ export default class Vulture extends Enemy {
                     } else if(Math.abs(dx) < 32) {
                         --this.framesBeforeAttack;
                         if(this.framesBeforeAttack <= 0) {
+                            sara.HurtByEnemy();
                             this.state = VultureState.ATTACK;
                         }
                         Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
