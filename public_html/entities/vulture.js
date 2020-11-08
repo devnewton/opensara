@@ -10,7 +10,7 @@ import Sara from "./sara.js";
 const VultureState = {
     IDLE: 1,
     FLY: 2,
-    SURPRISED: 3,
+    ATTACK: 3,
     DYING: 4
 };
 
@@ -109,8 +109,8 @@ export default class Vulture extends Enemy {
             {name: "fly-right1", x: 66, y: 101, w: 60, h: 42},
             {name: "fly-right2", x: 130, y: 101, w: 60, h: 42},
             {name: "fly-right3", x: 194, y: 101, w: 60, h: 42},
-            {name: "dying-left0", x: 2, y: 145, w: 57, h: 27},
-            {name: "dying-right0", x: 62, y: 145, w: 57, h: 27}
+            {name: "dying-left0", x: 160, y: 73, w: 57, h: 27},
+            {name: "dying-right0", x: 160, y: 45, w: 57, h: 27}
         ]);
 
         Vulture.animations[VultureDirection.LEFT] = new VultureAnimations();
