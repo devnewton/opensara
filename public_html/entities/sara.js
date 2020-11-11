@@ -413,7 +413,7 @@ export default class Sara {
             this.state = SaraState.DYING;
             Playnewton.PPU.SetBodyImmovable(this.body, true);
             let layers = [];
-            for (let i = Z_ORDER.MIN; i < Z_ORDER.MAX; ++i) {
+            for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
                 if (i !== Z_ORDER.SARA) {
                     layers.push(i);
                 }

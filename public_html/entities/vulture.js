@@ -10,7 +10,7 @@ import Sara from "./sara.js";
 const VultureState = {
     IDLE: 1,
     FLY: 2,
-    SURPRISED: 3,
+    ATTACK: 3,
     DYING: 4
 };
 
@@ -70,14 +70,8 @@ export default class Vulture extends Enemy {
      * @type VultureDirection
      */
     direction = VultureDirection.LEFT;
-
-    /**
-     * 
-     * @returns {number}
-     */
-    get stateElapsedTime() {
-        return performance.now() - this.stateStartTime;
-    }
+    
+    framesBeforeAttack = 0;
 
     /**
      * @type number
@@ -109,8 +103,16 @@ export default class Vulture extends Enemy {
             {name: "fly-right1", x: 66, y: 101, w: 60, h: 42},
             {name: "fly-right2", x: 130, y: 101, w: 60, h: 42},
             {name: "fly-right3", x: 194, y: 101, w: 60, h: 42},
-            {name: "dying-left0", x: 2, y: 145, w: 57, h: 27},
-            {name: "dying-right0", x: 62, y: 145, w: 57, h: 27}
+            {name: "attack-left0", x: 2, y: 145, w: 60, h: 42},
+            {name: "attack-left1", x: 63, y: 145, w: 60, h: 42},
+            {name: "attack-left2", x: 125, y: 145, w: 60, h: 42},
+            {name: "attack-left3", x: 187, y: 145, w: 60, h: 42},
+            {name: "attack-right0", x: 2, y: 189, w: 60, h: 42},
+            {name: "attack-right1", x: 63, y: 189, w: 60, h: 42},
+            {name: "attack-right2", x: 125, y: 189, w: 60, h: 42},
+            {name: "attack-right3", x: 187, y: 189, w: 60, h: 42},
+            {name: "dying-left0", x: 160, y: 73, w: 57, h: 27},
+            {name: "dying-right0", x: 160, y: 45, w: 57, h: 27}
         ]);
 
         Vulture.animations[VultureDirection.LEFT] = new VultureAnimations();
@@ -138,6 +140,20 @@ export default class Vulture extends Enemy {
             {name: "fly-right1", delay: 100},
             {name: "fly-right2", delay: 100},
             {name: "fly-right3", delay: 100}
+        ]);
+        
+        Vulture.animations[VultureDirection.LEFT].attack = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "attack-left0", delay: 100},
+            {name: "attack-left1", delay: 100},
+            {name: "attack-left2", delay: 100},
+            {name: "attack-left3", delay: 100}
+        ]);
+
+        Vulture.animations[VultureDirection.RIGHT].attack = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "attack-right0", delay: 100},
+            {name: "attack-right1", delay: 100},
+            {name: "attack-right2", delay: 100},
+            {name: "attack-right3", delay: 100}
         ]);
 
         Vulture.animations[VultureDirection.LEFT].dying =
@@ -193,6 +209,13 @@ export default class Vulture extends Enemy {
             case VultureState.FLY:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Vulture.animations[this.direction].fly);
                 break;
+            case VultureState.ATTACK:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Vulture.animations[this.direction].attack, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                if(this.sprite.animationStopped) {
+                    this.framesBeforeAttack = 10;
+                    this.state = VultureState.FLY;
+                }
+                break;
             case VultureState.DYING:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Vulture.animations[this.direction].dying);
                 break;
@@ -216,15 +239,24 @@ export default class Vulture extends Enemy {
                 let dx = sara.body.centerX - this.body.centerX;
                 let dy = sara.body.centerY - this.body.centerY;
                 let distance = Math.sqrt(dx ** 2 + dy ** 2);
-                if(distance > 64) {
-                    let s = this.flySpeed / distance;
-                    dx *= s;
-                    dy *= s;
-                    this.direction = dx < 0 ? VultureDirection.LEFT : VultureDirection.RIGHT;
-                    Playnewton.PPU.SetBodyVelocity(this.body, dx, dy);
-                } else {
-                    Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
+                this.direction = dx < 0 ? VultureDirection.LEFT : VultureDirection.RIGHT;
+                if(distance < 128) {
+                    if(Math.abs(dy) > 8) {
+                        dx = 0;
+                    } else if(Math.abs(dx) < 32) {
+                        --this.framesBeforeAttack;
+                        if(this.framesBeforeAttack <= 0) {
+                            sara.HurtByEnemy();
+                            this.state = VultureState.ATTACK;
+                        }
+                        Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
+                        return;
+                    }
                 }
+                let s = this.flySpeed / distance;
+                dx *= s;
+                dy *= s;
+                Playnewton.PPU.SetBodyVelocity(this.body, dx, dy);
                 break;
             case VultureState.DYING:
                 if(!Playnewton.PPU.CheckIfBodyIsInWorldBound(this.body)) {
