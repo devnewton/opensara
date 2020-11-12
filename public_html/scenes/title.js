@@ -45,8 +45,13 @@ export default class Title extends Scene {
         let pad = Playnewton.CTRL.GetPad(0);
         if(pad.start && this.nextScene === this) {
             this.Stop();
-            this.nextScene = new Level();
-            this.nextScene.Start();
+            let scene = this;
+            for(let n = 5; n >= 1; --n) {
+                let level = new Level(`maps/mountain/mountain_${n}.tmx`, scene);
+                scene = level;
+            }
+            this.nextScene = scene;
+            scene.Start();
         }
     }
 }

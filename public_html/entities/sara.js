@@ -418,6 +418,7 @@ export default class Sara {
                     layers.push(i);
                 }
             }
+            //TODO move this code elsewhere
             new Fadeout(1000, layers);
         }
     }

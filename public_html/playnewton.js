@@ -2704,6 +2704,10 @@ class Playnewton_PPU {
         this.world = new PPU_World();
     }
 
+    Reset() {
+        this.bodies = [];
+    }
+
     /**
      * 
      * @param {number} x 

@@ -35,4 +35,8 @@ export default class Poison {
         }
     }
 
+    Stop() {
+        clearInterval(this.intervalId);
+    }
+
 }

@@ -11,6 +11,7 @@ import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
 import Cat from "../entities/cat.js"
 import Vulture from "../entities/vulture.js"
+import Fadeout from "../entities/fadeout.js"
 
 export default class Level extends Scene {
 
@@ -58,6 +59,22 @@ export default class Level extends Scene {
      * @type Array<Enemy>
      */
     enemies = [];
+
+    /**
+     * @type string
+     */
+    mapPath;
+
+    /**
+     * @type Scene
+     */
+    nextSceneOnExit;
+
+    constructor(mapPath, nextSceneOnExit) {
+        super();
+        this.mapPath = mapPath;
+        this.nextSceneOnExit = nextSceneOnExit;
+    }
 
     async InitSara() {
         await Sara.Preload();
@@ -120,7 +137,7 @@ export default class Level extends Scene {
     async InitMoutainLevels() {
         let skyBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sky.png");
 
-        let map = await Playnewton.DRIVE.LoadTmxMap("maps/mountain/mountain_01.tmx");
+        let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
 
         let skySprite = Playnewton.GPU.GetAvailableSprite();
         Playnewton.GPU.SetSpritePicture(skySprite, Playnewton.GPU.CreatePicture(skyBitmap));
@@ -182,6 +199,11 @@ export default class Level extends Scene {
         this.progress = 100;
     }
 
+    Stop() {
+        super.Stop();
+        this.poison.Stop();
+    }
+
     UpdateBodies() {
         this.sara.UpdateBody();
         this.enemies.forEach((enemy) => enemy.UpdateBody());
@@ -223,6 +245,15 @@ export default class Level extends Scene {
         this.exits = this.exits.filter((exit) => {
             if (exit.Pursue(this.sara.sprite)) {
                 exit.Free();
+                let layers = [];
+                for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
+                    layers.push(i);
+                }
+                new Fadeout(1000, layers, () => {
+                    this.Stop();
+                    this.nextScene = this.nextSceneOnExit;
+                    this.nextSceneOnExit.Start();
+                });
                 return false;
             } else {
                 return true;

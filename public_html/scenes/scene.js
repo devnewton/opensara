@@ -33,11 +33,14 @@ export default class Scene {
     }
 
     async Start() {
+        Playnewton.GPU.Reset();
+        Playnewton.PPU.Reset();
         this.progress = 0;
     }
 
     Stop() {
         Playnewton.GPU.Reset();
+        Playnewton.PPU.Reset();
     }
 
     /**
