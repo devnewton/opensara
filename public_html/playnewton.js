@@ -1063,6 +1063,7 @@ class Playnewton_DRIVE {
                     let body = PPU.GetAvailableBody();
                     if (body) {
                         body.debugColor = objectgroup.color;
+                        body.tag = this._ParseStringProperty('tag', object.properties, objectgroup.properties);
                         PPU.SetBodyPosition(body, groupX + object.x, groupY + object.y);
                         PPU.SetBodyRectangle(body, 0, 0, object.width, object.height);
                         PPU.SetBodyImmovable(body, this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties));
@@ -2453,6 +2454,13 @@ class PPU_BodyTouches {
  * @type PPU_Body
  */
 class PPU_Body {
+
+    /**
+     * 
+     * @type string
+     */
+    tag;
+
     /**
      * 
      * @type PPU_Vector
