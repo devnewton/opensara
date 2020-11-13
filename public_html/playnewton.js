@@ -413,10 +413,12 @@ class Playnewton_CTRL {
         }
 
         document.addEventListener("keydown", (event) => {
+            event.preventDefault();
             this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, true);
             return false;
         });
         document.addEventListener("keyup", (event) => {
+            event.preventDefault();
             this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, false);
             return false;
         });
