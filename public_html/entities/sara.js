@@ -81,6 +81,17 @@ export default class Sara {
      *  @type number
      */
     jumpImpulse = 18;
+
+    /**
+     *  @type number
+     */
+    jumpImpulseFrames = 10;
+
+        /**
+     *  @type number
+     */
+    jumpImpulseFrameCounter = 0;
+
     
     /**
      *  @type number
@@ -260,7 +271,7 @@ export default class Sara {
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 48);
         Playnewton.PPU.SetBodyPosition(this.body, x, y - 48);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);
-        Playnewton.PPU.SetBodyVelocityBounds(this.body, -10, 10, -20, 10);
+        Playnewton.PPU.SetBodyVelocityBounds(this.body, -8, 8, -11, 8);
         Playnewton.PPU.EnableBody(this.body);
     }
 
@@ -292,6 +303,7 @@ export default class Sara {
             case SaraState.WALK:
                 if (pad.A) {
                     if (this.canJump && this.isOnGround) {
+                        this.jumpImpulseFrameCounter = this.jumpImpulseFrames;
                         velocityY = -this.jumpImpulse;
                         this.canJump = false;
                         this.state = SaraState.JUMP;
@@ -312,8 +324,9 @@ export default class Sara {
             case SaraState.JUMP:
                 if (pad.A) {
                     if (this.canJump) {
-                        velocityY = -this.jumpImpulse;
                         this.canJump = false;
+                        this.jumpImpulseFrameCounter = this.jumpImpulseFrames;
+                        velocityY = -this.jumpImpulse;
                         this.state = SaraState.DOUBLE_JUMP;
                     }
                 } else {
@@ -328,6 +341,10 @@ export default class Sara {
                     }
                 } else {
                     this.canStomp = true;
+                    --this.jumpImpulseFrameCounter;
+                    if(this.jumpImpulseFrameCounter > 0) {
+                        velocityY = -this.jumpImpulse;
+                    }
                 }
                 break;
             case SaraState.DOUBLE_JUMP:
@@ -340,6 +357,10 @@ export default class Sara {
                     }
                 } else {
                     this.canStomp = true;
+                    --this.jumpImpulseFrameCounter;
+                    if(this.jumpImpulseFrameCounter > 0) {
+                        velocityY = -this.jumpImpulse;
+                    }
                 }
                 break;
             case SaraState.STOMP:
