@@ -2,7 +2,7 @@ const PLAYNEWTON_DEFAULT_SCREEN_WIDTH = 1280;
 const PLAYNEWTON_DEFAULT_SCREEN_HEIGHT = 720;
 
 /**
- * Frame description for TLN.CreateSpriteset()
+ * Frame description for CreateSpriteset()
  * @type GPU_SpritesetFrameDescription
  */
 class GPU_SpritesetFrameDescription {
