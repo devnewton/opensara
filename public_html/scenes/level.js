@@ -70,6 +70,11 @@ export default class Level extends Scene {
      */
     nextSceneOnExit;
 
+    /**
+     * @type Fadeout
+     */
+    fadeout;
+
     constructor(mapPath, nextSceneOnExit) {
         super();
         this.mapPath = mapPath;
@@ -199,21 +204,38 @@ export default class Level extends Scene {
         this.progress = 100;
     }
 
-    Stop() {
-        super.Stop();
-        this.poison.Stop();
-    }
-
     UpdateBodies() {
+        if(this.sara.dead && !this.fadeout) {
+            let layers = [];
+            for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
+                if (i !== Z_ORDER.SARA) {
+                    layers.push(i);
+                }
+            }
+            this.fadeout = new Fadeout(1000, layers, () => {
+                let gameoverLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+                Playnewton.GPU.HUD.SetLabelFont(gameoverLabel, "bold 48px monospace");
+                Playnewton.GPU.HUD.SetLabelColor(gameoverLabel, "#ff0000");
+                Playnewton.GPU.HUD.SetLabelAlign(gameoverLabel, "center");
+                Playnewton.GPU.HUD.SetLabelPosition(gameoverLabel, 512, 288);
+                Playnewton.GPU.HUD.SetLabelText(gameoverLabel, "Game over");
+                Playnewton.GPU.HUD.EnableLabel(gameoverLabel);
+
+                Playnewton.GPU.HUD.DisableBar(this.healthBar);
+                Playnewton.GPU.HUD.DisableLabel(this.poisonCounterLabel);
+                Playnewton.GPU.HUD.DisableLabel(this.itemsLabel);
+            });
+        }
         this.sara.UpdateBody();
         this.enemies.forEach((enemy) => enemy.UpdateBody());
+        this.poison.Update();
     }
 
     UpdateSprites() {
         this.sara.UpdateSprite();
         this.enemies.forEach((enemy) => enemy.UpdateSprite());
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
-        Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.hurtCounter}💀`);
+        Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.countDown}💀`);
         Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
 
         this.enemies.forEach((enemy) => {
@@ -245,19 +267,25 @@ export default class Level extends Scene {
         this.exits = this.exits.filter((exit) => {
             if (exit.Pursue(this.sara.sprite)) {
                 exit.Free();
-                let layers = [];
-                for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
-                    layers.push(i);
+                if(!this.sara.dead && !this.fadeout) {
+                    let layers = [];
+                    for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
+                        layers.push(i);
+                    }
+                    this.fadeout = new Fadeout(1000, layers, () => {
+                        this.Stop();
+                        this.nextScene = this.nextSceneOnExit;
+                        this.nextSceneOnExit.Start();
+                    });
                 }
-                new Fadeout(1000, layers, () => {
-                    this.Stop();
-                    this.nextScene = this.nextSceneOnExit;
-                    this.nextSceneOnExit.Start();
-                });
                 return false;
             } else {
                 return true;
             }
         });
+
+        if(this.fadeout) {
+            this.fadeout.Update();
+        }
     }
 }

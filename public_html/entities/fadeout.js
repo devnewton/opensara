@@ -33,8 +33,6 @@ export default class Fadeout {
     constructor(duration, layers, doneCallback = undefined) {
         this.layers = layers;
         this.doneCallback = doneCallback;
-
-        this.intervalId = setInterval(() => this.Update(), duration / 100);
     }
 
     Update() {
@@ -52,17 +50,8 @@ export default class Fadeout {
     Done() {
         if(this.doneCallback) {
             this.doneCallback();
-        } else {
-            //TODO move this code elsewhere
-            let gameoverLabel = Playnewton.GPU.HUD.GetAvailableLabel();
-            Playnewton.GPU.HUD.SetLabelFont(gameoverLabel, "bold 48px monospace");
-            Playnewton.GPU.HUD.SetLabelColor(gameoverLabel, "#ff0000");
-            Playnewton.GPU.HUD.SetLabelAlign(gameoverLabel, "center");
-            Playnewton.GPU.HUD.SetLabelPosition(gameoverLabel, 512, 288);
-            Playnewton.GPU.HUD.SetLabelText(gameoverLabel, "Game over");
-            Playnewton.GPU.HUD.EnableLabel(gameoverLabel);
+            this.doneCallback = undefined;
         }
-        clearInterval(this.intervalId);
     }
 
 }

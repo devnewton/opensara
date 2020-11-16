@@ -408,11 +408,15 @@ export default class Sara {
     }
 
     CollectOneHeart() {
-        this.health = Math.min(this.health + 1, this.maxHealth);
+        if(!this.dead) {
+            this.health = Math.min(this.health + 1, this.maxHealth);
+        }
     }
 
     CollectOneKey() {
-        ++this.nbKeys;
+        if(!this.dead) {
+            ++this.nbKeys;
+        }
     }
 
     HurtByPoison() {
@@ -433,14 +437,6 @@ export default class Sara {
         if (this.dead) {
             this.state = SaraState.DYING;
             Playnewton.PPU.SetBodyImmovable(this.body, true);
-            let layers = [];
-            for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
-                if (i !== Z_ORDER.SARA) {
-                    layers.push(i);
-                }
-            }
-            //TODO move this code elsewhere
-            new Fadeout(1000, layers);
         }
     }
     

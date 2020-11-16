@@ -91,7 +91,7 @@ class GPU_Sprite {
      * @type GPU_SpritePicture
      */
     picture;
-    
+
     /**
      * 
      * @type number
@@ -103,7 +103,7 @@ class GPU_Sprite {
      * @type number
      */
     angle = 0;
-    
+
     /**
      * 
      * @type boolean
@@ -413,12 +413,12 @@ class Playnewton_CTRL {
         }
 
         document.addEventListener("keydown", (event) => {
-            if(this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, true)) {
+            if (this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, true)) {
                 event.preventDefault();
             }
         });
-        document.addEventListener("keyup", (event) => {            
-            if(this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, false)) {
+        document.addEventListener("keyup", (event) => {
+            if (this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, false)) {
                 event.preventDefault();
             }
         });
@@ -1048,7 +1048,7 @@ class Playnewton_DRIVE {
                 }
                 ++z;
             }
-    }
+        }
     }
 
     /**
@@ -1078,7 +1078,7 @@ class Playnewton_DRIVE {
                     }
                 }
             }
-    }
+        }
     }
 
     /**
@@ -1104,7 +1104,7 @@ class Playnewton_DRIVE {
             for (let object of objectgroup.objects) {
                 callback(object, objectgroup, groupX + object.x, groupY + object.y);
             }
-    }
+        }
     }
 
     async LoadTileset(tsxUrl) {
@@ -1139,7 +1139,7 @@ class Playnewton_DRIVE {
         tileset.spacing = parseInt(tilesetElement.getAttribute("spacing"), 10) || 0;
         tileset.margin = parseInt(tilesetElement.getAttribute("margin"), 10) || 0;
         tileset.properties = this._LoadTmxProperties(tilesetElement);
-        if(!this._ParseBooleanProperty("doNotLoadBitmap", tileset.properties)) {
+        if (!this._ParseBooleanProperty("doNotLoadBitmap", tileset.properties)) {
             tileset.bitmap = await this.LoadBitmap(baseUrl + tilesetElement.getElementsByTagName("image")[0].getAttribute("source"));
         }
 
@@ -1280,11 +1280,11 @@ class Playnewton_DRIVE {
         let data = new Uint32Array(nbtiles);
         for (let i = 0; i < str.length; i += 4) {
             data[i / 4] = (
-                    str.charCodeAt(i) |
-                    str.charCodeAt(i + 1) << 8 |
-                    str.charCodeAt(i + 2) << 16 |
-                    str.charCodeAt(i + 3) << 24
-                    ) >>> 0;
+                str.charCodeAt(i) |
+                str.charCodeAt(i + 1) << 8 |
+                str.charCodeAt(i + 2) << 16 |
+                str.charCodeAt(i + 3) << 24
+            ) >>> 0;
         }
         return data;
     }
@@ -2006,7 +2006,7 @@ class Playnewton_GPU {
      */
     SetVideoOutput(canvas) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext("2d", {alpha: false});
+        this.ctx = canvas.getContext("2d", { alpha: false });
         this.ctx.imageSmoothingEnabled = false;
     }
 
@@ -2162,10 +2162,12 @@ class Playnewton_GPU {
      * @param {type} label
      */
     _DrawLabel(label) {
-        this.ctx.font = label.font;
-        this.ctx.fillStyle = label.color;
-        this.ctx.textAlign = label.align;
-        this.ctx.fillText(label.text, label.x, label.y);
+        if (label.enabled) {
+            this.ctx.font = label.font;
+            this.ctx.fillStyle = label.color;
+            this.ctx.textAlign = label.align;
+            this.ctx.fillText(label.text, label.x, label.y);
+        }
     }
 
     /**
@@ -2187,17 +2189,18 @@ class Playnewton_GPU {
      * @param {GPU_Bar} bar 
      */
     _DrawBar(bar) {
-        let x, y;
-        let level = bar.level;
-        for (let x = 0; x < bar.nbColumns; ++x) {
-            for (let y = 0; y < bar.nbRows; ++y) {
-                this.ctx.beginPath();
-                this.ctx.rect(-0.5 + bar.x + x * (bar.cellWidth + bar.cellSpacing), -0.5 + bar.y + y * (bar.cellHeight + bar.cellSpacing), bar.cellWidth, bar.cellHeight);
-                this.ctx.fillStyle = level-- > 0 ? bar.filledColor : bar.emptyColor;
-                this.ctx.fill();
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeStyle = bar.borderColor;
-                this.ctx.stroke();
+        if (bar.enabled) {
+            let level = bar.level;
+            for (let x = 0; x < bar.nbColumns; ++x) {
+                for (let y = 0; y < bar.nbRows; ++y) {
+                    this.ctx.beginPath();
+                    this.ctx.rect(-0.5 + bar.x + x * (bar.cellWidth + bar.cellSpacing), -0.5 + bar.y + y * (bar.cellHeight + bar.cellSpacing), bar.cellWidth, bar.cellHeight);
+                    this.ctx.fillStyle = level-- > 0 ? bar.filledColor : bar.emptyColor;
+                    this.ctx.fill();
+                    this.ctx.lineWidth = 1;
+                    this.ctx.strokeStyle = bar.borderColor;
+                    this.ctx.stroke();
+                }
             }
         }
     }
@@ -2843,7 +2846,7 @@ class Playnewton_PPU {
     SetBodyAffectedByGravity(body, affectedByGravity) {
         body.affectedByGravity = affectedByGravity;
     }
-    
+
 
     /**
      * @param {PPU_Body} body
@@ -2918,9 +2921,9 @@ class Playnewton_PPU {
      */
     CheckIfBodyRunIntoOther(runner, runned) {
         return this.CheckIfBodiesIntersects(runner, runned)
-                && ((runner.right > runned.left && runner.isGoingRight)
-                        || (runner.left < runned.right && runner.isGoingLeft)
-                        );
+            && ((runner.right > runned.left && runner.isGoingRight)
+                || (runner.left < runned.right && runner.isGoingLeft)
+            );
     }
 
     /**
@@ -3092,11 +3095,11 @@ class Playnewton_PPU {
         if (bodyA.movable && bodyB.immovable) {
             this._SeparateMovableBodyFromImmovableBodyByY(bodyA, bodyB);
         } else
-        if (bodyA.immovable && bodyB.movable) {
-            this._SeparateMovableBodyFromImmovableBodyByY(bodyB, bodyA);
-        } else if (bodyA.movable && bodyB.movable) {
-            this._SeparateMovableBodiesByY(bodyB, bodyA);
-        }
+            if (bodyA.immovable && bodyB.movable) {
+                this._SeparateMovableBodyFromImmovableBodyByY(bodyB, bodyA);
+            } else if (bodyA.movable && bodyB.movable) {
+                this._SeparateMovableBodiesByY(bodyB, bodyA);
+            }
     }
 
     /**
@@ -3150,7 +3153,7 @@ class Playnewton_PPU {
             body.previousPosition.x = body.position.x;
             body.previousPosition.y = body.position.y;
 
-            if(body.affectedByGravity) {
+            if (body.affectedByGravity) {
                 body.velocity.addForce(this.world.gravity);
             }
 

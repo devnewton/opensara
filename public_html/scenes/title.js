@@ -24,6 +24,8 @@ export default class Title extends Scene {
     }
 
     async Start() {
+        await super.Start();
+        this.nextScene = this;
         for (let z = 0; z < 1; ++z) {
             let layer = Playnewton.GPU.GetLayer(z);
             Playnewton.GPU.EnableLayer(layer);

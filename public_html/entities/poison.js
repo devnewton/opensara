@@ -1,42 +1,33 @@
 import Playnewton from "../playnewton.js"
 
 export default class Poison {
+    /**
+     * @type number
+     */
+    nextPoison = 0;
 
     /**
      * @type number
      */
-    hurtCooldown = 3;
+    countDown = 0;
 
-    /**
-     * @type number
-     */
-    hurtCounter;
-
-    /**
-     * @type number
-     */
-    intervalId;
+    static poisonInterval = 4000;
 
     constructor(victim) {
         this.victim = victim;
-        this.hurtCounter = this.hurtCooldown;
-
-        this.intervalId = setInterval(() => this.Update(), 1000);
     }
 
     Update() {
-        --this.hurtCounter;
-        if (this.hurtCounter < 0) {
+        let now = Playnewton.GPU.fpsLimiter.now;
+        if(this.nextPoison === 0) {
+            this.nextPoison = now + Poison.poisonInterval;
+        }
+        if(this.nextPoison < now) {
+            this.nextPoison = now + Poison.poisonInterval;
             this.victim.HurtByPoison();
-            this.hurtCounter = this.hurtCooldown;
+            return;
         }
-        if(this.victim.dead) {
-            clearInterval(this.intervalId);
-        }
-    }
-
-    Stop() {
-        clearInterval(this.intervalId);
+        this.countDown = Math.trunc((this.nextPoison - now) / 1000);
     }
 
 }
