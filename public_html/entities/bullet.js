@@ -76,11 +76,11 @@ export class Bullet extends Enemy{
         super();
         this.animations = animations;
         
-        this.sprite = Playnewton.GPU.GetAvailableSprite();
+        this.sprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.BULLETS);
         Playnewton.GPU.EnableSprite(this.sprite);
 
-        this.body = Playnewton.PPU.GetAvailableBody();
+        this.body = Playnewton.PPU.CreateBody();
         Playnewton.PPU.SetBodyAffectedByGravity(this.body, false);
         Playnewton.PPU.SetBodyCollisionMask(this.body, 0);
         Playnewton.PPU.EnableBody(this.body);

@@ -262,12 +262,12 @@ export default class Sara {
     }
 
     constructor(x, y) {
-        this.sprite = Playnewton.GPU.GetAvailableSprite();
+        this.sprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[SaraDirection.LEFT].stand);
         Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.SARA);
         Playnewton.GPU.EnableSprite(this.sprite);
 
-        this.body = Playnewton.PPU.GetAvailableBody();
+        this.body = Playnewton.PPU.CreateBody();
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 48);
         Playnewton.PPU.SetBodyPosition(this.body, x, y - 48);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);

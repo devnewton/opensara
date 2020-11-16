@@ -169,12 +169,12 @@ export default class Vulture extends Enemy {
 
     constructor(x, y) {
         super();
-        this.sprite = Playnewton.GPU.GetAvailableSprite();
+        this.sprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Vulture.animations[this.direction].idle);
         Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.ENEMIES);
         Playnewton.GPU.EnableSprite(this.sprite);
 
-        this.body = Playnewton.PPU.GetAvailableBody();
+        this.body = Playnewton.PPU.CreateBody();
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 37, 54);
         Playnewton.PPU.SetBodyPosition(this.body, x, y - 54);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, false);

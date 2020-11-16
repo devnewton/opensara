@@ -88,7 +88,7 @@ export default class Exit {
     }
 
     constructor() {
-        this.sprite = Playnewton.GPU.GetAvailableSprite();
+        this.sprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Exit.animations.inactive);
         Playnewton.GPU.SetSpritePosition(this.sprite, 200, 200);
         Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.DOORS);

@@ -68,7 +68,7 @@ export default class Key {
     }
 
     constructor() {
-        this.sprite = Playnewton.GPU.GetAvailableSprite();
+        this.sprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Key.animations.idle);
         Playnewton.GPU.SetSpritePosition(this.sprite, 200, 200);
         Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.COLLECTIBLES);

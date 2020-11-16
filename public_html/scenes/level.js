@@ -144,7 +144,7 @@ export default class Level extends Scene {
 
         let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
 
-        let skySprite = Playnewton.GPU.GetAvailableSprite();
+        let skySprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpritePicture(skySprite, Playnewton.GPU.CreatePicture(skyBitmap));
         Playnewton.GPU.SetSpritePosition(skySprite, 0, 0);
         Playnewton.GPU.EnableSprite(skySprite);
@@ -160,18 +160,18 @@ export default class Level extends Scene {
     }
 
     async InitHUD() {
-        this.healthBar = Playnewton.GPU.HUD.GetAvailableBar();
+        this.healthBar = Playnewton.GPU.HUD.CreateBar();
         Playnewton.GPU.HUD.SetBarPosition(this.healthBar, 10, 10);
         Playnewton.GPU.HUD.SetBarSize(this.healthBar, this.sara.maxHealth);
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
         Playnewton.GPU.HUD.EnableBar(this.healthBar, true);
 
-        this.poisonCounterLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+        this.poisonCounterLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelPosition(this.poisonCounterLabel, 150, 22);
         Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, "16💀");
         Playnewton.GPU.HUD.EnableLabel(this.poisonCounterLabel);
 
-        this.itemsLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+        this.itemsLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelPosition(this.itemsLabel, 200, 22);
         Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "");
         Playnewton.GPU.HUD.EnableLabel(this.itemsLabel);
@@ -180,6 +180,8 @@ export default class Level extends Scene {
     }
 
     async Start() {
+        await super.Start();
+
         this.progress = 0;
 
         for (let z = Z_ORDER.MIN; z <= Z_ORDER.MAX; ++z) {
@@ -213,7 +215,7 @@ export default class Level extends Scene {
                 }
             }
             this.fadeout = new Fadeout(1000, layers, () => {
-                let gameoverLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+                let gameoverLabel = Playnewton.GPU.HUD.CreateLabel();
                 Playnewton.GPU.HUD.SetLabelFont(gameoverLabel, "bold 48px monospace");
                 Playnewton.GPU.HUD.SetLabelColor(gameoverLabel, "#ff0000");
                 Playnewton.GPU.HUD.SetLabelAlign(gameoverLabel, "center");

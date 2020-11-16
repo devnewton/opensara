@@ -195,12 +195,12 @@ export default class Tatou extends Enemy {
 
     constructor(x, y) {
         super();
-        this.sprite = Playnewton.GPU.GetAvailableSprite();
+        this.sprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[TatouDirection.LEFT].stand);
         Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.ENEMIES);
         Playnewton.GPU.EnableSprite(this.sprite);
 
-        this.body = Playnewton.PPU.GetAvailableBody();
+        this.body = Playnewton.PPU.CreateBody();
         Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 64, 32);
         Playnewton.PPU.SetBodyPosition(this.body, x, y - 32);
         Playnewton.PPU.SetBodyCollideWorldBounds(this.body, true);

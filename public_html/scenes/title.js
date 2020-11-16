@@ -7,14 +7,14 @@ export default class Title extends Scene {
     async InitTitle() {
         let titleBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/title.png");
 
-        let titleSprite = Playnewton.GPU.GetAvailableSprite();
+        let titleSprite = Playnewton.GPU.CreateSprite();
         Playnewton.GPU.SetSpritePicture(titleSprite, Playnewton.GPU.CreatePicture(titleBitmap));
         Playnewton.GPU.SetSpritePosition(titleSprite, 216, 32);
         Playnewton.GPU.EnableSprite(titleSprite);
     }
 
     async InitHUD() {
-        let startLabel = Playnewton.GPU.HUD.GetAvailableLabel();
+        let startLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelPosition(startLabel, 512, 288);
         Playnewton.GPU.HUD.SetLabelText(startLabel, "Press ⌨️F1 or 🎮start");
         Playnewton.GPU.HUD.SetLabelAlign(startLabel, "center");

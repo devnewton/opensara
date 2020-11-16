@@ -1028,8 +1028,8 @@ class Playnewton_DRIVE {
                         if (tile) {
                             let picture = picturesByTile.get(tile);
                             let animation = animationsByTile.get(tile);
-                            let sprite = GPU.GetAvailableSprite();
-                            if (sprite && (picture || animation)) {
+                            let sprite = GPU.CreateSprite();
+                            if (picture || animation) {
                                 if (picture) {
                                     picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
                                     GPU.SetSpritePicture(sprite, picture);
@@ -1040,8 +1040,6 @@ class Playnewton_DRIVE {
                                 GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight);
                                 GPU.SetSpriteZ(sprite, mapZ + z);
                                 GPU.EnableSprite(sprite);
-                            } else {
-                                console.log("No available sprite");
                             }
                         }
                     }
@@ -1065,17 +1063,13 @@ class Playnewton_DRIVE {
             for (let object of objectgroup.objects) {
                 let type = this._ParseStringProperty("type", object.properties, objectgroup.properties);
                 if (type === "body") {
-                    let body = PPU.GetAvailableBody();
-                    if (body) {
-                        body.debugColor = objectgroup.color;
-                        body.tag = this._ParseStringProperty('tag', object.properties, objectgroup.properties);
-                        PPU.SetBodyPosition(body, groupX + object.x, groupY + object.y);
-                        PPU.SetBodyRectangle(body, 0, 0, object.width, object.height);
-                        PPU.SetBodyImmovable(body, this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties));
-                        PPU.EnableBody(body);
-                    } else {
-                        console.log("No available body");
-                    }
+                    let body = PPU.CreateBody();
+                    body.debugColor = objectgroup.color;
+                    body.tag = this._ParseStringProperty('tag', object.properties, objectgroup.properties);
+                    PPU.SetBodyPosition(body, groupX + object.x, groupY + object.y);
+                    PPU.SetBodyRectangle(body, 0, 0, object.width, object.height);
+                    PPU.SetBodyImmovable(body, this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties));
+                    PPU.EnableBody(body);
                 }
             }
         }
@@ -1532,15 +1526,11 @@ class GPU_HUD {
     }
 
     /**
-     * Finds an available (unused) label. 
      * @returns {GPU_Label} label
      */
-    GetAvailableLabel() {
-        let label = this.labels.find(label => !label.enabled);
-        if (!label) {
-            label = new GPU_Label();
-            this.labels.push(label);
-        }
+    CreateLabel() {
+        let label = new GPU_Label();
+        this.labels.push(label);
         return label;
     }
 
@@ -1608,15 +1598,11 @@ class GPU_HUD {
     }
 
     /**
-     * Finds an available (unused) bar. 
      * @returns {GPU_Bar} bar
      */
-    GetAvailableBar() {
-        let bar = this.bars.find(bar => !bar.enabled);
-        if (!bar) {
-            bar = new GPU_Bar();
-            this.bars.push(bar);
-        }
+    CreateBar() {
+        let bar = new GPU_Bar();
+        this.bars.push(bar);
         return bar;
     }
 
@@ -1971,15 +1957,11 @@ class Playnewton_GPU {
     }
 
     /**
-     * Finds an available (unused) sprite. 
      * @returns {GPU_Sprite} sprite
      */
-    GetAvailableSprite() {
-        let sprite = this.sprites.find(sprite => !sprite.enabled);
-        if (!sprite) {
-            sprite = new GPU_Sprite();
-            this.sprites.push(sprite);
-        }
+    CreateSprite() {
+        let sprite = new GPU_Sprite();
+        this.sprites.push(sprite);
         return sprite;
     }
 
@@ -1993,7 +1975,6 @@ class Playnewton_GPU {
 
     /**
      * Disables the sprite so it is not drawn. 
-     * Disabled sprites are returned by the function GetAvailableSprite as available 
      * @param {GPU_Sprite} sprite
      */
     DisableSprite(sprite) {
@@ -2750,15 +2731,11 @@ class Playnewton_PPU {
     }
 
     /**
-     * Finds an available (unused) body. 
      * @returns {PPU_Body} body
      */
-    GetAvailableBody() {
-        let body = this.bodies.find((body) => !body.enabled);
-        if (!body) {
-            body = new PPU_Body();
-            this.bodies.push(body);
-        }
+    CreateBody() {
+        let body = new PPU_Body();
+        this.bodies.push(body);
         return body;
     }
 
@@ -2802,7 +2779,6 @@ class Playnewton_PPU {
 
     /**
      * Disables the body so it is not updated. 
-     * Disabled bodies are returned by the function GetAvailableBody as available 
      * @param {PPU_Body} body
      */
     DisableBody(body) {
