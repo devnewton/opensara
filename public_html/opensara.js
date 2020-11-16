@@ -1,5 +1,4 @@
 import Playnewton from "./playnewton.js"
-import Level from "./scenes/level.js"
 import Title from "./scenes/title.js"
 
 export default class OpenSara {
@@ -9,18 +8,22 @@ export default class OpenSara {
             switch (event.code) {
                 case "ArrowUp":
                     pad.A = down;
-                    break;
+                    return true;
                 case "ArrowDown":
                     pad.down = down;
-                    break;
+                    return true;
                 case "ArrowLeft":
                     pad.left = down;
-                    break;
+                    return true;
                 case "ArrowRight":
                     pad.right = down;
-                    break;
+                    return true;
                 case "F1":
                     pad.start = down;
+                    return true;
+                default:
+                    return false;
+
             }
         };
 

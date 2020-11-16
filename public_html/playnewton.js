@@ -413,14 +413,14 @@ class Playnewton_CTRL {
         }
 
         document.addEventListener("keydown", (event) => {
-            event.preventDefault();
-            this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, true);
-            return false;
+            if(this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, true)) {
+                event.preventDefault();
+            }
         });
-        document.addEventListener("keyup", (event) => {
-            event.preventDefault();
-            this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, false);
-            return false;
+        document.addEventListener("keyup", (event) => {            
+            if(this.MapKeyboardEventToPadButton(this.keyboardVirtualPad, event, false)) {
+                event.preventDefault();
+            }
         });
     }
 
@@ -434,36 +434,39 @@ class Playnewton_CTRL {
         switch (event.code) {
             case "ArrowUp":
                 pad.up = down;
-                break;
+                return true;
             case "ArrowDown":
                 pad.down = down;
-                break;
+                return true;
             case "ArrowLeft":
                 pad.left = down;
-                break;
+                return true;
             case "ArrowRight":
                 pad.right = down;
-                break;
+                return true;
             case "KeyZ":
                 pad.A = down;
-                break;
+                return true;
             case "KeyX":
                 pad.B = down;
-                break;
+                return true;
             case "KeyA":
                 pad.X = down;
-                break;
+                return true;
             case "KeyS":
                 pad.Y = down;
-                break;
+                return true;
             case "KeyD":
                 pad.L = down;
-                break;
+                return true;
             case "KeyC":
                 pad.R = down;
-                break;
+                return true;
             case "Enter":
                 pad.start = down;
+                return true;
+            default:
+                return false;
         }
     }
 
