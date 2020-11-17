@@ -44,11 +44,19 @@ export default class Apple {
         let bitmap = Collectible.bitmap;
 
         let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
-            {name: "apple1", x: 44, y: 106, w: 8, h: 10}
+            {name: "apple1", x: 44, y: 106, w: 8, h: 10},
+            {name: "apple2", x: 76, y: 106, w: 8, h: 10},
+            {name: "apple3", x: 108, y: 106, w: 8, h: 10},
+            {name: "apple4", x: 140, y: 106, w: 8, h: 10}
         ]);
 
         Apple.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
-            {name: "apple1", x: 44, y: 106, w: 8, h: 10}
+            {name: "apple1", delay: 100},
+            {name: "apple2", delay: 100},
+            {name: "apple3", delay: 100},
+            {name: "apple4", delay: 100},
+            {name: "apple3", delay: 100},
+            {name: "apple2", delay: 100}
         ]);
     }
 

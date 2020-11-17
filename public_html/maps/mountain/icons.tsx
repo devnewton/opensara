@@ -29,6 +29,9 @@
   <image width="37" height="54" source="../../icons/vulture-icon.png"/>
  </tile>
  <tile id="5">
+  <properties>
+   <property name="type" value="witch"/>
+  </properties>
   <image width="62" height="57" source="../../icons/witch-icon.png"/>
  </tile>
 </tileset>

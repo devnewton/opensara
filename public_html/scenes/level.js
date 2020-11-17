@@ -5,7 +5,6 @@ import Collectible from "../entities/collectible.js"
 import Exit from "../entities/exit.js"
 import Heart from "../entities/heart.js"
 import Key from "../entities/key.js"
-import Apple from "../entities/apple.js"
 import Poison from "../entities/poison.js"
 import Tatou from "../entities/tatou.js"
 import Enemy from "../entities/enemy.js"
@@ -30,11 +29,6 @@ export default class Level extends Scene {
      * @type Key[]
      */
     keys = [];
-
-    /**
-     * @type Apple[]
-     */
-    apples = [];
 
     /**
      * @type Exit[]
@@ -138,10 +132,6 @@ export default class Level extends Scene {
                         if(!this.sara) {
                             this.sara = new Sara(x, y);
                         }
-                        break;
-                    case "apple":
-                        let apple = new Apple(x, y);
-                        this.apples.push(apple);
                         break;
                 }
             }
@@ -266,16 +256,6 @@ export default class Level extends Scene {
             if (heart.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneHeart();
                 heart.Free();
-                return false;
-            } else {
-                return true;
-            }
-        });
-
-        this.apples = this.apples.filter((apple) => {
-            if (apple.Pursue(this.sara.sprite)) {
-                //TODO
-                apple.Free();
                 return false;
             } else {
                 return true;

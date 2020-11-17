@@ -1,22 +1,22 @@
 import Playnewton from "../playnewton.js"
 
 /**
- * Fadeout done callback
+ * HueRotate done callback
  *
- * @callback doneCallback
+ * @callback hueRotatedoneCallback
  */
 
-export default class Fadeout {
+export default class HueRotate {
 
     /**
      * @type Array<number>
      */
     layers;
 
-    brightnessPercentage = 100;
+    angle = 360;
 
     /**
-     * @type doneCallback
+     * @type hueRotatedoneCallback
      */
     doneCallback;
 
@@ -25,17 +25,17 @@ export default class Fadeout {
      * @param {Array<number>} layers 
      * @param {doneCallback}
      */
-    constructor(duration, layers, doneCallback = undefined) {
+    constructor(layers, doneCallback = undefined) {
         this.layers = layers;
         this.doneCallback = doneCallback;
     }
 
     Update() {
-        --this.brightnessPercentage;
-        if(this.brightnessPercentage >= 0) {
+        this.angle -= 4;
+        if(this.angle >= 0) {
             for(let l of this.layers) {
                 let layer = Playnewton.GPU.GetLayer(l);
-                layer.filter = `brightness(${this.brightnessPercentage}%)`;
+                layer.filter = `hue-rotate(${this.angle}deg) brightness(${this.angle/2}%)`;
             }
         } else {
             this.Done();
@@ -44,6 +44,10 @@ export default class Fadeout {
 
     Done() {
         if(this.doneCallback) {
+            for(let l of this.layers) {
+                let layer = Playnewton.GPU.GetLayer(l);
+                layer.filter = "none";
+            }
             this.doneCallback();
             this.doneCallback = undefined;
         }

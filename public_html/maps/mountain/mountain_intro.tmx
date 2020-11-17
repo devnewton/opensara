@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="86">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="97">
  <tileset firstgid="1" source="mountain.tsx"/>
  <tileset firstgid="50" source="collectibles.tsx"/>
  <tileset firstgid="114" source="icons.tsx"/>
@@ -56,6 +56,14 @@
  </objectgroup>
  <objectgroup id="3" name="collectibles">
   <object id="85" gid="75" x="509.818" y="485.636" width="32" height="32"/>
+  <object id="86" gid="75" x="502.667" y="465.333" width="32" height="32"/>
+  <object id="87" gid="75" x="527.333" y="486" width="32" height="32"/>
+  <object id="88" gid="75" x="537.333" y="462.333" width="32" height="32"/>
+  <object id="89" gid="75" x="520.667" y="455" width="32" height="32"/>
+  <object id="91" gid="75" x="518.667" y="474" width="32" height="32"/>
+  <object id="92" gid="75" x="530" y="456" width="32" height="32"/>
+  <object id="95" gid="75" x="512.667" y="467" width="32" height="32"/>
+  <object id="96" gid="75" x="527.667" y="476.333" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="5" name="enemies">
   <object id="71" gid="116" x="79.6667" y="492" width="31" height="47"/>
