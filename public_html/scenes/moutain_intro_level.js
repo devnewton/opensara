@@ -2,18 +2,11 @@ import Scene from "./scene.js"
 import Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
 import Collectible from "../entities/collectible.js"
-import Exit from "../entities/exit.js"
-import Heart from "../entities/heart.js"
-import Key from "../entities/key.js"
 import Apple from "../entities/apple.js"
-import Poison from "../entities/poison.js"
-import Tatou from "../entities/tatou.js"
-import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
-import Cat from "../entities/cat.js"
-import Vulture from "../entities/vulture.js"
 import Fadeout from "../entities/fadeout.js"
 import HueRotate from "../entities/huerotate.js"
+import Witch from "../entities/witch.js"
 
 export default class MoutainIntroLevel extends Scene {
 
@@ -21,6 +14,11 @@ export default class MoutainIntroLevel extends Scene {
      * @type Sara
      */
     sara;
+
+    /**
+     * @type Witch
+     */
+    witch;
 
     /**
      * @type Apple[]
@@ -73,6 +71,11 @@ export default class MoutainIntroLevel extends Scene {
                         let apple = new Apple(x, y);
                         this.apples.push(apple);
                         break;
+                    case "witch":
+                        if(!this.witch) {
+                            this.witch = new Witch(x, y);
+                        }
+                        break;
                 }
             }
         },
@@ -113,16 +116,23 @@ export default class MoutainIntroLevel extends Scene {
         await this.InitSara();
         this.progress = 50;
 
+        await Witch.Preload();
+        this.properties = 75
+
         await this.InitMoutainIntroLevels();
         this.progress = 100;
     }
 
     UpdateBodies() {
         this.sara.UpdateBody();
+        this.witch.UpdateBody();
     }
 
     UpdateSprites() {
         this.sara.UpdateSprite();
+        this.witch.UpdateSprite();
+
+        this.witch.Pursue(this.sara);
 
         this.apples = this.apples.filter((apple) => {
             if (apple.Pursue(this.sara.sprite)) {
@@ -138,7 +148,7 @@ export default class MoutainIntroLevel extends Scene {
                 layers.push(i);
             }
             this.hueRotate = new HueRotate(layers, () => {
-                //TODO
+                this.witch.fly();
             });
         }
 
