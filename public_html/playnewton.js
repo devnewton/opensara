@@ -870,6 +870,8 @@ class TMX_Map {
      * @type TMX_ObjectGroup[]
      */
     objectgroups = [];
+
+    properties = new Map();
 }
 
 class Playnewton_DRIVE {
@@ -894,6 +896,7 @@ class Playnewton_DRIVE {
         let tmx = await (await fetch(tmxUrl)).text();
         let doc = parser.parseFromString(tmx, "application/xml");
         let mapElement = doc.getElementsByTagName("map")[0];
+        map.properties = this._LoadTmxProperties(mapElement);
         map.width = parseInt(mapElement.getAttribute("width"), 10);
         map.height = parseInt(mapElement.getAttribute("height"), 10);
         map.tileWidth = parseInt(mapElement.getAttribute("tilewidth"), 10);

@@ -48,7 +48,7 @@ export default class Title extends Scene {
         if(pad.start && this.nextScene === this) {
             this.Stop();
             let scene = this;
-            for(let n = 5; n >= 1; --n) {
+            for(let n = 5; n >= 0; --n) {
                 let level = new Level(`maps/mountain/mountain_${n}.tmx`, scene);
                 scene = level;
             }

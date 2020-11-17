@@ -5,6 +5,7 @@ import Collectible from "../entities/collectible.js"
 import Exit from "../entities/exit.js"
 import Heart from "../entities/heart.js"
 import Key from "../entities/key.js"
+import Apple from "../entities/apple.js"
 import Poison from "../entities/poison.js"
 import Tatou from "../entities/tatou.js"
 import Enemy from "../entities/enemy.js"
@@ -29,6 +30,11 @@ export default class Level extends Scene {
      * @type Key[]
      */
     keys = [];
+
+    /**
+     * @type Apple[]
+     */
+    apples = [];
 
     /**
      * @type Exit[]
@@ -96,6 +102,7 @@ export default class Level extends Scene {
         await Exit.Preload();
         await Heart.Preload();
         await Key.Preload();
+        await Apple.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
                 (object, objectgroup, x, y) => {
             if (object.tile) {
@@ -132,6 +139,10 @@ export default class Level extends Scene {
                             this.sara = new Sara(x, y);
                         }
                         break;
+                    case "apple":
+                        let apple = new Apple(x, y);
+                        this.apples.push(apple);
+                        break;
                 }
             }
         },
@@ -157,6 +168,11 @@ export default class Level extends Scene {
 
         await this.InitCollectibles(map);
 
+        if("true" === map.properties.get("poison")) {
+            this.poison = new Poison(this.sara);
+        }
+
+
     }
 
     async InitHUD() {
@@ -168,7 +184,7 @@ export default class Level extends Scene {
 
         this.poisonCounterLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelPosition(this.poisonCounterLabel, 150, 22);
-        Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, "16💀");
+        Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, "");
         Playnewton.GPU.HUD.EnableLabel(this.poisonCounterLabel);
 
         this.itemsLabel = Playnewton.GPU.HUD.CreateLabel();
@@ -200,9 +216,6 @@ export default class Level extends Scene {
         this.progress = 80;
 
         await this.InitHUD();
-        this.progress = 90;
-
-        this.poison = new Poison(this.sara);
         this.progress = 100;
     }
 
@@ -230,14 +243,18 @@ export default class Level extends Scene {
         }
         this.sara.UpdateBody();
         this.enemies.forEach((enemy) => enemy.UpdateBody());
-        this.poison.Update();
+        if(this.poison) {
+            this.poison.Update();
+        }
     }
 
     UpdateSprites() {
         this.sara.UpdateSprite();
         this.enemies.forEach((enemy) => enemy.UpdateSprite());
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
-        Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.countDown}💀`);
+        if(this.poison) {
+            Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.countDown}💀`);
+        }
         Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
 
         this.enemies.forEach((enemy) => {
@@ -249,6 +266,16 @@ export default class Level extends Scene {
             if (heart.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneHeart();
                 heart.Free();
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+        this.apples = this.apples.filter((apple) => {
+            if (apple.Pursue(this.sara.sprite)) {
+                //TODO
+                apple.Free();
                 return false;
             } else {
                 return true;

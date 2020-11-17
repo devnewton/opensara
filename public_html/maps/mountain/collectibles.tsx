@@ -16,4 +16,9 @@
    <property name="type" value="exit"/>
   </properties>
  </tile>
+ <tile id="25">
+  <properties>
+   <property name="type" value="apple"/>
+  </properties>
+ </tile>
 </tileset>
