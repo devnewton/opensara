@@ -157,11 +157,7 @@ export default class Level extends Scene {
 
         await this.InitCollectibles(map);
 
-        if("true" === map.properties.get("poison")) {
-            this.poison = new Poison(this.sara);
-        }
-
-
+        this.poison = new Poison(this.sara);
     }
 
     async InitHUD() {
