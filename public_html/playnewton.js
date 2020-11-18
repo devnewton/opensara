@@ -1554,7 +1554,7 @@ class GPU_HUD {
      * @param {GPU_Label} label
      * @param {number} delayBetweenTwoCharacter
      */
-    StartLabelTypewriterEffect(label, text, delayBetweenTwoCharacter = 100) {
+    StartLabelTypewriterEffect(label, text, delayBetweenTwoCharacter = 50) {
         label.text = text;
         label.typewriterEffectStartTime = performance.now();
         label.typewriterEffectDelayBetweenTwoCharacter = delayBetweenTwoCharacter;
