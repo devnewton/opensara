@@ -123,6 +123,18 @@ export default class MoutainIntroLevel extends Scene {
 
         await this.InitMoutainIntroLevels();
         this.progress = 100;
+
+        this.InitSkipLabel()
+    }
+
+    InitSkipLabel() {
+        let label = Playnewton.GPU.HUD.CreateLabel()
+        Playnewton.GPU.HUD.SetLabelFont(label, "bold 12px monospace")
+        Playnewton.GPU.HUD.SetLabelAlign(label, "right")
+        Playnewton.GPU.HUD.SetLabelPosition(label, 1024, 564)
+        Playnewton.GPU.HUD.SetLabelColor(label, "#eeeeee")
+        Playnewton.GPU.HUD.SetLabelText(label, "Skip with ⌨️F1 or 🎮start")
+        Playnewton.GPU.HUD.EnableLabel(label)
     }
 
     UpdateBodies() {
