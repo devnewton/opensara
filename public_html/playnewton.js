@@ -1471,6 +1471,18 @@ class GPU_Label {
     /**
      * @type number
      */
+    typewriterEffectStartTime;
+
+    /**
+     * @type number
+     */
+    typewriterEffectDelayBetweenTwoCharacter;
+
+    typewriterEffectResolve;
+
+    /**
+     * @type number
+     */
     x = 0;
 
     /**
@@ -1535,6 +1547,20 @@ class GPU_HUD {
         let label = new GPU_Label();
         this.labels.push(label);
         return label;
+    }
+
+    /**
+     * 
+     * @param {GPU_Label} label
+     * @param {number} delayBetweenTwoCharacter
+     */
+    StartLabelTypewriterEffect(label, text, delayBetweenTwoCharacter = 100) {
+        label.text = text;
+        label.typewriterEffectStartTime = performance.now();
+        label.typewriterEffectDelayBetweenTwoCharacter = delayBetweenTwoCharacter;
+        return new Promise(resolve => {
+            label.typewriterEffectResolve = resolve
+        });
     }
 
     /**
@@ -1703,7 +1729,7 @@ class Playnewton_GPU {
     sprites = [];
 
     /**
-     * @type GPU_Hud
+     * @type GPU_HUD
      */
     HUD = new GPU_HUD();
 
@@ -2143,14 +2169,27 @@ class Playnewton_GPU {
 
     /**
      * 
-     * @param {type} label
+     * @param {GPU_Label} label
      */
     _DrawLabel(label) {
         if (label.enabled) {
             this.ctx.font = label.font;
             this.ctx.fillStyle = label.color;
             this.ctx.textAlign = label.align;
-            this.ctx.fillText(label.text, label.x, label.y);
+            let text = label.text;
+            if(label.typewriterEffectStartTime) {
+                let nbCharacter = (this.fpsLimiter.now - label.typewriterEffectStartTime) / label.typewriterEffectDelayBetweenTwoCharacter;
+                if(nbCharacter <= 0) {
+                    return;
+                }
+                if(nbCharacter < label.text.length) {
+                    text = text.slice(0, nbCharacter);
+                } else if(label.typewriterEffectResolve) {
+                    label.typewriterEffectResolve();
+                    label.typewriterEffectResolve = undefined;
+                }
+            }
+            this.ctx.fillText(text, label.x, label.y);
         }
     }
 
@@ -3203,6 +3242,13 @@ class Playnewton {
     ENUMS = {
         GPU_AnimationMode: GPU_AnimationMode,
         GPU_AnimationState: GPU_AnimationState
+    }
+
+    /**
+     * @param {number} ms 
+     */
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 

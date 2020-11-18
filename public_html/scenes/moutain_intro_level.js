@@ -45,6 +45,8 @@ export default class MoutainIntroLevel extends Scene {
      */
     hueRotate;
 
+    skippable = false;
+
     constructor(mapPath, nextSceneOnExit) {
         super();
         this.mapPath = mapPath;
@@ -59,27 +61,27 @@ export default class MoutainIntroLevel extends Scene {
         await Collectible.Preload();
         await Apple.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
-                (object, objectgroup, x, y) => {
-            if (object.tile) {
-                switch (object.tile.properties.get("type")) {
-                    case "sara":
-                        if(!this.sara) {
-                            this.sara = new Sara(x, y);
-                        }
-                        break;
-                    case "apple":
-                        let apple = new Apple(x, y);
-                        this.apples.push(apple);
-                        break;
-                    case "witch":
-                        if(!this.witch) {
-                            this.witch = new Witch(x, y);
-                        }
-                        break;
+            (object, objectgroup, x, y) => {
+                if (object.tile) {
+                    switch (object.tile.properties.get("type")) {
+                        case "sara":
+                            if (!this.sara) {
+                                this.sara = new Sara(x, y);
+                            }
+                            break;
+                        case "apple":
+                            let apple = new Apple(x, y);
+                            this.apples.push(apple);
+                            break;
+                        case "witch":
+                            if (!this.witch) {
+                                this.witch = new Witch(x, y);
+                            }
+                            break;
+                    }
                 }
-            }
-        },
-                map);
+            },
+            map);
 
     }
 
@@ -142,22 +144,74 @@ export default class MoutainIntroLevel extends Scene {
                 return true;
             }
         });
-        if(this.apples.length === 0 && !this.hueRotate) {
+        if (this.apples.length === 0 && !this.hueRotate) {
             let layers = [];
             for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
                 layers.push(i);
             }
-            this.hueRotate = new HueRotate(layers, () => {
+            this.hueRotate = new HueRotate(layers, async () => {
                 this.witch.fly();
+                let label = Playnewton.GPU.HUD.CreateLabel();
+                Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
+
+                Playnewton.GPU.HUD.SetLabelAlign(label, "left");
+                Playnewton.GPU.HUD.SetLabelPosition(label, 32, 532);
+                Playnewton.GPU.HUD.EnableLabel(label);
+
+                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You just ate my poisoned apples !");
+                await Playnewton.delay(1000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What? Why do you poison apples ?");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No time to explain. Do you want to live ?");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Sure !");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] You need a magic flower to cure you.");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Where does this magic flower grow?");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Find magic keys to open magic signs.");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] That's magic bullshit !");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Do you want to live ?");
+                await Playnewton.delay(1000);
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Ok...");
+                await Playnewton.delay(1000);
+                this.fadeoutToNextLevel();
             });
         }
 
-        if(this.hueRotate) {
+        let pad = Playnewton.CTRL.GetPad(0);
+        if(!pad.start) {
+            this.skippable = true;
+        }
+        if (this.skippable && pad.start) {
+            this.fadeoutToNextLevel();
+        }
+
+        if (this.hueRotate) {
             this.hueRotate.Update();
         }
 
-        if(this.fadeout) {
+        if (this.fadeout) {
             this.fadeout.Update();
+        }
+    }
+
+    fadeoutToNextLevel() {
+        if (!this.fadeout) {
+            let layers = [];
+            for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
+                layers.push(i);
+            }
+            this.fadeout = new Fadeout(1000, layers, () => {
+                this.Stop();
+                this.nextScene = this.nextSceneOnExit;
+                this.nextSceneOnExit.Start();
+            });
         }
     }
 }

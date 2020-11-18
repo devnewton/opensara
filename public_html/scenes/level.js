@@ -96,7 +96,6 @@ export default class Level extends Scene {
         await Exit.Preload();
         await Heart.Preload();
         await Key.Preload();
-        await Apple.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
                 (object, objectgroup, x, y) => {
             if (object.tile) {
