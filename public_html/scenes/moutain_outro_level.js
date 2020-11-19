@@ -1,0 +1,232 @@
+import Scene from "./scene.js"
+import Playnewton from "../playnewton.js"
+import Sara from "../entities/sara.js"
+import Collectible from "../entities/collectible.js"
+import Flower from "../entities/flower.js"
+import Z_ORDER from "../utils/z_order.js"
+import Fadeout from "../entities/fadeout.js"
+import HueRotate from "../entities/huerotate.js"
+import Witch from "../entities/witch.js"
+
+export default class MoutainOutroLevel extends Scene {
+
+    /**
+     * @type Sara
+     */
+    sara;
+
+    /**
+     * @type Witch
+     */
+    witch;
+
+    /**
+     * @type Flower[]
+     */
+    flowers = [];
+
+    /**
+     * @type string
+     */
+    mapPath;
+
+    /**
+     * @type Scene
+     */
+    nextSceneOnExit;
+
+    /**
+     * @type Fadeout
+     */
+    fadeout;
+
+    /**
+     * @type HueRotate
+     */
+    hueRotate;
+
+    skippable = false;
+
+    constructor(mapPath, nextSceneOnExit) {
+        super();
+        this.mapPath = mapPath;
+        this.nextSceneOnExit = nextSceneOnExit;
+    }
+
+    async InitSara() {
+        await Sara.Preload();
+    }
+
+    async InitCollectibles(map) {
+        await Collectible.Preload();
+        await Flower.Preload();
+        Playnewton.DRIVE.ForeachTmxMapObject(
+            (object, objectgroup, x, y) => {
+                if (object.tile) {
+                    switch (object.tile.properties.get("type")) {
+                        case "sara":
+                            if (!this.sara) {
+                                this.sara = new Sara(x, y);
+                            }
+                            break;
+                        case "flower":
+                            let flower = new Flower(x, y);
+                            this.flowers.push(flower);
+                            break;
+                        case "witch":
+                            if (!this.witch) {
+                                this.witch = new Witch(x, y);
+                            }
+                            break;
+                    }
+                }
+            },
+            map);
+
+    }
+
+    async InitMoutainOutroLevels() {
+        let skyBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sky.png");
+
+        let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
+
+        let skySprite = Playnewton.GPU.CreateSprite();
+        Playnewton.GPU.SetSpritePicture(skySprite, Playnewton.GPU.CreatePicture(skyBitmap));
+        Playnewton.GPU.SetSpritePosition(skySprite, 0, 0);
+        Playnewton.GPU.EnableSprite(skySprite);
+
+        Playnewton.PPU.SetWorldBounds(0, 0, 1024, 576);
+        Playnewton.PPU.SetWorldGravity(0, 1);
+
+        Playnewton.DRIVE.ConvertTmxMapToGPUSprites(Playnewton.GPU, map, 0, 0, Z_ORDER.BACKGROUND);
+        Playnewton.DRIVE.ConvertTmxMapToPPUBodies(Playnewton.PPU, map, 0, 0);
+
+        await this.InitCollectibles(map);
+    }
+
+    async Start() {
+        await super.Start();
+
+        this.progress = 0;
+
+        for (let z = Z_ORDER.MIN; z <= Z_ORDER.MAX; ++z) {
+            let layer = Playnewton.GPU.GetLayer(z);
+            Playnewton.GPU.EnableLayer(layer);
+        }
+        this.progress = 20;
+
+        await this.InitSara();
+        this.progress = 50;
+
+        await Witch.Preload();
+        this.properties = 75
+
+        await this.InitMoutainOutroLevels();
+        this.progress = 100;
+
+        this.InitSkipLabel()
+    }
+
+    InitSkipLabel() {
+        let label = Playnewton.GPU.HUD.CreateLabel()
+        Playnewton.GPU.HUD.SetLabelFont(label, "bold 12px monospace")
+        Playnewton.GPU.HUD.SetLabelAlign(label, "right")
+        Playnewton.GPU.HUD.SetLabelPosition(label, 1024, 564)
+        Playnewton.GPU.HUD.SetLabelColor(label, "#eeeeee")
+        Playnewton.GPU.HUD.SetLabelText(label, "Skip with ⌨️F1 or 🎮start")
+        Playnewton.GPU.HUD.EnableLabel(label)
+    }
+
+    UpdateBodies() {
+        this.sara.UpdateBody();
+        this.witch.UpdateBody();
+    }
+
+    UpdateSprites() {
+        this.sara.UpdateSprite();
+        this.witch.UpdateSprite();
+
+        this.witch.Pursue(this.sara);
+
+        this.flowers = this.flowers.filter((flower) => {
+            if (flower.Pursue(this.sara.sprite)) {
+                flower.Free();
+                return false;
+            } else {
+                return true;
+            }
+        });
+        if (this.flowers.length === 0 && !this.hueRotate) {
+            let layers = [];
+            for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
+                layers.push(i);
+            }
+            this.hueRotate = new HueRotate(layers, async () => {
+                this.witch.fly();
+                let label = Playnewton.GPU.HUD.CreateLabel();
+                Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
+
+                Playnewton.GPU.HUD.SetLabelAlign(label, "left");
+                Playnewton.GPU.HUD.SetLabelPosition(label, 32, 532);
+                Playnewton.GPU.HUD.EnableLabel(label);
+
+                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You found the flower !");
+                await Playnewton.delay(2000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Am I cured ?");
+                await Playnewton.delay(2000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Yes ! No need for a prince charming !");
+                await Playnewton.delay(2000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] You can invoke a prince charming ?");
+                await Playnewton.delay(2000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No, but I can disappear.");
+                await Playnewton.delay(2000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] By running away ?");
+                await Playnewton.delay(2000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Oh you know the trick...");
+                await Playnewton.delay(2000);
+                Playnewton.GPU.HUD.SetLabelColor(label, "#ffffff");
+                Playnewton.GPU.HUD.SetLabelPosition(label, 512, 532);
+                Playnewton.GPU.HUD.SetLabelAlign(label, "center");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "THE END", 200);
+                await Playnewton.delay(2000);
+            });
+        }
+
+        let pad = Playnewton.CTRL.GetPad(0);
+        if(!pad.start) {
+            this.skippable = true;
+        }
+        if (this.skippable && pad.start) {
+            this.fadeoutToNextLevel();
+        }
+
+        if (this.hueRotate) {
+            this.hueRotate.Update();
+        }
+
+        if (this.fadeout) {
+            this.fadeout.Update();
+        }
+    }
+
+    fadeoutToNextLevel() {
+        if (!this.fadeout) {
+            let layers = [];
+            for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
+                layers.push(i);
+            }
+            this.fadeout = new Fadeout(1000, layers, () => {
+                this.Stop();
+                this.nextScene = this.nextSceneOnExit;
+                this.nextSceneOnExit.Start();
+            });
+        }
+    }
+}

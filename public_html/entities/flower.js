@@ -6,7 +6,7 @@ import Collectible from "./collectible.js"
  * @readonly
  * @enum {number}
  */
-const AppleState = {
+const FlowerState = {
     IDLE: 1,
     PURSUE: 2
 };
@@ -14,15 +14,15 @@ const AppleState = {
 const PURSUE_START_DISTANCE = 64;
 const PURSUE_DONE_DISTANCE = 8;
 const PURSUE_SPEED = 2;
-        
-class AppleAnimations {
+
+class FlowerAnimations {
     /**
      * @type GPU_SpriteAnimation
      */
     idle;
 }
 
-export default class Apple {
+export default class Flower {
     /**
      * 
      * @type GPU_Sprite
@@ -32,27 +32,19 @@ export default class Apple {
     /**
      *  @type SaraState
      */
-    state = AppleState.IDLE;
+    state = FlowerState.IDLE;
 
-    static animations = new AppleAnimations();
+    static animations = new FlowerAnimations();
 
     static async Preload() {
         let bitmap = Collectible.bitmap;
 
         let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
-            {name: "apple1", x: 44, y: 106, w: 8, h: 10},
-            {name: "apple2", x: 76, y: 106, w: 8, h: 10},
-            {name: "apple3", x: 108, y: 106, w: 8, h: 10},
-            {name: "apple4", x: 140, y: 106, w: 8, h: 10}
+            {name: "flower1", x: 8, y: 97, w: 16, h: 30},
         ]);
 
-        Apple.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
-            {name: "apple1", delay: 100},
-            {name: "apple2", delay: 100},
-            {name: "apple3", delay: 100},
-            {name: "apple4", delay: 100},
-            {name: "apple3", delay: 100},
-            {name: "apple2", delay: 100}
+        Flower.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
+            {name: "flower1", delay: 100}
         ]);
     }
 
@@ -63,8 +55,8 @@ export default class Apple {
      */
     constructor(x, y) {
         this.sprite = Playnewton.GPU.CreateSprite();
-        Playnewton.GPU.SetSpriteAnimation(this.sprite, Apple.animations.idle);
-        Playnewton.GPU.SetSpritePosition(this.sprite, x + 16, y - 32 + this.sprite.height);
+        Playnewton.GPU.SetSpriteAnimation(this.sprite, Flower.animations.idle);
+        Playnewton.GPU.SetSpritePosition(this.sprite, x + 16, y - 32);
         Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.COLLECTIBLES);
         Playnewton.GPU.EnableSprite(this.sprite);
     }
@@ -79,8 +71,8 @@ export default class Apple {
         if (distance < PURSUE_DONE_DISTANCE) {
             return true;
         }
-        if (this.state == AppleState.PURSUE || distance < PURSUE_START_DISTANCE) {
-            this.state = AppleState.PURSUE;
+        if (this.state == FlowerState.PURSUE || distance < PURSUE_START_DISTANCE) {
+            this.state = FlowerState.PURSUE;
             let speed = PURSUE_SPEED / distance;
             dx *= speed;
             dy *= speed;

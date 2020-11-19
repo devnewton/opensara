@@ -2,6 +2,7 @@ import Scene from "./scene.js"
 import Playnewton from "../playnewton.js"
 import Level from "./level.js"
 import MoutainIntroLevel from "./moutain_intro_level.js";
+import MoutainOutroLevel from "./moutain_outro_level.js";
 
 export default class Title extends Scene {
 
@@ -48,12 +49,13 @@ export default class Title extends Scene {
         let pad = Playnewton.CTRL.GetPad(0);
         if(pad.start && this.nextScene === this) {
             this.Stop();
-            let scene = this;
-            for(let n = 5; n >= 1; --n) {
+            let scene = new MoutainOutroLevel("maps/mountain/mountain_outro.tmx", this);
+            /*for(let n = 5; n >= 1; --n) {
                 let level = new Level(`maps/mountain/mountain_${n}.tmx`, scene);
                 scene = level;
-            }
-            this.nextScene = new MoutainIntroLevel("maps/mountain/mountain_intro.tmx", scene);
+            }*/
+            this.nextScene = scene;
+            //this.nextScene = new MoutainIntroLevel("maps/mountain/mountain_intro.tmx", scene);
             this.nextScene.Start();
         }
     }

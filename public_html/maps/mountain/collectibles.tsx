@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="1.4.2" name="collectibles" tilewidth="32" tileheight="32" tilecount="64" columns="8">
+<tileset version="1.2" tiledversion="1.3.3" name="collectibles" tilewidth="32" tileheight="32" tilecount="64" columns="8">
  <image source="../../sprites/collectibles.png" width="256" height="256"/>
  <tile id="0">
   <properties>
@@ -14,6 +14,11 @@
  <tile id="16">
   <properties>
    <property name="type" value="exit"/>
+  </properties>
+ </tile>
+ <tile id="24">
+  <properties>
+   <property name="type" value="flower"/>
   </properties>
  </tile>
  <tile id="25">
