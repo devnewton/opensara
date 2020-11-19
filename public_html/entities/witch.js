@@ -9,7 +9,8 @@ import Sara from "./sara.js";
  */
 const WitchState = {
     IDLE: 1,
-    FLY: 2
+    FLY: 2,
+    FLEE: 3
 };
 
 /**
@@ -57,6 +58,8 @@ export default class Witch extends Enemy {
      */
     static animations = [];
 
+    hoverDy = 0;
+
     static async Preload() {
         let witchBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/witch.png");
 
@@ -98,11 +101,22 @@ export default class Witch extends Enemy {
     }
 
     UpdateBody() {
+        switch (this.state) {
+            case WitchState.FLEE:
+                if(Playnewton.PPU.CheckIfBodyIsInWorldBound(this.body)) {
+                    Playnewton.PPU.SetBodyVelocity(this.body, -this.flySpeed, 0);
+                } else {
+                    Playnewton.PPU.DisableBody(this.body);
+                    Playnewton.GPU.DisableSprite(this.sprite);
+                }
+                break
+        }
     }
 
     UpdateSprite() {
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Witch.animations[this.direction].fly);
-        Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
+        let y = this.body.position.y + Math.sin(performance.now() / 300) * 4;
+        Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, y);    
     }
 
     /**
@@ -131,10 +145,17 @@ export default class Witch extends Enemy {
                 dy *= s;
                 Playnewton.PPU.SetBodyVelocity(this.body, dx, dy);
                 break;
+            case WitchState.FLEE:
+                break;
         }
     }
 
     fly() {
         this.state = WitchState.FLY;
+    }
+
+    flee() {
+        this.direction = WitchDirection.LEFT;
+        this.state = WitchState.FLEE;
     }
 }

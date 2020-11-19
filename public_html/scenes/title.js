@@ -50,12 +50,11 @@ export default class Title extends Scene {
         if(pad.start && this.nextScene === this) {
             this.Stop();
             let scene = new MoutainOutroLevel("maps/mountain/mountain_outro.tmx", this);
-            /*for(let n = 5; n >= 1; --n) {
+            for(let n = 5; n >= 1; --n) {
                 let level = new Level(`maps/mountain/mountain_${n}.tmx`, scene);
                 scene = level;
-            }*/
-            this.nextScene = scene;
-            //this.nextScene = new MoutainIntroLevel("maps/mountain/mountain_intro.tmx", scene);
+            }
+            this.nextScene = new MoutainIntroLevel("maps/mountain/mountain_intro.tmx", scene);
             this.nextScene.Start();
         }
     }

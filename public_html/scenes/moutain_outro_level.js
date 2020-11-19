@@ -196,6 +196,7 @@ export default class MoutainOutroLevel extends Scene {
                 Playnewton.GPU.HUD.SetLabelAlign(label, "center");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "THE END", 200);
                 await Playnewton.delay(2000);
+                this.witch.flee();
             });
         }
 
