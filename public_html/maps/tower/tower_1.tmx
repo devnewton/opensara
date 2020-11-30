@@ -1,33 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="73">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="155">
  <tileset firstgid="1" source="tower.tsx"/>
  <tileset firstgid="50" source="collectibles.tsx"/>
  <tileset firstgid="114" source="icons.tsx"/>
- <tileset firstgid="120" source="tower_bg.tsx"/>
- <layer id="4" name="bg0" width="32" height="18">
+ <tileset firstgid="120" source="tower_bg0_tileset.tsx"/>
+ <objectgroup id="7" name="bg0_relief">
+  <object id="80" gid="120" x="0" y="576" width="256" height="256"/>
+  <object id="84" gid="121" x="256" y="576" width="256" height="256"/>
+  <object id="85" gid="121" x="768" y="576" width="256" height="256"/>
+  <object id="87" gid="121" x="512" y="320" width="256" height="256"/>
+  <object id="88" gid="121" x="0" y="320" width="256" height="256"/>
+  <object id="89" gid="120" x="256" y="320" width="256" height="256"/>
+  <object id="90" gid="120" x="512" y="576" width="256" height="256"/>
+  <object id="91" gid="120" x="768" y="320" width="256" height="256"/>
+  <object id="94" gid="121" x="0" y="64" width="256" height="256"/>
+  <object id="97" gid="121" x="512" y="64" width="256" height="256"/>
+  <object id="98" gid="120" x="768" y="64" width="256" height="256"/>
+  <object id="99" gid="121" x="768" y="-192" width="256" height="256"/>
+  <object id="100" gid="120" x="512" y="-192" width="256" height="256"/>
+  <object id="101" gid="121" x="256" y="-192" width="256" height="256"/>
+  <object id="102" gid="120" x="0" y="-192" width="256" height="256"/>
+  <object id="103" gid="121" x="0" y="-448" width="256" height="256"/>
+  <object id="104" gid="120" x="256" y="-448" width="256" height="256"/>
+  <object id="106" gid="121" x="768" y="-448" width="256" height="256"/>
+  <object id="107" gid="120" x="768" y="-704" width="256" height="256"/>
+  <object id="108" gid="121" x="512" y="-704" width="256" height="256"/>
+  <object id="109" gid="120" x="256" y="-704" width="256" height="256"/>
+  <object id="110" gid="120" x="0" y="-704" width="256" height="256"/>
+  <object id="111" gid="121" x="0" y="-960" width="256" height="256"/>
+  <object id="112" gid="121" x="256" y="-960" width="256" height="256"/>
+  <object id="113" gid="120" x="512" y="-960" width="256" height="256"/>
+  <object id="114" gid="120" x="768" y="-960" width="256" height="256"/>
+  <object id="115" gid="121" x="768" y="-1216" width="256" height="256"/>
+  <object id="116" gid="120" x="512" y="-1216" width="256" height="256"/>
+  <object id="117" gid="121" x="256" y="-1216" width="256" height="256"/>
+  <object id="119" gid="121" x="768" y="-1472" width="256" height="256"/>
+  <object id="121" gid="121" x="256" y="-1472" width="256" height="256"/>
+  <object id="122" gid="120" x="0" y="-1472" width="256" height="256"/>
+  <object id="123" gid="121" x="768" y="-1728" width="256" height="256"/>
+  <object id="124" gid="121" x="0" y="-1728" width="256" height="256"/>
+  <object id="125" gid="120" x="256" y="-1728" width="256" height="256"/>
+  <object id="126" gid="120" x="512" y="-1728" width="256" height="256"/>
+  <object id="127" gid="121" x="768" y="-1984" width="256" height="256"/>
+  <object id="128" gid="121" x="512" y="-1984" width="256" height="256"/>
+  <object id="129" gid="120" x="0" y="-1984" width="256" height="256"/>
+  <object id="130" gid="120" x="256" y="-1984" width="256" height="256"/>
+  <object id="131" gid="121" x="0" y="-2240" width="256" height="256"/>
+  <object id="134" gid="121" x="512" y="-2240" width="256" height="256"/>
+  <object id="135" gid="120" x="768" y="-2240" width="256" height="256"/>
+  <object id="136" gid="121" x="768" y="-2496" width="256" height="256"/>
+  <object id="137" gid="121" x="0" y="-2496" width="256" height="256"/>
+  <object id="138" gid="120" x="256" y="-2496" width="256" height="256"/>
+  <object id="139" gid="120" x="512" y="-2496" width="256" height="256"/>
+  <object id="140" gid="120" x="0" y="-2752" width="256" height="256"/>
+  <object id="141" gid="120" x="256" y="-2752" width="256" height="256"/>
+  <object id="142" gid="121" x="512" y="-2752" width="256" height="256"/>
+  <object id="144" gid="120" x="0" y="-3008" width="256" height="256"/>
+  <object id="145" gid="120" x="768" y="-3008" width="256" height="256"/>
+  <object id="146" gid="121" x="512" y="-3008" width="256" height="256"/>
+  <object id="147" gid="121" x="256" y="-3008" width="256" height="256"/>
+  <object id="149" gid="123" x="256" y="64" width="256" height="256"/>
+  <object id="150" gid="124" x="512" y="-448" width="256" height="256"/>
+ </objectgroup>
+ <layer id="1" name="bg1" width="32" height="18" locked="1">
   <data encoding="csv">
-19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
-19,19,20,19,27,19,19,19,27,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,20,19,19,19,19,19,19,19,
-19,19,26,19,19,19,19,19,20,19,19,20,19,27,19,19,19,19,19,19,19,20,19,19,19,19,19,19,19,19,20,19,
-19,19,19,19,19,18,19,26,19,19,19,19,19,19,19,19,19,19,18,19,19,19,19,19,20,19,25,20,20,19,19,19,
-19,20,19,19,19,19,26,19,19,19,19,19,20,19,19,20,19,27,19,19,19,19,19,19,19,19,19,19,19,20,19,25,
-19,19,19,26,18,19,19,19,18,19,19,19,25,27,19,19,19,19,19,25,19,19,20,19,19,19,26,19,19,19,19,19,
-19,19,19,27,19,19,19,19,19,19,19,18,20,25,18,19,19,19,19,19,19,18,19,19,19,19,18,26,25,19,19,20,
-19,19,19,19,19,18,19,19,19,20,19,19,19,19,19,19,25,19,19,19,19,18,27,26,20,19,19,19,19,19,19,19,
-19,19,19,19,19,19,20,19,19,19,19,19,19,19,18,26,19,26,18,19,19,25,19,19,19,19,19,26,19,19,19,19,
-19,27,19,19,19,18,19,19,19,20,19,19,19,19,19,19,19,19,19,19,19,20,19,19,19,26,19,19,25,19,20,19,
-19,19,19,19,19,25,19,19,19,18,19,18,20,19,19,25,19,18,19,18,19,19,19,19,19,19,19,20,19,20,19,19,
-19,19,19,19,18,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,25,20,20,19,25,19,19,19,25,19,
-19,19,27,19,19,19,19,18,19,19,19,20,19,19,19,19,20,20,19,19,19,19,19,19,19,19,19,19,27,19,20,20,
-19,19,19,19,19,27,19,19,19,19,19,19,25,19,19,19,26,19,19,19,18,19,18,19,18,19,19,19,20,19,19,20,
-19,19,19,19,19,19,19,19,25,19,19,19,19,19,18,19,19,26,26,20,19,19,19,19,27,18,19,27,27,19,19,19,
-19,19,20,19,19,19,19,19,20,19,19,19,19,20,19,19,19,19,20,19,19,19,19,19,19,19,19,19,19,19,19,19,
-19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
-19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19
-</data>
- </layer>
- <layer id="1" name="bg1" width="32" height="18">
-  <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -41,22 +77,26 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,120,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 2,2,2,30,29,2,2,2,30,2,2,29,2,2,2,31,29,2,2,2,30,2,31,2,31,2,29,2,2,29,2,2,
 9,9,9,9,9,9,24,9,9,9,9,22,9,9,9,9,22,9,9,24,9,22,9,23,9,23,9,9,23,22,23,24
 </data>
  </layer>
- <objectgroup color="#00ff7f" id="2" name="platforms">
+ <objectgroup color="#00ff7f" id="2" name="platforms" locked="1">
   <properties>
    <property name="immovable" value="true"/>
    <property name="type" value="body"/>
   </properties>
  </objectgroup>
- <objectgroup id="3" name="collectibles"/>
- <objectgroup id="5" name="enemies">
+ <objectgroup id="3" name="collectibles">
+  <object id="151" gid="123" x="0" y="-1216" width="256" height="256"/>
+  <object id="152" gid="123" x="256" y="-2240" width="256" height="256"/>
+  <object id="153" gid="124" x="512" y="-1472" width="256" height="256"/>
+  <object id="154" gid="124" x="768" y="-2752" width="256" height="256"/>
+ </objectgroup>
+ <objectgroup id="5" name="enemies" locked="1">
   <object id="71" gid="116" x="386" y="519.667" width="31" height="47"/>
-  <object id="72" gid="116" x="-160" y="172" width="31" height="47"/>
  </objectgroup>
 </map>
