@@ -18,6 +18,9 @@ nbproject/private/
 # Krita
 *.kra
 
+# Gimp
+*.xcf
+
 # Libresprite
 *.ase
 

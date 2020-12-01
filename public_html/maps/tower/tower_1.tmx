@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="180" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="155">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="180" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="157">
  <tileset firstgid="1" source="tower.tsx"/>
  <tileset firstgid="50" source="collectibles.tsx"/>
  <tileset firstgid="114" source="icons.tsx"/>
  <tileset firstgid="120" source="tower_bg0_tileset.tsx"/>
+ <tileset firstgid="129" source="tower_sky.tsx"/>
  <objectgroup id="7" name="bg0_relief" locked="1">
   <object id="80" gid="120" x="0" y="5760" width="256" height="256"/>
   <object id="84" gid="121" x="256" y="5760" width="256" height="256"/>
@@ -61,6 +62,9 @@
   <object id="147" gid="121" x="256" y="2176" width="256" height="256"/>
   <object id="149" gid="123" x="256" y="5248" width="256" height="256"/>
   <object id="150" gid="124" x="512" y="4736" width="256" height="256"/>
+ </objectgroup>
+ <objectgroup id="8" name="bg0_sky">
+  <object id="155" gid="129" x="0" y="1920" width="1024" height="1024"/>
  </objectgroup>
  <layer id="1" name="bg1" width="32" height="180">
   <data encoding="csv">
@@ -123,12 +127,12 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,11,12,12,12,12,12,12,12,12,13,0,0,0,11,12,12,12,12,12,12,12,12,12,12,12,13,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-11,12,13,0,0,0,0,0,0,0,0,0,0,11,12,13,0,0,0,0,0,0,0,0,0,11,12,13,0,0,0,0,
+12,12,13,0,0,0,0,0,0,0,0,0,0,11,12,13,0,0,0,0,0,0,0,0,0,0,0,0,0,11,12,12,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,11,12,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
