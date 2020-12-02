@@ -1,5 +1,5 @@
-const PLAYNEWTON_DEFAULT_SCREEN_WIDTH = 1280;
-const PLAYNEWTON_DEFAULT_SCREEN_HEIGHT = 720;
+const PLAYNEWTON_DEFAULT_SCREEN_WIDTH = 1024;
+const PLAYNEWTON_DEFAULT_SCREEN_HEIGHT = 576;
 
 /**
  * Frame description for CreateSpriteset()
@@ -721,11 +721,18 @@ class TMX_Layer {
      * @type number
      */
     x;
+
     /**
      * The y coordinate of the layer in tiles
      * @type number
      */
     y;
+
+    /**
+     * The z order to sort layers and object groups
+     * @type number
+     */
+    z;
 
     /**
      * Width of the layer in tiles
@@ -767,6 +774,12 @@ class TMX_Object {
      * @type number
      */
     y;
+
+    /**
+     * The z order to sort layers and object groups
+     * @type number
+     */
+    z;
 
     /**
      * Width of the object
@@ -915,70 +928,79 @@ class Playnewton_DRIVE {
             map.tilesets.push(tileset);
         }
 
-        for (let layerElement of doc.getElementsByTagName("layer")) {
-            let layer = new TMX_Layer();
-            layer.name = layerElement.getAttribute("name");
-            layer.x = parseInt(layerElement.getAttribute("x"), 10) || 0;
-            layer.y = parseInt(layerElement.getAttribute("y"), 10) || 0;
-            layer.width = parseInt(layerElement.getAttribute("width"), 10);
-            layer.height = parseInt(layerElement.getAttribute("height"), 10);
+        let z = 0;
+        for (let layerOrObjectGroupElement of doc.querySelectorAll("layer,objectgroup")) {
+            switch (layerOrObjectGroupElement.tagName) {
+                case "layer":
+                    let layerElement = layerOrObjectGroupElement;
+                    let layer = new TMX_Layer();
+                    layer.name = layerElement.getAttribute("name");
+                    layer.x = parseInt(layerElement.getAttribute("x"), 10) || 0;
+                    layer.y = parseInt(layerElement.getAttribute("y"), 10) || 0;
+                    layer.z = z;
+                    ++z;
+                    layer.width = parseInt(layerElement.getAttribute("width"), 10);
+                    layer.height = parseInt(layerElement.getAttribute("height"), 10);
 
-            let dataElement = layerElement.getElementsByTagName("data")[0];
-            if (dataElement) {
-                let encoding = dataElement.getAttribute("encoding");
-                let chunkElements = dataElement.getElementsByTagName("chunk");
-                if (chunkElements.length > 0) {
-                    for (let chunkElement of chunkElements) {
-                        layer.chunks.push(this._LoadChunkElement(map, chunkElement, encoding));
-                    }
-                } else {
-                    layer.chunks.push(this._LoadChunkElement(map, dataElement));
-                }
-
-            }
-            map.layers.push(layer);
-        }
-
-        for (let objectgroupElement of doc.getElementsByTagName("objectgroup")) {
-            let objectGroup = new TMX_ObjectGroup();
-            objectGroup.name = objectgroupElement.getAttribute("name");
-            objectGroup.color = objectgroupElement.getAttribute("color");
-            objectGroup.x = parseInt(objectgroupElement.getAttribute("x"), 10) || 0;
-            objectGroup.y = parseInt(objectgroupElement.getAttribute("y"), 10) || 0;
-            objectGroup.properties = this._LoadTmxProperties(objectgroupElement);
-            for (let objectElement of objectgroupElement.getElementsByTagName("object")) {
-                let object = new TMX_Object();
-                object.name = objectElement.getAttribute("name");
-                object.x = parseInt(objectElement.getAttribute("x"), 10) || 0;
-                object.y = parseInt(objectElement.getAttribute("y"), 10) || 0;
-                object.width = parseInt(objectElement.getAttribute("width"), 10);
-                object.height = parseInt(objectElement.getAttribute("height"), 10);
-                let global_tile_id = parseInt(objectElement.getAttribute("gid"), 10);
-                if (global_tile_id) {
-                    //TODO Read out the flags
-                    //let flipped_horizontally = (global_tile_id & TMX_FLIPPED_HORIZONTALLY_FLAG);
-                    //let flipped_vertically = (global_tile_id & TMX_FLIPPED_VERTICALLY_FLAG);
-                    //let flipped_diagonally = (global_tile_id & TMX_FLIPPED_DIAGONALLY_FLAG);
-
-                    // Clear the flags
-                    global_tile_id &= ~(TMX_FLIPPED_HORIZONTALLY_FLAG | TMX_FLIPPED_VERTICALLY_FLAG | TMX_FLIPPED_DIAGONALLY_FLAG);
-
-                    // Resolve the tile
-                    for (let i = map.tilesets.length - 1; i >= 0; --i) {
-                        let tileset = map.tilesets[i];
-
-                        if (tileset.firstgid <= global_tile_id) {
-                            object.tile = tileset.tiles.get(global_tile_id - tileset.firstgid);
-                            break;
+                    let dataElement = layerElement.getElementsByTagName("data")[0];
+                    if (dataElement) {
+                        let encoding = dataElement.getAttribute("encoding");
+                        let chunkElements = dataElement.getElementsByTagName("chunk");
+                        if (chunkElements.length > 0) {
+                            for (let chunkElement of chunkElements) {
+                                layer.chunks.push(this._LoadChunkElement(map, chunkElement, encoding));
+                            }
+                        } else {
+                            layer.chunks.push(this._LoadChunkElement(map, dataElement));
                         }
-                    }
-                }
-                object.properties = this._LoadTmxProperties(objectElement);
-                objectGroup.objects.push(object);
-            }
-            map.objectgroups.push(objectGroup);
-        }
 
+                    }
+                    map.layers.push(layer);
+                    break;
+                case "objectgroup":
+                    let objectgroupElement = layerOrObjectGroupElement;
+                    let objectGroup = new TMX_ObjectGroup();
+                    objectGroup.name = objectgroupElement.getAttribute("name");
+                    objectGroup.color = objectgroupElement.getAttribute("color");
+                    objectGroup.x = parseInt(objectgroupElement.getAttribute("x"), 10) || 0;
+                    objectGroup.y = parseInt(objectgroupElement.getAttribute("y"), 10) || 0;
+                    objectGroup.z = z;
+                    ++z;
+                    objectGroup.properties = this._LoadTmxProperties(objectgroupElement);
+                    for (let objectElement of objectgroupElement.getElementsByTagName("object")) {
+                        let object = new TMX_Object();
+                        object.name = objectElement.getAttribute("name");
+                        object.x = parseInt(objectElement.getAttribute("x"), 10) || 0;
+                        object.y = parseInt(objectElement.getAttribute("y"), 10) || 0;
+                        object.width = parseInt(objectElement.getAttribute("width"), 10);
+                        object.height = parseInt(objectElement.getAttribute("height"), 10);
+                        let global_tile_id = parseInt(objectElement.getAttribute("gid"), 10);
+                        if (global_tile_id) {
+                            //TODO Read out the flags
+                            //let flipped_horizontally = (global_tile_id & TMX_FLIPPED_HORIZONTALLY_FLAG);
+                            //let flipped_vertically = (global_tile_id & TMX_FLIPPED_VERTICALLY_FLAG);
+                            //let flipped_diagonally = (global_tile_id & TMX_FLIPPED_DIAGONALLY_FLAG);
+
+                            // Clear the flags
+                            global_tile_id &= ~(TMX_FLIPPED_HORIZONTALLY_FLAG | TMX_FLIPPED_VERTICALLY_FLAG | TMX_FLIPPED_DIAGONALLY_FLAG);
+
+                            // Resolve the tile
+                            for (let i = map.tilesets.length - 1; i >= 0; --i) {
+                                let tileset = map.tilesets[i];
+
+                                if (tileset.firstgid <= global_tile_id) {
+                                    object.tile = tileset.tiles.get(global_tile_id - tileset.firstgid);
+                                    break;
+                                }
+                            }
+                        }
+                        object.properties = this._LoadTmxProperties(objectElement);
+                        objectGroup.objects.push(object);
+                    }
+                    map.objectgroups.push(objectGroup);
+                    break
+            }
+        }
         return map;
     }
 
@@ -1022,7 +1044,6 @@ class Playnewton_DRIVE {
                 }
             }
         }
-        let z = 0;
         for (let layer of map.layers) {
             for (let chunk of layer.chunks) {
                 for (let y = 0; y < chunk.height; ++y) {
@@ -1041,13 +1062,37 @@ class Playnewton_DRIVE {
                                     GPU.SetSpriteAnimation(sprite, animation);
                                 }
                                 GPU.SetSpritePosition(sprite, mapX + (layer.x + chunk.x + x) * map.tileWidth, mapY + (layer.y + chunk.y + y) * map.tileHeight);
-                                GPU.SetSpriteZ(sprite, mapZ + z);
+                                GPU.SetSpriteZ(sprite, mapZ + layer.z);
                                 GPU.EnableSprite(sprite);
                             }
                         }
                     }
                 }
-                ++z;
+            }
+        }
+        for (let objectgroup of map.objectgroups) {
+            for (let object of objectgroup.objects) {
+                let tile = object.tile;
+                if (tile) {
+                    let tileType = this._ParseStringProperty("type", object.properties, object.tile.properties);
+                    if (!tileType) {
+                        let picture = picturesByTile.get(tile);
+                        let animation = animationsByTile.get(tile);
+                        let sprite = GPU.CreateSprite();
+                        if (picture || animation) {
+                            if (picture) {
+                                picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
+                                GPU.SetSpritePicture(sprite, picture);
+                            }
+                            if (animation) {
+                                GPU.SetSpriteAnimation(sprite, animation);
+                            }
+                            GPU.SetSpritePosition(sprite, mapX + objectgroup.x + object.x, mapY + objectgroup.y + object.y - object.height);
+                            GPU.SetSpriteZ(sprite, mapZ + objectgroup.z);
+                            GPU.EnableSprite(sprite);
+                        }
+                    }
+                }
             }
         }
     }
@@ -1753,6 +1798,17 @@ class Playnewton_GPU {
      * @type CanvasRenderingContext2D
      */
     ctx;
+
+    /**
+     * @type number
+     */
+    scrollX = 0;
+
+    /**
+     * @type number
+     */
+    scrollY = 0;
+
     /**
      * 
      * @returns {Playnewton_GPU}
@@ -1762,9 +1818,20 @@ class Playnewton_GPU {
     }
 
     Reset() {
+        this.scrollX = 0;
+        this.scrollY = 0;
         this.layers = [];
         this.sprites = [];
         this.HUD.Reset();
+    }
+
+    /**
+     * @param {number} x 
+     * @param {number} y
+     */
+    SetScroll(x, y) {
+        this.scrollX = x;
+        this.scrollY = y;
     }
 
     /**
@@ -2034,10 +2101,18 @@ class Playnewton_GPU {
     DrawFrame(elapsedTime) {
         if (this.fpsLimiter.ShouldDraw()) {
             this._UpdateSprites(elapsedTime);
+            let scroll = this.scrollX || this.scrollY;
             if (this.ctx) {
                 this.ctx.fillStyle = "black";
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                if (scroll) {
+                    this.ctx.save();
+                    this.ctx.translate(this.scrollX, this.scrollY);
+                }
                 this._DrawSprites();
+                if (scroll) {
+                    this.ctx.restore();
+                }
                 this._DrawHUD(this.HUD);
             }
         }
@@ -2177,14 +2252,14 @@ class Playnewton_GPU {
             this.ctx.fillStyle = label.color;
             this.ctx.textAlign = label.align;
             let text = label.text;
-            if(label.typewriterEffectStartTime) {
+            if (label.typewriterEffectStartTime) {
                 let nbCharacter = (this.fpsLimiter.now - label.typewriterEffectStartTime) / label.typewriterEffectDelayBetweenTwoCharacter;
-                if(nbCharacter <= 0) {
+                if (nbCharacter <= 0) {
                     return;
                 }
-                if(nbCharacter < label.text.length) {
+                if (nbCharacter < label.text.length) {
                     text = text.slice(0, nbCharacter);
-                } else if(label.typewriterEffectResolve) {
+                } else if (label.typewriterEffectResolve) {
                     label.typewriterEffectResolve();
                     label.typewriterEffectResolve = undefined;
                 }

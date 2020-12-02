@@ -91,7 +91,7 @@ export default class MountainLevel extends Scene {
         await Vulture.Preload();
     }
 
-    async InitCollectibles(map) {
+    async InitMapObjects(map) {
         await Collectible.Preload();
         await Exit.Preload();
         await Heart.Preload();
@@ -139,7 +139,7 @@ export default class MountainLevel extends Scene {
 
     }
 
-    async InitMountainLevels() {
+    async InitMap() {
         let skyBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sky.png");
 
         let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
@@ -155,7 +155,7 @@ export default class MountainLevel extends Scene {
         Playnewton.DRIVE.ConvertTmxMapToGPUSprites(Playnewton.GPU, map, 0, 0, Z_ORDER.BACKGROUND);
         Playnewton.DRIVE.ConvertTmxMapToPPUBodies(Playnewton.PPU, map, 0, 0);
 
-        await this.InitCollectibles(map);
+        await this.InitMapObjects(map);
 
         this.poison = new Poison(this.sara);
     }
@@ -197,7 +197,7 @@ export default class MountainLevel extends Scene {
         await this.InitEnemies();
         this.progress = 50;
 
-        await this.InitMountainLevels();
+        await this.InitMap();
         this.progress = 80;
 
         await this.InitHUD();
