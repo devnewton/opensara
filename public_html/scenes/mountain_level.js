@@ -13,7 +13,7 @@ import Cat from "../entities/cat.js"
 import Vulture from "../entities/vulture.js"
 import Fadeout from "../entities/fadeout.js"
 
-export default class Level extends Scene {
+export default class MountainLevel extends Scene {
 
     /**
      * @type Sara
@@ -139,7 +139,7 @@ export default class Level extends Scene {
 
     }
 
-    async InitMoutainLevels() {
+    async InitMountainLevels() {
         let skyBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sky.png");
 
         let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
@@ -197,7 +197,7 @@ export default class Level extends Scene {
         await this.InitEnemies();
         this.progress = 50;
 
-        await this.InitMoutainLevels();
+        await this.InitMountainLevels();
         this.progress = 80;
 
         await this.InitHUD();

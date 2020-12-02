@@ -2,13 +2,13 @@ import Scene from "./scene.js"
 import Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
 import Collectible from "../entities/collectible.js"
-import Apple from "../entities/apple.js"
+import Flower from "../entities/flower.js"
 import Z_ORDER from "../utils/z_order.js"
 import Fadeout from "../entities/fadeout.js"
 import HueRotate from "../entities/huerotate.js"
 import Witch from "../entities/witch.js"
 
-export default class MoutainIntroLevel extends Scene {
+export default class MountainOutroLevel extends Scene {
 
     /**
      * @type Sara
@@ -21,9 +21,9 @@ export default class MoutainIntroLevel extends Scene {
     witch;
 
     /**
-     * @type Apple[]
+     * @type Flower[]
      */
-    apples = [];
+    flowers = [];
 
     /**
      * @type string
@@ -59,7 +59,7 @@ export default class MoutainIntroLevel extends Scene {
 
     async InitCollectibles(map) {
         await Collectible.Preload();
-        await Apple.Preload();
+        await Flower.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
                 if (object.tile) {
@@ -69,9 +69,9 @@ export default class MoutainIntroLevel extends Scene {
                                 this.sara = new Sara(x, y);
                             }
                             break;
-                        case "apple":
-                            let apple = new Apple(x, y);
-                            this.apples.push(apple);
+                        case "flower":
+                            let flower = new Flower(x, y);
+                            this.flowers.push(flower);
                             break;
                         case "witch":
                             if (!this.witch) {
@@ -85,7 +85,7 @@ export default class MoutainIntroLevel extends Scene {
 
     }
 
-    async InitMoutainIntroLevels() {
+    async InitMountainOutroLevels() {
         let skyBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sky.png");
 
         let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
@@ -121,7 +121,7 @@ export default class MoutainIntroLevel extends Scene {
         await Witch.Preload();
         this.properties = 75
 
-        await this.InitMoutainIntroLevels();
+        await this.InitMountainOutroLevels();
         this.progress = 100;
 
         this.InitSkipLabel()
@@ -148,15 +148,15 @@ export default class MoutainIntroLevel extends Scene {
 
         this.witch.Pursue(this.sara);
 
-        this.apples = this.apples.filter((apple) => {
-            if (apple.Pursue(this.sara.sprite)) {
-                apple.Free();
+        this.flowers = this.flowers.filter((flower) => {
+            if (flower.Pursue(this.sara.sprite)) {
+                flower.Free();
                 return false;
             } else {
                 return true;
             }
         });
-        if (this.apples.length === 0 && !this.hueRotate) {
+        if (this.flowers.length === 0 && !this.hueRotate) {
             let layers = [];
             for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
                 layers.push(i);
@@ -171,36 +171,32 @@ export default class MoutainIntroLevel extends Scene {
                 Playnewton.GPU.HUD.EnableLabel(label);
 
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You just ate my poisoned apples !");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You found the flower !");
                 await Playnewton.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What? Why do you poison apples ?");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Am I cured ?");
                 await Playnewton.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No time to explain. Do you want to live ?");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Yes ! No need for a prince charming !");
                 await Playnewton.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Sure !");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] You can invoke a prince charming ?");
                 await Playnewton.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] You need a magic flower to cure you.");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No, but I can disappear.");
                 await Playnewton.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Where does this magic flower grow?");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] By running away ?");
                 await Playnewton.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Find magic keys to open magic signs.");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Oh you know the trick...");
                 await Playnewton.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] That's magic bullshit !");
+                Playnewton.GPU.HUD.SetLabelColor(label, "#ffffff");
+                Playnewton.GPU.HUD.SetLabelPosition(label, 512, 532);
+                Playnewton.GPU.HUD.SetLabelAlign(label, "center");
+                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "THE END", 200);
                 await Playnewton.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Do you want to live ?");
-                await Playnewton.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Ok...");
-                await Playnewton.delay(2000);
-                this.fadeoutToNextLevel();
+                this.witch.flee();
             });
         }
 
