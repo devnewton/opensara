@@ -70,6 +70,7 @@ export default class TowerLevel extends Scene {
                     case "sara":
                         if(!this.sara) {
                             this.sara = new Sara(x, y);
+                            this.sara.Wait();
                         }
                         break;
                     default:
@@ -114,6 +115,32 @@ export default class TowerLevel extends Scene {
 
         await this.InitHUD();
         this.progress = 100;
+
+        this.IntroDialog();
+    }
+
+    async IntroDialog() {
+        let label = Playnewton.GPU.HUD.CreateLabel();
+        Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
+        Playnewton.GPU.HUD.SetLabelAlign(label, "left");
+        Playnewton.GPU.HUD.SetLabelPosition(label, 8, 550);
+        Playnewton.GPU.HUD.EnableLabel(label);
+
+        Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Hello ? It's raining outside...");
+        await Playnewton.delay(2000);
+        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Can I stay here for the night ?");
+        await Playnewton.delay(2000);
+        Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Drakul] Please do, the lava will warm up your body.");
+        await Playnewton.delay(2000);
+        Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What lava ?");
+        await Playnewton.delay(2000);
+        
+        Playnewton.GPU.HUD.DisableLabel(label);
+
+        this.sara.StopWaiting();
     }
 
     UpdateBodies() {
@@ -144,12 +171,7 @@ export default class TowerLevel extends Scene {
         this.sara.UpdateSprite();
 
         let scrollY = -this.sara.sprite.y + 288;
-        /*if(scrollY < 0) {
-            scrollY = 0;
-        }
-        if(scrollY > (152 * 32 - 576)) {
-            scrollY = 152 * 32 - 576;
-        }*/
+        scrollY = Math.max(scrollY, -152 * 32 + 576);
         Playnewton.GPU.SetScroll(0, scrollY);
 
         this.enemies.forEach((enemy) => enemy.UpdateSprite());

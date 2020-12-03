@@ -12,7 +12,8 @@ const SaraState = {
     DOUBLE_JUMP: 3,
     STOMP: 4,
     BOUNCE: 5,
-    DYING: 6
+    DYING: 6,
+    WAIT: 7
 };
 
 /**
@@ -289,17 +290,21 @@ export default class Sara {
             velocityX /= 2;
         }
 
-        if (pad.left) {
-            this.direction = SaraDirection.LEFT;
-            velocityX -= this.walkSpeed;
-        } else if (pad.right) {
-            this.direction = SaraDirection.RIGHT;
-            velocityX += this.walkSpeed;
-        } else {
-            velocityX = 0;
+        if(this.state !== SaraState.WAIT) {
+            if (pad.left) {
+                this.direction = SaraDirection.LEFT;
+                velocityX -= this.walkSpeed;
+            } else if (pad.right) {
+                this.direction = SaraDirection.RIGHT;
+                velocityX += this.walkSpeed;
+            } else {
+                velocityX = 0;
+            }
         }
 
         switch (this.state) {
+            case SaraState.WAIT:
+                break;
             case SaraState.WALK:
                 if (pad.A) {
                     if (this.canJump && this.isOnGround) {
@@ -378,6 +383,7 @@ export default class Sara {
 
     UpdateSprite() {
         switch (this.state) {
+            case SaraState.WAIT:
             case SaraState.WALK:
                 if (Math.abs(this.body.velocity.x) < Number.EPSILON) {
                     Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].stand);
@@ -440,7 +446,15 @@ export default class Sara {
         }
     }
     
-        /**
+    Wait() {
+        this.state = SaraState.WAIT;
+    }
+
+    StopWaiting() {
+        this.state = SaraState.WALK;
+    }
+
+    /**
      * @param {Enemy} enemy 
      */
     Stomp(enemy) {
