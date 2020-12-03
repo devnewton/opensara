@@ -750,6 +750,11 @@ class TMX_Layer {
      * @type TMX_Chunk[]
      */
     chunks = [];
+
+    /**
+     * @type number
+     */
+    opacity = 1;
 }
 
 
@@ -843,6 +848,11 @@ class TMX_ObjectGroup {
      * @type TMX_Object[]
      */
     objects = [];
+
+    /**
+     * @type number
+     */
+    opacity = 1;
 }
 
 class TMX_Map {
@@ -938,6 +948,7 @@ class Playnewton_DRIVE {
                     layer.x = parseInt(layerElement.getAttribute("x"), 10) || 0;
                     layer.y = parseInt(layerElement.getAttribute("y"), 10) || 0;
                     layer.z = z;
+                    layer.opacity = parseFloat(layerElement.getAttribute("opacity")) || 1;
                     ++z;
                     layer.width = parseInt(layerElement.getAttribute("width"), 10);
                     layer.height = parseInt(layerElement.getAttribute("height"), 10);
@@ -965,6 +976,7 @@ class Playnewton_DRIVE {
                     objectGroup.x = parseInt(objectgroupElement.getAttribute("x"), 10) || 0;
                     objectGroup.y = parseInt(objectgroupElement.getAttribute("y"), 10) || 0;
                     objectGroup.z = z;
+                    objectGroup.opacity = parseFloat(objectgroupElement.getAttribute("opacity")) || 1;
                     ++z;
                     objectGroup.properties = this._LoadTmxProperties(objectgroupElement);
                     for (let objectElement of objectgroupElement.getElementsByTagName("object")) {
@@ -1045,6 +1057,7 @@ class Playnewton_DRIVE {
             }
         }
         for (let layer of map.layers) {
+            GPU.SetLayerOpacity(GPU.GetLayer(mapZ + layer.z), layer.opacity);
             for (let chunk of layer.chunks) {
                 for (let y = 0; y < chunk.height; ++y) {
                     for (let x = 0; x < chunk.width; ++x) {
@@ -1071,6 +1084,7 @@ class Playnewton_DRIVE {
             }
         }
         for (let objectgroup of map.objectgroups) {
+            GPU.SetLayerOpacity(GPU.GetLayer(mapZ + objectgroup.z), objectgroup.opacity);
             for (let object of objectgroup.objects) {
                 let tile = object.tile;
                 if (tile) {
@@ -2175,7 +2189,7 @@ class Playnewton_GPU {
                     this.ctx.scale(layer.scale, layer.scale);
                     this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
                 }
-                if (layer.alpha !== 1) {
+                if (layer.alpha < 1) {
                     this.ctx.globalAlpha = layer.alpha;
                 }
                 for (let sprite of this.sprites) {
