@@ -1,4 +1,4 @@
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 
 export default class Poison {
     /**

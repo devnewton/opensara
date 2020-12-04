@@ -1,5 +1,5 @@
 import Enemy from "./enemy.js"
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Sara from "./sara.js";
 

@@ -1,5 +1,5 @@
 import Scene from "./scene.js"
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
 import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"

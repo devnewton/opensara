@@ -1,4 +1,4 @@
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Enemy from "./enemy.js";
 
@@ -150,7 +150,7 @@ export class Bullet extends Enemy{
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, this.animations.fly);
                 break;
             case BulletState.EXPLODE:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, this.animations.explode, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, this.animations.explode, Playnewton.GPU_AnimationMode.ONCE);
                 if(this.sprite.animationStopped) {
                     Playnewton.GPU.SetSpriteVisible(this.sprite, false);
                     this.state = BulletState.EXPLODED;

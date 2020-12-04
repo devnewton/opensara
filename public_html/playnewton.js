@@ -67,7 +67,7 @@ class GPU_Spriteset {
  * 
  * @type GPU_Sprite
  */
-class GPU_Sprite {
+export class GPU_Sprite {
 
     /**
      * 
@@ -262,7 +262,7 @@ class GPU_SpriteAnimationFrame {
  * 
  * @type GPU_SpriteAnimation
  */
-class GPU_SpriteAnimation {
+export class GPU_SpriteAnimation {
 
     /**
      * 
@@ -281,7 +281,7 @@ class GPU_SpriteAnimation {
  * @readonly
  * @enum {number}
  */
-const GPU_AnimationMode = {
+export const GPU_AnimationMode = {
     ONCE: 1,
     LOOP: 2
 };
@@ -325,7 +325,7 @@ class GPU_FpsLimiter {
     }
 }
 
-class CTRL_Gamepad {
+export class CTRL_Gamepad {
     /**
      * 
      * @type name
@@ -388,7 +388,7 @@ class CTRL_Gamepad {
     start = false;
 }
 
-class Playnewton_CTRL {
+export class Playnewton_CTRL {
 
     /**
      * 
@@ -1422,7 +1422,7 @@ class Playnewton_DRIVE {
  * 
  * @type GPU_Layer
  */
-class GPU_Layer {
+export class GPU_Layer {
     /**
      * 
      * @type number
@@ -1459,7 +1459,7 @@ class GPU_Layer {
     enabled = true;
 }
 
-class GPU_Bar {
+export class GPU_Bar {
     /**
      * @type number
      */
@@ -1521,7 +1521,7 @@ class GPU_Bar {
     enabled = false;
 }
 
-class GPU_Label {
+export class GPU_Label {
     /**
      * @type string
      */
@@ -1569,7 +1569,7 @@ class GPU_Label {
 /**
  * @type GPU_HUD
  */
-class GPU_HUD {
+export class GPU_HUD {
     /**
      * @type GPU_Bar[]
      */
@@ -1774,7 +1774,7 @@ class GPU_HUD {
     }
 }
 
-class Playnewton_GPU {
+export class Playnewton_GPU {
 
     /**
      * 
@@ -2574,7 +2574,7 @@ class PPU_BodyTouches {
  * 
  * @type PPU_Body
  */
-class PPU_Body {
+export class PPU_Body {
 
     /**
      * 
@@ -3303,42 +3303,15 @@ class Playnewton_PPU {
     }
 }
 
-class Playnewton {
-    /**
-     * 
-     * @type Playnewton_DRIVE
-     */
-    DRIVE = new Playnewton_DRIVE();
-
-    /**
-     * 
-     * @type Playnewton_GPU
-     */
-    GPU = new Playnewton_GPU();
-
-    /**
-     * 
-     * @type Playnewton_PPU
-     */
-    PPU = new Playnewton_PPU();
-
-    /**
-     * 
-     * @type Playnewton_CTRL
-     */
-    CTRL = new Playnewton_CTRL();
-
-    ENUMS = {
-        GPU_AnimationMode: GPU_AnimationMode,
-        GPU_AnimationState: GPU_AnimationState
-    }
-
-    /**
-     * @param {number} ms 
-     */
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+/**
+ * @param {number} ms 
+ */
+export function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export default new Playnewton();
+export const DRIVE = new Playnewton_DRIVE();
+export const GPU = new Playnewton_GPU();
+export const PPU = new Playnewton_PPU();
+export const CTRL = new Playnewton_CTRL();
+

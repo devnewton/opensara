@@ -1,4 +1,4 @@
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 
 /**
  * Fadeout done callback

@@ -1,4 +1,4 @@
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Collectible from "./collectible.js"
 

@@ -1,5 +1,5 @@
 import Enemy from "./enemy.js"
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Sara from "./sara.js";
 
@@ -269,7 +269,7 @@ export default class Tatou extends Enemy {
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].roll);
                 break;
             case TatouState.DYING:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].dying, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Tatou.animations[this.direction].dying, Playnewton.GPU_AnimationMode.ONCE);
                 break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);

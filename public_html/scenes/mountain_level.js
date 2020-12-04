@@ -1,5 +1,5 @@
 import Scene from "./scene.js"
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
 import Collectible from "../entities/collectible.js"
 import Exit from "../entities/exit.js"

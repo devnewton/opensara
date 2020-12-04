@@ -1,4 +1,4 @@
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Fadeout from "./fadeout.js";
 
@@ -407,7 +407,7 @@ export default class Sara {
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].stomp);
                 break;
             case SaraState.DYING:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].dying, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Sara.animations[this.direction].dying, Playnewton.GPU_AnimationMode.ONCE);
                 break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);

@@ -1,5 +1,5 @@
 import Enemy from "./enemy.js"
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Sara from "./sara.js";
 
@@ -210,7 +210,7 @@ export default class Vulture extends Enemy {
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Vulture.animations[this.direction].fly);
                 break;
             case VultureState.ATTACK:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Vulture.animations[this.direction].attack, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Vulture.animations[this.direction].attack, Playnewton.GPU_AnimationMode.ONCE);
                 if(this.sprite.animationStopped) {
                     this.framesBeforeAttack = 10;
                     this.state = VultureState.FLY;

@@ -1,5 +1,5 @@
 import Enemy from "./enemy.js"
-import Playnewton from "../playnewton.js"
+import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Sara from "./sara.js";
 import { Bullet, BulletAnimations } from "./bullet.js";
@@ -209,19 +209,19 @@ export default class Cat extends Enemy {
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.idle);
                 break;
             case CatState.ATTACK:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.attack, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.attack, Playnewton.GPU_AnimationMode.ONCE);
                 if(this.sprite.animationStopped) {
                     this.state = CatState.IDLE;
                 }
                 break;
             case CatState.HURT:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.hurt, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.hurt, Playnewton.GPU_AnimationMode.ONCE);
                 if(this.sprite.animationStopped) {
                     this.state = CatState.IDLE;
                 }
                 break;
             case CatState.DEAD:
-                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.die, Playnewton.ENUMS.GPU_AnimationMode.ONCE);
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Cat.animations.die, Playnewton.GPU_AnimationMode.ONCE);
                 break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);

@@ -1,4 +1,4 @@
-import Playnewton from "./playnewton.js"
+import * as Playnewton from "./playnewton.js"
 import Title from "./scenes/title.js"
 
 export default class OpenSara {
