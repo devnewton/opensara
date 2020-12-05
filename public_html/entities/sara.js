@@ -69,7 +69,7 @@ export default class Sara {
 
     /**
      * 
-     * @type PPU_Body
+     * @type Playnewton.PPU_Body
      */
     body;
 

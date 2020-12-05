@@ -1,6 +1,5 @@
 import Enemy from "./enemy.js"
 import * as Playnewton from "../playnewton.js"
-import Z_ORDER from "../utils/z_order.js";
 import Sara from "./sara.js";
 
 /**
@@ -17,12 +16,12 @@ export default class Lava extends Enemy {
     /**
      *  @type GPU_Layer
      */
-    eruptSpeed = 1;
+    layer;
 
     /**
      *  @type number
      */
-    eruptSpeed = 1;
+    static eruptSpeed = 1;
 
     /**
      *  @type LavaState
@@ -30,11 +29,23 @@ export default class Lava extends Enemy {
     state;
 
     /**
-     * 
-     * @param {GPU_Layer} layer 
+     * @type number
      */
-    constructor(layer) {
+    y;
+
+    /**
+     * @type number
+     */
+    scrollY = 0;
+
+    /**
+     * 
+     * @param {Playnewton.GPU_Layer} layer 
+     * @param {number} y 
+     */
+    constructor(layer, y) {
         super();
+        this.y = y;
         this.layer = layer;
         this.state = LavaState.IDLE;
     }
@@ -44,12 +55,13 @@ export default class Lava extends Enemy {
             case LavaState.IDLE:
                 break;
             case LavaState.ERUPT:
-                //TODO
+                this.y -= Lava.eruptSpeed;
+                this.scrollY -= Lava.eruptSpeed;
         }
     }
 
     UpdateSprite() {
-        //TODO 
+        Playnewton.GPU.SetLayerScroll(this.layer, 0, this.scrollY);
     }
 
     /**
@@ -57,7 +69,10 @@ export default class Lava extends Enemy {
      * @param {Sara} sara 
      */
     Pursue(sara) {
-        //TODO
+        let maxY = this.y + Math.sin(Playnewton.GPU.fpsLimiter.now) * 8;
+        if(sara.body.bottom > maxY) {
+            sara.body.bottom = maxY;
+        }
     }
 
     Erupt() {

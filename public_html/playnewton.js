@@ -807,6 +807,11 @@ class TMX_Object {
      * @type TMX_Tile
      */
     tile;
+
+    /**
+     * @type string
+     */
+    type;
 }
 
 /**
@@ -982,6 +987,7 @@ class Playnewton_DRIVE {
                     for (let objectElement of objectgroupElement.getElementsByTagName("object")) {
                         let object = new TMX_Object();
                         object.name = objectElement.getAttribute("name");
+                        object.type = objectElement.getAttribute("type");
                         object.x = parseInt(objectElement.getAttribute("x"), 10) || 0;
                         object.y = parseInt(objectElement.getAttribute("y"), 10) || 0;
                         object.width = parseInt(objectElement.getAttribute("width"), 10);
@@ -1849,6 +1855,16 @@ export class Playnewton_GPU {
     }
 
     /**
+     * @param {GPU_Layer} layer
+     * @param {number} x 
+     * @param {number} y
+     */
+    SetLayerScroll(layer, x, y) {
+        layer.x = x;
+        layer.y = y;
+    }
+
+    /**
      * @param {boolean} enabled 
      */
     EnableHUD(enabled) {
@@ -2180,9 +2196,9 @@ export class Playnewton_GPU {
             if (layer && layer.enabled) {
                 this.ctx.save();
                 this.ctx.filter = layer.filter;
-                if (layer.x !== 0 && layer.x !== 0) {
+                //if (layer.x !== 0 || layer.y !== 0) {
                     this.ctx.translate(layer.x, layer.y);
-                }
+                //}
                 if (layer.angle !== 0 || layer.scale !== 1) {
                     this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
                     this.ctx.rotate(layer.angle);
@@ -3307,8 +3323,11 @@ class Playnewton_PPU {
  * @param {number} ms 
  */
 export function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms);
+    });
 }
+
 
 export const DRIVE = new Playnewton_DRIVE();
 export const GPU = new Playnewton_GPU();

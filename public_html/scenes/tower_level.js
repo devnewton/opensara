@@ -4,6 +4,7 @@ import Sara from "../entities/sara.js"
 import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
 import Fadeout from "../entities/fadeout.js"
+import Lava from "../entities/lava.js"
 
 export default class TowerLevel extends Scene {
 
@@ -11,6 +12,11 @@ export default class TowerLevel extends Scene {
      * @type Sara
      */
     sara;
+
+    /**
+     * @type Lava
+     */
+    lava;
 
     /**
      * @type Playnewton.GPU_Bar
@@ -65,17 +71,20 @@ export default class TowerLevel extends Scene {
     async InitMapObjects(map) {
         Playnewton.DRIVE.ForeachTmxMapObject(
                 (object, objectgroup, x, y) => {
-            if (object.tile) {
-                switch (object.tile.properties.get("type")) {
-                    case "sara":
-                        if(!this.sara) {
-                            this.sara = new Sara(x, y);
-                            this.sara.Wait();
-                        }
-                        break;
-                    default:
-                        break;                    
-                }
+            let type = object.type || (object.tile && object.tile.properties.get("type"));
+            switch (type) {
+                case "sara":
+                    if(!this.sara) {
+                        this.sara = new Sara(x, y);
+                        this.sara.Wait();
+                    }
+                    break;
+                case "lava":
+                    if(!this.lava) {
+                        this.lava = new Lava(Playnewton.GPU.GetLayer(objectgroup.z), object.y + objectgroup.y);
+                    }
+                default:
+                    break;                    
             }
         },
                 map);
@@ -120,30 +129,43 @@ export default class TowerLevel extends Scene {
     }
 
     async IntroDialog() {
+        let skipLabel = Playnewton.GPU.HUD.CreateLabel();
+        Playnewton.GPU.HUD.SetLabelFont(skipLabel, "bold 12px monospace");
+        Playnewton.GPU.HUD.SetLabelAlign(skipLabel, "right");
+        Playnewton.GPU.HUD.SetLabelPosition(skipLabel, 1024, 564);
+        Playnewton.GPU.HUD.SetLabelColor(skipLabel, "#eeeeee");
+        Playnewton.GPU.HUD.SetLabelText(skipLabel, "Skip with ⌨️F1 or 🎮start");
+        Playnewton.GPU.HUD.EnableLabel(skipLabel);
+
         let label = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
         Playnewton.GPU.HUD.SetLabelAlign(label, "left");
         Playnewton.GPU.HUD.SetLabelPosition(label, 8, 550);
         Playnewton.GPU.HUD.EnableLabel(label);
 
-        Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Hello ? It's raining outside...");
-        await Playnewton.delay(2000);
-        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Can I stay here for the night ?");
-        await Playnewton.delay(2000);
-        Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Drakul] Please do, the lava will warm up your body.");
-        await Playnewton.delay(2000);
-        Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What lava ?");
-        await Playnewton.delay(2000);
-        
-        Playnewton.GPU.HUD.DisableLabel(label);
+        try {
+            Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Hello ? It's raining outside...");
+            await Playnewton.delay(2000);
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Can I stay here for the night ?");
+            await Playnewton.delay(2000);
+            Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Drakul] Please do, the lava will warm up your body.");
+            await Playnewton.delay(2000);
+            Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What lava ?");
+            await Playnewton.delay(2000);
+        } finally {
+            Playnewton.GPU.HUD.DisableLabel(label);
+            Playnewton.GPU.HUD.DisableLabel(skipLabel);
 
-        this.sara.StopWaiting();
+            this.sara.StopWaiting();
+            this.lava.Erupt();
+        }
     }
 
     UpdateBodies() {
+
         if(this.sara.dead && !this.fadeout) {
             let layers = [];
             for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
@@ -163,11 +185,14 @@ export default class TowerLevel extends Scene {
                 Playnewton.GPU.HUD.DisableBar(this.healthBar);
             });
         }
+        this.lava.UpdateBody();
+        this.lava.Pursue(this.sara);
         this.sara.UpdateBody();
         this.enemies.forEach((enemy) => enemy.UpdateBody());
     }
 
     UpdateSprites() {
+        this.lava.UpdateSprite();
         this.sara.UpdateSprite();
 
         let scrollY = -this.sara.sprite.y + 288;
