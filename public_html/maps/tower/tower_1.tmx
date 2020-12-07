@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="152" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="330">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="152" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="334">
  <tileset firstgid="1" source="tower.tsx"/>
  <tileset firstgid="50" source="collectibles.tsx"/>
  <tileset firstgid="114" source="icons.tsx"/>
@@ -22,8 +22,6 @@
   <object id="211" gid="120" x="256" y="2048" width="256" height="256"/>
   <object id="212" gid="120" x="0" y="1792" width="256" height="256"/>
   <object id="213" gid="120" x="256" y="1536" width="256" height="256"/>
-  <object id="214" gid="120" x="512" y="1280" width="256" height="256"/>
-  <object id="215" gid="121" x="0" y="1280" width="256" height="256"/>
   <object id="216" gid="121" x="512" y="1792" width="256" height="256"/>
   <object id="217" gid="121" x="768" y="2048" width="256" height="256"/>
   <object id="218" gid="121" x="256" y="2560" width="256" height="256"/>
@@ -66,8 +64,10 @@
   <object id="257" gid="121" x="768" y="1792" width="256" height="256"/>
   <object id="258" gid="120" x="256" y="1792" width="256" height="256"/>
   <object id="259" gid="121" x="0" y="1536" width="256" height="256"/>
-  <object id="260" gid="120" x="256" y="1280" width="256" height="256"/>
-  <object id="261" gid="121" x="768" y="1280" width="256" height="256"/>
+  <object id="330" gid="126" x="0" y="1280" width="256" height="256"/>
+  <object id="331" gid="126" x="256" y="1280" width="256" height="256"/>
+  <object id="332" gid="126" x="512" y="1280" width="256" height="256"/>
+  <object id="333" gid="126" x="768" y="1280" width="256" height="256"/>
  </objectgroup>
  <layer id="1" name="bg1" width="32" height="152" locked="1">
   <data encoding="csv">
@@ -101,8 +101,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,11,12,12,12,12,12,12,12,12,13,0,0,0,11,12,12,12,12,12,12,12,12,12,12,12,13,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -225,7 +225,7 @@
 9,9,9,9,9,9,24,9,9,9,9,22,9,9,9,9,22,9,9,24,9,22,9,23,9,23,9,9,23,22,23,24
 </data>
  </layer>
- <objectgroup id="10" name="lava" opacity="0.7">
+ <objectgroup id="10" name="lava" locked="1" opacity="0.7">
   <object id="272" gid="45" x="0" y="4960" width="32" height="32"/>
   <object id="277" gid="45" x="128" y="4960" width="32" height="32"/>
   <object id="278" gid="45" x="224" y="4960" width="32" height="32"/>
@@ -312,11 +312,11 @@
   <object id="193" x="416" y="1160" width="96" height="24"/>
   <object id="194" x="672" y="1320" width="96" height="24"/>
   <object id="195" x="928" y="1160" width="96" height="24"/>
-  <object id="197" x="96" y="1000" width="320" height="24"/>
-  <object id="198" x="512" y="1000" width="416" height="24"/>
+  <object id="197" x="96" y="968" width="320" height="24"/>
+  <object id="198" x="512" y="968" width="416" height="24"/>
  </objectgroup>
- <objectgroup id="3" name="collectibles"/>
- <objectgroup id="5" name="enemies" locked="1">
-  <object id="71" gid="116" x="416" y="4808" width="31" height="47"/>
+ <objectgroup id="3" name="collectibles" locked="1"/>
+ <objectgroup id="5" name="enemies">
+  <object id="71" gid="116" x="360" y="928" width="31" height="47"/>
  </objectgroup>
 </map>
