@@ -21,19 +21,93 @@ export class CLOCK_SkipException {
 }
 
 /**
- * @param {number} ms 
- * @param {CLOCK_SkipController} skipController
+ * @callback CLOCK_DELAY_ResolveCallback
+ * 
  */
-export function delay(ms, skipController) {
-    return new Promise((resolve, reject) => {
-        setTimeout(resolve, ms);
-    });
+
+/**
+ * @callback CLOCK_DELAY_RejectCallback
+ * @param {CLOCK_SkipException} exception
+ * 
+ */
+
+class CLOCK_DELAY {
+
+    /**
+     * @type CLOCK_DELAY_ResolveCallback
+     */
+    resolve;
+
+    /**
+     * @type CLOCK_DELAY_RejectCallback
+     */
+    reject;
+
+    /**
+     * @type number
+     */
+    waitUntilTime;
+
+    /**
+     * @type CLOCK_SkipSignal
+     */
+    signal;
+
+    /**
+     * 
+     * @param {number} waitUntilTime 
+     * @param {*} resolve 
+     * @param {*} reject 
+     * @param {CLOCK_SkipSignal} signal 
+     */
+    constructor(waitUntilTime, resolve, reject, signal) {
+        this.waitUntilTime = waitUntilTime;
+        this.resolve = resolve;
+        this.reject = reject;
+        this.signal = signal;
+    }
+
+    /**
+     * @type boolean
+     */
+    Wait(now) {
+        if(this.signal && this.signal.skipped) {
+            this.reject(new CLOCK_SkipException());
+            return false;
+        }
+        if(now >= this.waitUntilTime) {
+            this.resolve();
+            return false;
+        }
+        return true;
+    }
+
 }
 
 export class Playnewton_CLOCK {
+
+    /**
+     * @type Array<CLOCK_DELAY>
+     */
+    delays = [];
     get now() {
         return performance.now();
     }
+
+    Update() {
+        let now = CLOCK.now;
+        this.delays = this.delays.filter(delay => delay.Wait(now));
+    }
+
+    /**
+     * @param {number} ms 
+     * @param {CLOCK_SkipSignal} skipSignal
+     */
+    delay(ms, skipSignal = undefined) {
+        return new Promise((resolve, reject) => {
+            this.delays.push(new CLOCK_DELAY(CLOCK.now + ms, resolve, reject, skipSignal));
+    });
+}
 }
 
 /**

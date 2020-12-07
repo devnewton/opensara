@@ -172,30 +172,30 @@ export default class MountainOutroLevel extends Scene {
 
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You found the flower !");
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Am I cured ?");
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Yes ! No need for a prince charming !");
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] You can invoke a prince charming ?");
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No, but I can disappear.");
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] By running away ?");
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Oh you know the trick...");
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 Playnewton.GPU.HUD.SetLabelColor(label, "#ffffff");
                 Playnewton.GPU.HUD.SetLabelPosition(label, 512, 532);
                 Playnewton.GPU.HUD.SetLabelAlign(label, "center");
                 await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "THE END", 200);
-                await Playnewton.delay(2000);
+                await Playnewton.CLOCK.delay(2000);
                 this.witch.flee();
             });
         }

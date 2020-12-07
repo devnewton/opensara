@@ -43,6 +43,8 @@ export default class TowerLevel extends Scene {
      */
     fadeout;
 
+    isIntroSkippable = false;
+
     skipIntroController = new Playnewton.CLOCK_SkipController();
 
     constructor(mapPath, nextSceneOnExit) {
@@ -148,15 +150,15 @@ export default class TowerLevel extends Scene {
         try {
             Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
             await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Hello ? It's raining outside...", 50, this.skipIntroController.signal);
-            await Playnewton.delay(2000);
+            await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
             await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Can I stay here for the night ?", 50, this.skipIntroController.signal);
-            await Playnewton.delay(2000);
+            await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
             Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
             await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Drakul] Please do, the lava will warm up your body.", 50, this.skipIntroController.signal);
-            await Playnewton.delay(2000);
+            await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
             Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
             await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What lava ?", 50, this.skipIntroController.signal);
-            await Playnewton.delay(2000);
+            await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
         } catch (e) {
             if( !(e instanceof Playnewton.CLOCK_SkipException) ) {
                 throw e;
@@ -200,10 +202,12 @@ export default class TowerLevel extends Scene {
 
     UpdateSprites() {
         let pad = Playnewton.CTRL.GetPad(0);
-        if (pad.start) {
+        if(!pad.start) {
+            this.isIntroSkippable = true;
+        }
+        if (this.isIntroSkippable && pad.start) {
             this.skipIntroController.skip();
         }
-
 
         this.lava.UpdateSprite();
         this.sara.UpdateSprite();

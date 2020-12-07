@@ -36,6 +36,7 @@ export default class OpenSara {
             if(scene.ready) {
                 Playnewton.GPU.HUD.SetLoadingText("");
                 Playnewton.CTRL.Poll();
+                Playnewton.CLOCK.Update();
                 scene.UpdateBodies();
                 Playnewton.PPU.Update();
                 scene.UpdateSprites();
