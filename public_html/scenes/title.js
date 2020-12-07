@@ -19,7 +19,7 @@ export default class Title extends Scene {
     async InitHUD() {
         let startLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelPosition(startLabel, 512, 288);
-        Playnewton.GPU.HUD.SetLabelText(startLabel, "Press ⌨️F1 or 🎮start");
+        Playnewton.GPU.HUD.StartLabelTypewriterEffect(startLabel, "Press ⌨️F1 or 🎮start");
         Playnewton.GPU.HUD.SetLabelAlign(startLabel, "center");
         Playnewton.GPU.HUD.EnableLabel(startLabel);
 
