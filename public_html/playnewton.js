@@ -1,6 +1,41 @@
 const PLAYNEWTON_DEFAULT_SCREEN_WIDTH = 1024;
 const PLAYNEWTON_DEFAULT_SCREEN_HEIGHT = 576;
 
+export class CLOCK_SkipSignal {
+    /**
+     * @type boolean
+     */
+    skipped = false;
+}
+
+export class CLOCK_SkipController {
+
+    signal = new CLOCK_SkipSignal();
+
+    skip() {
+        this.signal.skipped = true;
+    }
+}
+
+export class CLOCK_SkipException {
+}
+
+/**
+ * @param {number} ms 
+ * @param {CLOCK_SkipController} skipController
+ */
+export function delay(ms, skipController) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms);
+    });
+}
+
+export class CLOCK {
+    get now() {
+        return performance.now();
+    }
+}
+
 /**
  * Frame description for CreateSpriteset()
  * @type GPU_SpritesetFrameDescription
@@ -1527,6 +1562,17 @@ export class GPU_Bar {
     enabled = false;
 }
 
+/**
+ * @callback TypewriterEffectResolveCallback
+ * 
+ */
+
+/**
+ * @callback TypewriterEffectRejectCallback
+ * @param {CLOCK_SkipException} exception
+ * 
+ */
+
 export class GPU_Label {
     /**
      * @type string
@@ -1543,7 +1589,20 @@ export class GPU_Label {
      */
     typewriterEffectDelayBetweenTwoCharacter;
 
+    /**
+     * @type TypewriterEffectResolveCallback
+     */
     typewriterEffectResolve;
+
+    /**
+     * @type TypewriterEffectRejectCallback
+     */
+    typewriterEffectReject;
+
+    /**
+     * @type CLOCK_SkipSignal
+     */
+    typewriterEffectSignal;
 
     /**
      * @type number
@@ -1570,6 +1629,29 @@ export class GPU_Label {
      * @type string
      */
     align = "start";
+
+    _HandleTypewriterEffectSkip() {
+        if (this.typewriterEffectSignal && this.typewriterEffectSignal.skipped) {
+            this.typewriterEffectSignal = undefined;
+            this.typewriterEffectStartTime = undefined;
+            this.typewriterEffectResolve = undefined;
+            if (this.typewriterEffectReject) {
+                this.typewriterEffectReject(new CLOCK_SkipException());
+                this.typewriterEffectReject = undefined;
+            }
+        }
+    }
+
+    _ResolveTypewriterEffect() {
+        this._HandleTypewriterEffectSkip();
+        this.typewriterEffectSignal = undefined;
+        this.typewriterEffectStartTime = undefined;
+        this.typewriterEffectReject = undefined;
+        if (this.typewriterEffectResolve) {
+            this.typewriterEffectResolve();
+            this.typewriterEffectResolve = undefined;
+        }
+    }
 }
 
 /**
@@ -1618,13 +1700,18 @@ export class GPU_HUD {
      * 
      * @param {GPU_Label} label
      * @param {number} delayBetweenTwoCharacter
+     * @param {CLOCK_SkipSignal} signal
      */
-    StartLabelTypewriterEffect(label, text, delayBetweenTwoCharacter = 50) {
+    StartLabelTypewriterEffect(label, text, delayBetweenTwoCharacter = 50, signal = null) {
         label.text = text;
         label.typewriterEffectStartTime = performance.now();
         label.typewriterEffectDelayBetweenTwoCharacter = delayBetweenTwoCharacter;
-        return new Promise(resolve => {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            label._HandleTypewriterEffectSkip();
+            label.typewriterEffectSignal = signal;
             label.typewriterEffectResolve = resolve
+            label.typewriterEffectReject = reject
         });
     }
 
@@ -2197,7 +2284,7 @@ export class Playnewton_GPU {
                 this.ctx.save();
                 this.ctx.filter = layer.filter;
                 //if (layer.x !== 0 || layer.y !== 0) {
-                    this.ctx.translate(layer.x, layer.y);
+                this.ctx.translate(layer.x, layer.y);
                 //}
                 if (layer.angle !== 0 || layer.scale !== 1) {
                     this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -2277,6 +2364,7 @@ export class Playnewton_GPU {
      * @param {GPU_Label} label
      */
     _DrawLabel(label) {
+        label._HandleTypewriterEffectSkip();
         if (label.enabled) {
             this.ctx.font = label.font;
             this.ctx.fillStyle = label.color;
@@ -2289,9 +2377,8 @@ export class Playnewton_GPU {
                 }
                 if (nbCharacter < label.text.length) {
                     text = text.slice(0, nbCharacter);
-                } else if (label.typewriterEffectResolve) {
-                    label.typewriterEffectResolve();
-                    label.typewriterEffectResolve = undefined;
+                } else {
+                    label._ResolveTypewriterEffect();
                 }
             }
             this.ctx.fillText(text, label.x, label.y);
@@ -3318,16 +3405,6 @@ class Playnewton_PPU {
 
     }
 }
-
-/**
- * @param {number} ms 
- */
-export function delay(ms) {
-    return new Promise((resolve, reject) => {
-        setTimeout(resolve, ms);
-    });
-}
-
 
 export const DRIVE = new Playnewton_DRIVE();
 export const GPU = new Playnewton_GPU();

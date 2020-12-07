@@ -43,6 +43,8 @@ export default class TowerLevel extends Scene {
      */
     fadeout;
 
+    skipIntroController = new Playnewton.CLOCK_SkipController();
+
     constructor(mapPath, nextSceneOnExit) {
         super();
         this.mapPath = mapPath;
@@ -70,24 +72,24 @@ export default class TowerLevel extends Scene {
 
     async InitMapObjects(map) {
         Playnewton.DRIVE.ForeachTmxMapObject(
-                (object, objectgroup, x, y) => {
-            let type = object.type || (object.tile && object.tile.properties.get("type"));
-            switch (type) {
-                case "sara":
-                    if(!this.sara) {
-                        this.sara = new Sara(x, y);
-                        this.sara.Wait();
-                    }
-                    break;
-                case "lava":
-                    if(!this.lava) {
-                        this.lava = new Lava(Playnewton.GPU.GetLayer(objectgroup.z), object.y + objectgroup.y);
-                    }
-                default:
-                    break;                    
-            }
-        },
-                map);
+            (object, objectgroup, x, y) => {
+                let type = object.type || (object.tile && object.tile.properties.get("type"));
+                switch (type) {
+                    case "sara":
+                        if (!this.sara) {
+                            this.sara = new Sara(x, y);
+                            this.sara.Wait();
+                        }
+                        break;
+                    case "lava":
+                        if (!this.lava) {
+                            this.lava = new Lava(Playnewton.GPU.GetLayer(objectgroup.z), object.y + objectgroup.y);
+                        }
+                    default:
+                        break;
+                }
+            },
+            map);
 
     }
 
@@ -145,17 +147,22 @@ export default class TowerLevel extends Scene {
 
         try {
             Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Hello ? It's raining outside...");
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Hello ? It's raining outside...", 50, this.skipIntroController.signal);
             await Playnewton.delay(2000);
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Can I stay here for the night ?");
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Can I stay here for the night ?", 50, this.skipIntroController.signal);
             await Playnewton.delay(2000);
             Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Drakul] Please do, the lava will warm up your body.");
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Drakul] Please do, the lava will warm up your body.", 50, this.skipIntroController.signal);
             await Playnewton.delay(2000);
             Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What lava ?");
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What lava ?", 50, this.skipIntroController.signal);
             await Playnewton.delay(2000);
-        } finally {
+        } catch (e) {
+            if( !(e instanceof Playnewton.CLOCK_SkipException) ) {
+                throw e;
+            }
+        }
+        finally {
             Playnewton.GPU.HUD.DisableLabel(label);
             Playnewton.GPU.HUD.DisableLabel(skipLabel);
 
@@ -166,7 +173,7 @@ export default class TowerLevel extends Scene {
 
     UpdateBodies() {
 
-        if(this.sara.dead && !this.fadeout) {
+        if (this.sara.dead && !this.fadeout) {
             let layers = [];
             for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
                 if (i !== Z_ORDER.SARA) {
@@ -192,6 +199,12 @@ export default class TowerLevel extends Scene {
     }
 
     UpdateSprites() {
+        let pad = Playnewton.CTRL.GetPad(0);
+        if (pad.start) {
+            this.skipIntroController.skip();
+        }
+
+
         this.lava.UpdateSprite();
         this.sara.UpdateSprite();
 
@@ -207,7 +220,7 @@ export default class TowerLevel extends Scene {
             enemy.Pursue(this.sara);
         });
 
-        if(this.fadeout) {
+        if (this.fadeout) {
             this.fadeout.Update();
         }
     }
