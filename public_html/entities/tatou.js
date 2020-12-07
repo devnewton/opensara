@@ -90,7 +90,7 @@ export default class Tatou extends Enemy {
      * @returns {number}
      */
     get stateElapsedTime() {
-        return performance.now() - this.stateStartTime;
+        return Playnewton.CLOCK.now - this.stateStartTime;
     }
 
     /**
@@ -322,7 +322,7 @@ export default class Tatou extends Enemy {
      */
     ChangeState(s) {
         this.state = s;
-        this.stateStartTime = performance.now();
+        this.stateStartTime = Playnewton.CLOCK.now;
     }
 
     Hurt() {

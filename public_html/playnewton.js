@@ -30,7 +30,7 @@ export function delay(ms, skipController) {
     });
 }
 
-export class CLOCK {
+export class Playnewton_CLOCK {
     get now() {
         return performance.now();
     }
@@ -341,7 +341,7 @@ class GPU_FpsLimiter {
     delta;
     constructor(fps = 60) {
         this.fps = fps;
-        this.then = performance.now();
+        this.then = CLOCK.now;
         this.interval = 1000 / fps;
     }
 
@@ -350,7 +350,7 @@ class GPU_FpsLimiter {
      * @returns {boolean}
      */
     ShouldDraw() {
-        this.now = performance.now();
+        this.now = CLOCK.now;
         this.delta = this.now - this.then;
         if (this.delta > this.interval) {
             this.then = this.now - (this.delta % this.interval);
@@ -1704,7 +1704,7 @@ export class GPU_HUD {
      */
     StartLabelTypewriterEffect(label, text, delayBetweenTwoCharacter = 50, signal = null) {
         label.text = text;
-        label.typewriterEffectStartTime = performance.now();
+        label.typewriterEffectStartTime = CLOCK.now;
         label.typewriterEffectDelayBetweenTwoCharacter = delayBetweenTwoCharacter;
         let self = this;
         return new Promise((resolve, reject) => {
@@ -3406,6 +3406,7 @@ class Playnewton_PPU {
     }
 }
 
+export const CLOCK = new Playnewton_CLOCK();
 export const DRIVE = new Playnewton_DRIVE();
 export const GPU = new Playnewton_GPU();
 export const PPU = new Playnewton_PPU();

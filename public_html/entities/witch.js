@@ -115,7 +115,7 @@ export default class Witch extends Enemy {
 
     UpdateSprite() {
         Playnewton.GPU.SetSpriteAnimation(this.sprite, Witch.animations[this.direction].fly);
-        let y = this.body.position.y + Math.sin(performance.now() / 300) * 4;
+        let y = this.body.position.y + Math.sin(Playnewton.CLOCK.now / 300) * 4;
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, y);    
     }
 
