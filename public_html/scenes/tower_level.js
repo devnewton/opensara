@@ -83,7 +83,7 @@ export default class TowerLevel extends Scene {
                         break;
                     case "lava":
                         if (!this.lava) {
-                            this.lava = new Lava(Playnewton.GPU.GetLayer(objectgroup.z), object.y + objectgroup.y);
+                            this.lava = new Lava(Playnewton.GPU.GetLayer(objectgroup.z), object.y + objectgroup.y, object.y + object.height + objectgroup.y);
                         }
                     default:
                         break;

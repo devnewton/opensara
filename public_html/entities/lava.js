@@ -36,6 +36,12 @@ export default class Lava extends Enemy {
     /**
      * @type number
      */
+    top;
+
+
+    /**
+     * @type number
+     */
     scrollY = 0;
 
     hurtingSara = false;
@@ -43,11 +49,13 @@ export default class Lava extends Enemy {
     /**
      * 
      * @param {Playnewton.GPU_Layer} layer 
-     * @param {number} y 
+     * @param {number} top 
+     * @param {number} bottom
      */
-    constructor(layer, y) {
+    constructor(layer, top, bottom) {
         super();
-        this.y = y;
+        this.y = bottom;
+        this.top = top;
         this.layer = layer;
         this.state = LavaState.IDLE;
     }
@@ -57,7 +65,7 @@ export default class Lava extends Enemy {
             case LavaState.IDLE:
                 break;
             case LavaState.ERUPT:
-                if(!this.hurtingSara) {
+                if(!this.hurtingSara && this.y > this.top) {
                     this.y -= Lava.eruptSpeed;
                     this.scrollY -= Lava.eruptSpeed;
                 }

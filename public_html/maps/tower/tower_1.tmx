@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="152" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="327">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="152" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="330">
  <tileset firstgid="1" source="tower.tsx"/>
  <tileset firstgid="50" source="collectibles.tsx"/>
  <tileset firstgid="114" source="icons.tsx"/>
@@ -266,7 +266,7 @@
   <object id="313" gid="125" x="256" y="5472" width="256" height="256"/>
   <object id="314" gid="125" x="512" y="5472" width="256" height="256"/>
   <object id="315" gid="125" x="768" y="5472" width="256" height="256"/>
-  <object id="325" type="lava" x="-8" y="4944" width="1040" height="528"/>
+  <object id="325" type="lava" x="-8" y="1064" width="1040" height="3880"/>
  </objectgroup>
  <objectgroup color="#00ff7f" id="2" name="platforms" locked="1">
   <properties>
