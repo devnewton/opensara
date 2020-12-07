@@ -38,6 +38,8 @@ export default class Lava extends Enemy {
      */
     scrollY = 0;
 
+    hurtingSara = false;
+
     /**
      * 
      * @param {Playnewton.GPU_Layer} layer 
@@ -55,8 +57,10 @@ export default class Lava extends Enemy {
             case LavaState.IDLE:
                 break;
             case LavaState.ERUPT:
-                this.y -= Lava.eruptSpeed;
-                this.scrollY -= Lava.eruptSpeed;
+                if(!this.hurtingSara) {
+                    this.y -= Lava.eruptSpeed;
+                    this.scrollY -= Lava.eruptSpeed;
+                }
         }
     }
 
@@ -69,9 +73,13 @@ export default class Lava extends Enemy {
      * @param {Sara} sara 
      */
     Pursue(sara) {
-        let maxY = this.y + Math.sin(Playnewton.GPU.fpsLimiter.now) * 8;
-        if(sara.body.bottom > maxY) {
+        let maxY = this.y + Math.sin(Playnewton.GPU.fpsLimiter.now / 300) * 8;
+        if(!sara.dead && sara.body.bottom > maxY) {
             sara.body.bottom = maxY;
+            this.hurtingSara = true;
+            sara.HurtByLava();
+        } else {
+            this.hurtingSara = false;
         }
     }
 

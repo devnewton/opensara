@@ -433,6 +433,11 @@ export default class Sara {
         this.Hurt();
         //TODO add hurted animation / movement?
     }
+
+    HurtByLava() {
+        this.Hurt();
+        //TODO add flames?
+    }
     
     Hurt() {
         if(this.dead || Playnewton.GPU.IsSpriteBlinking(this.sprite)) {
