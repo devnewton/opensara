@@ -445,56 +445,196 @@ export class CTRL_Gamepad {
      * @type boolean
      */
     up = false;
+
+    /**
+     * True if the up button was NOT pressed once since last reset
+     * @type boolean
+     */
+    upWasNotPressed = false;
+
     /**
      * Is the down button being pressed?
      * @type boolean
      */
     down = false;
+
+    /**
+     * True if the down button was NOT pressed once since last reset
+     * @type boolean
+     */
+    downWasNotPressed = false;
+
     /**
      * Is the left button being pressed?
      * @type boolean
      */
     left = false;
+
+    /**
+     * True if the left button was NOT pressed once since last reset
+     * @type boolean
+     */
+    leftWasNotPressed = false;
+
     /**
      * Is the right button being pressed?
      * @type boolean
      */
     right = false;
+
+    /**
+     * True if the up button was NOT pressed once since last reset
+     * @type boolean
+     */
+    rightWasNotPressed = false;
+
     /**
      * Is the bottom button in the right button cluster being pressed?
      * @type boolean
      */
     A = false;
+
+    /**
+     * True if the A button was NOT pressed once since last reset
+     * @type boolean
+     */
+    AWasNotPressed = false;
+
     /**
      * Is the right button in the right button cluster being pressed?
      * @type boolean
      */
     B = false;
+
+    /**
+     * True if the B button was NOT pressed once since last reset
+     * @type boolean
+     */
+    AWasNotPressed = false;
+
     /**
      * Is the left button in the right button cluster being pressed?
      * @type boolean
      */
     X = false;
+
+    /**
+     * True if the X button was NOT pressed once since last reset
+     * @type boolean
+     */
+    XWasNotPressed = false;
+
     /**
      * Is the top button in the right button cluster being pressed?
      * @type boolean
      */
     Y = false;
+
+    /**
+     * True if the Y button was NOT pressed once since last reset
+     * @type boolean
+     */
+    YWasNotPressed = false;
+
     /**
      * Is the left shoulder button being pressed?
      * @type boolean
      */
     L = false;
+
+    /**
+     * True if the L button was NOT pressed once since last reset
+     * @type boolean
+     */
+    LWasNotPressed = false;
+
     /**
      * Is the right shoulder button being pressed?
      * @type boolean
      */
     R = false;
+
+    /**
+     * True if the R button was NOT pressed once since last reset
+     * @type boolean
+     */
+    RWasNotPressed = false;
+
     /**
      * Is the start button being pressed?
      * @type boolean
      */
     start = false;
+
+    /**
+     * True if the start button was NOT pressed once since last reset
+     * @type boolean
+     */
+    startWasNotPressed = false;
+
+    _ResetWasNotPressed() {
+        this.upWasNotPressed = false;
+        this.downWasNotPressed = false;
+        this.leftWasNotPressed = false;
+        this.rightWasNotPressed = false;
+        this.AWasNotPressed = false;
+        this.BWasNotPressed = false;
+        this.XWasNotPressed = false;
+        this.YWasNotPressed = false;
+        this.LWasNotPressed = false;
+        this.RWasNotPressed = false;
+        this.startWasNotPressed = false;
+    }
+
+    _ResetStates() {
+        this.up = false;
+        this.down = false;
+        this.left = false;
+        this.right = false;
+        this.A = false;
+        this.B = false;
+        this.X = false;
+        this.Y = false;
+        this.L = false;
+        this.R = false;
+        this.start = false;
+    }
+
+    _UpdateWasNotPressed() {
+        if(!this.up) {
+            this.upWasNotPressed = true;
+        }
+        if(!this.down) {
+            this.downWasNotPressed = true;
+        }
+        if(!this.left) {
+            this.leftWasNotPressed = true;
+        }
+        if(!this.right) {
+            this.rightWasNotPressed = true;
+        }
+        if(!this.A) {
+            this.AWasNotPressed = true;
+        }
+        if(!this.B) {
+            this.BWasNotPressed = true;
+        }
+        if(!this.X) {
+            this.XWasNotPressed = true;
+        }
+        if(!this.Y) {
+            this.YWasNotPressed = true;
+        }
+        if(!this.L) {
+            this.LWasNotPressed = true;
+        }
+        if(!this.R) {
+            this.RWasNotPressed = true;
+        }
+        if(!this.start) {
+            this.startWasNotPressed = true;
+        }
+    }
 }
 
 export class Playnewton_CTRL {
@@ -610,6 +750,10 @@ export class Playnewton_CTRL {
             //use keyboard as an alternative pad when there is only one player
             this._MergePadsStates(this.pads[0], this.keyboardVirtualPad);
         }
+
+        for (let pad of this.pads) {
+            pad._UpdateWasNotPressed();
+        }
     }
 
     /**
@@ -621,19 +765,15 @@ export class Playnewton_CTRL {
         return this.pads[player];
     }
 
+    Reset() {
+        for (let pad of this.pads) {
+            pad._ResetWasNotPressed();
+        } 
+    }
+
     _ResetPadsStates() {
         for (let pad of this.pads) {
-            pad.up = false;
-            pad.down = false;
-            pad.left = false;
-            pad.right = false;
-            pad.A = false;
-            pad.B = false;
-            pad.X = false;
-            pad.Y = false;
-            pad.L = false;
-            pad.R = false;
-            pad.start = false;
+            pad._ResetStates();
         }
     }
 

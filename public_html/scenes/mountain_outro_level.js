@@ -45,7 +45,7 @@ export default class MountainOutroLevel extends Scene {
      */
     hueRotate;
 
-    skippable = false;
+    skipOutroController = new Playnewton.CLOCK_SkipController();
 
     constructor(mapPath, nextSceneOnExit) {
         super();
@@ -162,50 +162,56 @@ export default class MountainOutroLevel extends Scene {
                 layers.push(i);
             }
             this.hueRotate = new HueRotate(layers, async () => {
-                this.witch.fly();
-                let label = Playnewton.GPU.HUD.CreateLabel();
-                Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
+                try {
+                    this.witch.fly();
+                    let label = Playnewton.GPU.HUD.CreateLabel();
+                    Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
 
-                Playnewton.GPU.HUD.SetLabelAlign(label, "left");
-                Playnewton.GPU.HUD.SetLabelPosition(label, 32, 532);
-                Playnewton.GPU.HUD.EnableLabel(label);
+                    Playnewton.GPU.HUD.SetLabelAlign(label, "left");
+                    Playnewton.GPU.HUD.SetLabelPosition(label, 32, 532);
+                    Playnewton.GPU.HUD.EnableLabel(label);
 
-                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You found the flower !");
-                await Playnewton.CLOCK.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Am I cured ?");
-                await Playnewton.CLOCK.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Yes ! No need for a prince charming !");
-                await Playnewton.CLOCK.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] You can invoke a prince charming ?");
-                await Playnewton.CLOCK.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No, but I can disappear.");
-                await Playnewton.CLOCK.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] By running away ?");
-                await Playnewton.CLOCK.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Oh you know the trick...");
-                await Playnewton.CLOCK.delay(2000);
-                Playnewton.GPU.HUD.SetLabelColor(label, "#ffffff");
-                Playnewton.GPU.HUD.SetLabelPosition(label, 512, 532);
-                Playnewton.GPU.HUD.SetLabelAlign(label, "center");
-                await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "THE END", 200);
-                await Playnewton.CLOCK.delay(2000);
-                this.witch.flee();
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You found the flower !", 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Am I cured ?", 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Yes ! No need for a prince charming !", 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] You can invoke a prince charming ?", 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No, but I can disappear.", 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] By running away ?", 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Oh you know the trick...", 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    Playnewton.GPU.HUD.SetLabelColor(label, "#ffffff");
+                    Playnewton.GPU.HUD.SetLabelPosition(label, 512, 532);
+                    Playnewton.GPU.HUD.SetLabelAlign(label, "center");
+                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "THE END", 200, 50, this.skipOutroController.signal);
+                    await Playnewton.CLOCK.delay(2000, this.skipOutroController.signal);
+                    this.witch.flee();
+                } catch (e) {
+                    if (!(e instanceof Playnewton.CLOCK_SkipException)) {
+                        throw e;
+                    }
+                } finally {
+                    this.fadeoutToNextLevel();
+                }
             });
         }
 
         let pad = Playnewton.CTRL.GetPad(0);
-        if(!pad.start) {
-            this.skippable = true;
-        }
-        if (this.skippable && pad.start) {
+        if (pad.startWasNotPressed && pad.start) {
             this.fadeoutToNextLevel();
+            this.skipOutroController.skip();
         }
 
         if (this.hueRotate) {

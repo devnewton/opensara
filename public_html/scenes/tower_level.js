@@ -43,8 +43,6 @@ export default class TowerLevel extends Scene {
      */
     fadeout;
 
-    isIntroSkippable = false;
-
     skipIntroController = new Playnewton.CLOCK_SkipController();
 
     constructor(mapPath, nextSceneOnExit) {
@@ -202,10 +200,7 @@ export default class TowerLevel extends Scene {
 
     UpdateSprites() {
         let pad = Playnewton.CTRL.GetPad(0);
-        if(!pad.start) {
-            this.isIntroSkippable = true;
-        }
-        if (this.isIntroSkippable && pad.start) {
+        if (pad.startWasNotPressed && pad.start) {
             this.skipIntroController.skip();
         }
 
