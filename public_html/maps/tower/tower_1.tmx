@@ -317,6 +317,6 @@
  </objectgroup>
  <objectgroup id="3" name="collectibles" locked="1"/>
  <objectgroup id="5" name="enemies">
-  <object id="71" gid="116" x="360" y="928" width="31" height="47"/>
+  <object id="71" gid="116" x="440" y="4808" width="31" height="47"/>
  </objectgroup>
 </map>

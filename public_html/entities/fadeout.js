@@ -13,12 +13,20 @@ export default class Fadeout {
      */
     layers;
 
-    brightnessPercentage = 100;
-
     /**
      * @type doneCallback
      */
     doneCallback;
+
+    /**
+     * @type number
+     */
+    duration;
+
+    /**
+     * @type number
+     */
+    endTime;
 
     /**
      * @param {number} duration Fade out duration in milliseconds 
@@ -26,18 +34,19 @@ export default class Fadeout {
      * @param {doneCallback}
      */
     constructor(duration, layers, doneCallback = undefined) {
+        this.duration = duration;
+        this.endTime = Playnewton.CLOCK.now + duration;
         this.layers = layers;
         this.doneCallback = doneCallback;
     }
 
     Update() {
-        --this.brightnessPercentage;
-        if(this.brightnessPercentage >= 0) {
-            for(let l of this.layers) {
-                let layer = Playnewton.GPU.GetLayer(l);
-                layer.filter = `brightness(${this.brightnessPercentage}%)`;
-            }
-        } else {
+        let brightnessPercentage = Playnewton.FPU.bound(0, Math.ceil(100 * (this.endTime - Playnewton.CLOCK.now) / this.duration), 100);
+        for(let l of this.layers) {
+            let layer = Playnewton.GPU.GetLayer(l);
+            layer.filter = `brightness(${brightnessPercentage}%)`;
+        }
+        if(brightnessPercentage <= 0) {
             this.Done();
         }
     }

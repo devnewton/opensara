@@ -1,6 +1,5 @@
 import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
-import Fadeout from "./fadeout.js";
 
 /**
  * @readonly

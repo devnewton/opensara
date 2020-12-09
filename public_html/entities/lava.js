@@ -21,7 +21,7 @@ export default class Lava extends Enemy {
     /**
      *  @type number
      */
-    static eruptSpeed = 1;
+    static eruptSpeed = 2;
 
     /**
      *  @type LavaState

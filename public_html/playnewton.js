@@ -3620,8 +3620,31 @@ class Playnewton_PPU {
     }
 }
 
+/**
+ * Math utilities
+ * @type Playnewton_FPU
+ */
+class Playnewton_FPU {
+    /**
+     * 
+     * @param {number} min 
+     * @param {number} value 
+     * @param {number} max 
+     */
+    bound(min, value, max) {
+        if(value < min) {
+            return min;
+        }else if(value > max) {
+            return max;
+        } else {
+            return value;
+        }
+    }
+}
+
 export const CLOCK = new Playnewton_CLOCK();
 export const DRIVE = new Playnewton_DRIVE();
+export const FPU = new Playnewton_FPU();
 export const GPU = new Playnewton_GPU();
 export const PPU = new Playnewton_PPU();
 export const CTRL = new Playnewton_CTRL();
