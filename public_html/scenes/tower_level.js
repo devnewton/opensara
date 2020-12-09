@@ -136,7 +136,7 @@ export default class TowerLevel extends Scene {
         Playnewton.GPU.HUD.SetLabelAlign(skipLabel, "right");
         Playnewton.GPU.HUD.SetLabelPosition(skipLabel, 1024, 564);
         Playnewton.GPU.HUD.SetLabelColor(skipLabel, "#eeeeee");
-        Playnewton.GPU.HUD.SetLabelText(skipLabel, "Skip with ⌨️F1 or 🎮start");
+        Playnewton.GPU.HUD.SetLabelText(skipLabel, "Skip with ⌨️enter or 🎮start");
         Playnewton.GPU.HUD.EnableLabel(skipLabel);
 
         let label = Playnewton.GPU.HUD.CreateLabel();

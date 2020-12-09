@@ -18,7 +18,7 @@ export default class OpenSara {
                 case "ArrowRight":
                     pad.right = down;
                     return true;
-                case "F1":
+                case "Enter":
                     pad.start = down;
                     return true;
                 default:
