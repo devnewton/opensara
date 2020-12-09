@@ -12,6 +12,7 @@ import Z_ORDER from "../utils/z_order.js"
 import Cat from "../entities/cat.js"
 import Vulture from "../entities/vulture.js"
 import Fadeout from "../entities/fadeout.js"
+import { IngameMapKeyboardEventToPadButton } from "../utils/keyboard_mappings.js"
 
 export default class MountainLevel extends Scene {
 
@@ -182,6 +183,8 @@ export default class MountainLevel extends Scene {
 
     async Start() {
         await super.Start();
+
+        Playnewton.CTRL.MapKeyboardEventToPadButton = IngameMapKeyboardEventToPadButton;
 
         this.progress = 0;
 

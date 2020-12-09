@@ -5,6 +5,7 @@ import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
 import Fadeout from "../entities/fadeout.js"
 import Lava from "../entities/lava.js"
+import { IngameMapKeyboardEventToPadButton } from "../utils/keyboard_mappings.js"
 
 export default class TowerLevel extends Scene {
 
@@ -106,6 +107,8 @@ export default class TowerLevel extends Scene {
 
     async Start() {
         await super.Start();
+
+        Playnewton.CTRL.MapKeyboardEventToPadButton = IngameMapKeyboardEventToPadButton;
 
         this.progress = 0;
 

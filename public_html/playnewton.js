@@ -3640,6 +3640,22 @@ class Playnewton_FPU {
             return value;
         }
     }
+
+        /**
+     * 
+     * @param {number} min 
+     * @param {number} value 
+     * @param {number} max 
+     */
+    wrap(min, value, max) {
+        if(value < min) {
+            return max;
+        }else if(value > max) {
+            return min;
+        } else {
+            return value;
+        }
+    }
 }
 
 export const CLOCK = new Playnewton_CLOCK();

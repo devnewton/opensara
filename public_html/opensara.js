@@ -4,29 +4,6 @@ import Title from "./scenes/title.js"
 export default class OpenSara {
 
     async Start() {
-        Playnewton.CTRL.MapKeyboardEventToPadButton = (pad, event, down) => {
-            switch (event.code) {
-                case "ArrowUp":
-                    pad.A = down;
-                    return true;
-                case "ArrowDown":
-                    pad.down = down;
-                    return true;
-                case "ArrowLeft":
-                    pad.left = down;
-                    return true;
-                case "ArrowRight":
-                    pad.right = down;
-                    return true;
-                case "Enter":
-                    pad.start = down;
-                    return true;
-                default:
-                    return false;
-
-            }
-        };
-
         Playnewton.GPU.SetVideoOutput(document.getElementById('game'));
 
         let scene = new Title();
