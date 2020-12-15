@@ -48,13 +48,15 @@ export default class Exit {
      */
     nbLock = 1;
 
-    static animations = new ExitAnimations();
+    /**
+     * @type ExitAnimations
+     */
+    static animations;
 
 
-    static async Preload() {
-        let bitmap = Collectible.bitmap;
+    static async Load() {
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
+        let spriteset = Playnewton.GPU.CreateSpriteset(Collectible.bitmap, [
             { name: "exit1", x: 0, y: 64, w: 32, h: 32 },
             { name: "exit2", x: 32, y: 64, w: 32, h: 32 },
             { name: "exit3", x: 64, y: 64, w: 32, h: 32 },
@@ -65,6 +67,8 @@ export default class Exit {
             { name: "exit8", x: 224, y: 64, w: 32, h: 32 }
 
         ]);
+
+        Exit.animations = new ExitAnimations();
 
         Exit.animations.inactive = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "exit1", delay: 1000 },
@@ -85,6 +89,10 @@ export default class Exit {
             { name: "exit3", delay: 200 },
             { name: "exit2", delay: 200 },
         ]);
+    }
+
+    Unload() {
+        Exit.animations = null;
     }
 
     constructor() {

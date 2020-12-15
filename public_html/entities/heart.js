@@ -18,7 +18,7 @@ const PURSUE_SPEED = 8;
  * 
  * @type SaraAnimations
  */
-class HeatAnimations {
+class HeartAnimations {
     /**
      * @type GPU_SpriteAnimation
      */
@@ -43,9 +43,12 @@ export default class Heart {
      */
     state = HeartState.IDLE;
 
-    static animations = new HeatAnimations();
+    /**
+     * @type HeartAnimations
+     */
+    static animations;
 
-    static async Preload() {
+    static async Load() {
         let bitmap = Collectible.bitmap;
 
         let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
@@ -59,6 +62,8 @@ export default class Heart {
 
         ]);
 
+        Heart.animations = new HeartAnimations();
+
         Heart.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "heart1", delay: 100},
             {name: "heart2", delay: 100},
@@ -68,6 +73,10 @@ export default class Heart {
             {name: "heart6", delay: 100},
             {name: "heart7", delay: 100}
         ]);
+    }
+
+    static Unload() {
+        Heart.animations = null;
     }
 
     constructor() {

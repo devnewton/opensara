@@ -38,9 +38,12 @@ export default class Key {
      */
     state = KeyState.IDLE;
 
-    static animations = new KeyAnimations();
+    /**
+     * @type KeyAnimations
+     */
+    static animations;
 
-    static async Preload() {
+    static async Load() {
         let bitmap = Collectible.bitmap;
 
         let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
@@ -55,6 +58,8 @@ export default class Key {
 
         ]);
 
+        Key.animations = new KeyAnimations();
+
         Key.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "key1", delay: 5000},
             {name: "key2", delay: 100},
@@ -65,6 +70,10 @@ export default class Key {
             {name: "key7", delay: 100},
             {name: "key8", delay: 100}
         ]);
+    }
+
+    static Unload() {
+        Key.animations = null;
     }
 
     constructor() {

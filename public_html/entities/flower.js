@@ -34,18 +34,26 @@ export default class Flower {
      */
     state = FlowerState.IDLE;
 
-    static animations = new FlowerAnimations();
+    /**
+     * @type FlowerAnimations
+     */
+    static animations;
 
-    static async Preload() {
-        let bitmap = Collectible.bitmap;
+    static async Load() {
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
+        let spriteset = Playnewton.GPU.CreateSpriteset(Collectible.bitmap, [
             {name: "flower1", x: 8, y: 97, w: 16, h: 30},
         ]);
+
+        Flower.animations = new FlowerAnimations();
 
         Flower.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "flower1", delay: 100}
         ]);
+    }
+
+    static Unload() {
+        Flower.animations = null;
     }
 
     /**

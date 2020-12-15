@@ -82,21 +82,11 @@ export default class MountainLevel extends Scene {
         this.nextSceneOnExit = nextSceneOnExit;
     }
 
-    async InitSara() {
-        await Sara.Preload();
-    }
-
-    async InitEnemies() {
-        await Tatou.Preload();
-        await Cat.Preload();
-        await Vulture.Preload();
-    }
-
     async InitMapObjects(map) {
-        await Collectible.Preload();
-        await Exit.Preload();
-        await Heart.Preload();
-        await Key.Preload();
+        await Collectible.Load();
+        await Exit.Load();
+        await Heart.Load();
+        await Key.Load();
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
                 switch (object.type) {
@@ -185,17 +175,31 @@ export default class MountainLevel extends Scene {
         }
         this.progress = 20;
 
-        await this.InitSara();
+        await Sara.Load();
+        this.progress = 30;
+
+        await Tatou.Load();
         this.progress = 40;
 
-        await this.InitEnemies();
+        await Cat.Load();
         this.progress = 50;
+
+        await Vulture.Load();
+        this.progress = 60;
 
         await this.InitMap();
         this.progress = 80;
 
         await this.InitHUD();
         this.progress = 100;
+    }
+
+    Stop() {
+        super.Stop();
+        Sara.Unload();
+        Tatou.Unload();
+        Cat.Unload();
+        Vulture.Unload();
     }
 
     UpdateBodies() {

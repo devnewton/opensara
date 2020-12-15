@@ -54,13 +54,7 @@ export default class MountainOutroLevel extends Scene {
         this.nextSceneOnExit = nextSceneOnExit;
     }
 
-    async InitSara() {
-        await Sara.Preload();
-    }
-
     async InitCollectibles(map) {
-        await Collectible.Preload();
-        await Flower.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
                 switch (object.type) {
@@ -109,16 +103,31 @@ export default class MountainOutroLevel extends Scene {
         }
         this.progress = 20;
 
-        await this.InitSara();
+        await Sara.Load();
         this.progress = 50;
 
-        await Witch.Preload();
-        this.properties = 75
+        await Witch.Load();
+        this.properties = 60;
+
+        await Collectible.Load();
+        this.properties = 70;
+
+        await Flower.Load();
+        this.properties = 80;
 
         await this.InitMountainOutroLevels();
-        this.progress = 100;
+        this.progress = 90;
 
-        this.InitSkipLabel()
+        this.InitSkipLabel();
+        this.progress = 100;
+    }
+
+    Stop() {
+        super.Stop();
+        Sara.Unload();
+        Witch.Unload();
+        Collectible.Unload();
+        Flower.Unload();
     }
 
     InitSkipLabel() {

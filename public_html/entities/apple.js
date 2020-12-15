@@ -34,17 +34,20 @@ export default class Apple {
      */
     state = AppleState.IDLE;
 
-    static animations = new AppleAnimations();
+    /**
+     * @type AppleAnimations
+     */
+    static animations;
 
-    static async Preload() {
-        let bitmap = Collectible.bitmap;
-
-        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
+    static async Load() {
+        let spriteset = Playnewton.GPU.CreateSpriteset(Collectible.bitmap, [
             {name: "apple1", x: 44, y: 106, w: 8, h: 10},
             {name: "apple2", x: 76, y: 106, w: 8, h: 10},
             {name: "apple3", x: 108, y: 106, w: 8, h: 10},
             {name: "apple4", x: 140, y: 106, w: 8, h: 10}
         ]);
+
+        Apple.animations = new AppleAnimations();
 
         Apple.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "apple1", delay: 100},
@@ -54,6 +57,10 @@ export default class Apple {
             {name: "apple3", delay: 100},
             {name: "apple2", delay: 100}
         ]);
+    }
+
+    static Unload() {
+        Apple.animations = null;
     }
 
     /**

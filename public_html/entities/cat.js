@@ -71,13 +71,25 @@ export default class Cat extends Enemy {
      */
     bullet;
 
-    static animations = new CatAnimations();
-    static bulletAnimations = new BulletAnimations();
+    /**
+     * @type CatAnimations
+     */
+    static animations;
 
-    static async Preload() {
-        let catBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/cat.png");
+    /**
+     * @type BulletAnimations
+     */
+    static bulletAnimations;
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(catBitmap, [
+    /**
+     * @type ImageBitmap
+     */
+    static bitmap;
+
+    static async Load() {
+        Cat.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/cat.png");
+
+        let spriteset = Playnewton.GPU.CreateSpriteset(Cat.bitmap, [
             { name: "idle00", x: 1, y: 1, w: 30, h: 59 },
             { name: "attack00", x: 1, y: 1, w: 30, h: 59 },
             { name: "attack01", x: 31, y: 1, w: 30, h: 59 },
@@ -123,6 +135,8 @@ export default class Cat extends Enemy {
             { name: "bullet-explode12", x: 128, y: 214, w: 32, h: 32 }
         ]);
 
+        Cat.animations = new CatAnimations();
+
         Cat.animations.idle = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "idle00", delay: 100 }
         ]);
@@ -156,6 +170,8 @@ export default class Cat extends Enemy {
             { name: "die03", delay: 500 }
         ]);
 
+        Cat.bulletAnimations = new BulletAnimations();
+
         Cat.bulletAnimations.grow = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "bullet-grow00", delay: 1000 },
         ]);
@@ -183,6 +199,13 @@ export default class Cat extends Enemy {
             { name: "bullet-explode11", delay: 100 },
             { name: "bullet-explode12", delay: 100 }
         ]);
+    }
+
+    static Unload() {
+        Cat.animations = null;
+        Cat.bulletAnimations = null;
+        Cat.bitmap.close();
+        Cat.bitmap = null;
     }
 
     constructor(x, y) {

@@ -2,7 +2,17 @@ import * as Playnewton from "../playnewton.js"
 
 export default class Collectible {
 
-    static async Preload() {
+    /**
+     * @type ImageBitmap
+     */
+    static bitmap;
+
+    static async Load() {
         Collectible.bitmap = await Playnewton.DRIVE.LoadBitmap("maps/collectibles/collectibles.png");
+    }
+
+    static Unload() {
+        Collectible.bitmap.close();
+        Collectible.bitmap = null;
     }
 }

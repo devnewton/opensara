@@ -90,11 +90,16 @@ export default class Title extends Scene {
      */
     adventureIndex;
 
+    /**
+     * @type ImageBitmap
+     */
+    titleBitmap;
+
     async InitTitle() {
-        let titleBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/title.png");
+        this.titleBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/title.png");
 
         let titleSprite = Playnewton.GPU.CreateSprite();
-        Playnewton.GPU.SetSpritePicture(titleSprite, Playnewton.GPU.CreatePicture(titleBitmap));
+        Playnewton.GPU.SetSpritePicture(titleSprite, Playnewton.GPU.CreatePicture(this.titleBitmap));
         Playnewton.GPU.SetSpritePosition(titleSprite, 216, 32);
         Playnewton.GPU.EnableSprite(titleSprite);
     }
@@ -135,6 +140,12 @@ export default class Title extends Scene {
 
         await this.InitHUD();
         this.progress = 100;
+    }
+
+    Stop() {
+        super.Stop();
+        this.titleBitmap.close();
+        this.titleBitmap = null;
     }
 
     UpdateBodies() {

@@ -56,18 +56,24 @@ export default class Witch extends Enemy {
     /**
      * @type WitchAnimations[]
      */
-    static animations = [];
+    static animations;
 
     hoverDy = 0;
 
-    static async Preload() {
-        let witchBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/witch.png");
+    /**
+     * @type ImageBitmap
+     */
+    static bitmap;
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(witchBitmap, [
+    static async Load() {
+        Witch.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/witch.png");
+
+        let spriteset = Playnewton.GPU.CreateSpriteset(Witch.bitmap, [
             {name: "fly-left0", x: 2, y: 2, w: 55 , h: 46},
             {name: "fly-right0", x: 2, y: 50, w: 55, h: 46}
         ]);
 
+        Witch.animations = [];
         Witch.animations[WitchDirection.LEFT] = new WitchAnimations();
         Witch.animations[WitchDirection.RIGHT] = new WitchAnimations();
 
@@ -78,6 +84,12 @@ export default class Witch extends Enemy {
         Witch.animations[WitchDirection.RIGHT].fly = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "fly-right0", delay: 100}
         ]);
+    }
+
+    static Unload() {
+        Witch.animations = null;
+        Witch.bitmap.close();
+        Witch.bitmap = null;
     }
 
     constructor(x, y) {

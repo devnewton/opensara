@@ -52,13 +52,6 @@ export default class TowerLevel extends Scene {
         this.nextSceneOnExit = nextSceneOnExit;
     }
 
-    async InitSara() {
-        await Sara.Preload();
-    }
-
-    async InitEnemies() {
-    }
-
     async InitMap() {
         let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
 
@@ -117,11 +110,8 @@ export default class TowerLevel extends Scene {
         }
         this.progress = 20;
 
-        await this.InitSara();
+        await Sara.Load();
         this.progress = 40;
-
-        await this.InitEnemies();
-        this.progress = 50;
 
         await this.InitMap();
         this.progress = 80;
@@ -130,6 +120,11 @@ export default class TowerLevel extends Scene {
         this.progress = 100;
 
         this.IntroDialog();
+    }
+
+    Stop() {
+        super.Stop();
+        Sara.Unload();
     }
 
     async IntroDialog() {

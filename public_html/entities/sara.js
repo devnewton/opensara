@@ -145,12 +145,17 @@ export default class Sara {
     /**
      * @type SaraAnimations[]
      */
-    static animations = [];
+    static animations;
 
-    static async Preload() {
-        let saraBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
+    /**
+     * @type ImageBitmap
+     */
+    static bitmap;
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(saraBitmap, [
+    static async Load() {
+        Sara.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
+
+        let spriteset = Playnewton.GPU.CreateSpriteset(Sara.bitmap, [
             {name: "stand-left", x: 1, y: 1, w: 32, h: 48},
             {name: "stand-right", x: 1, y: 50, w: 32, h: 48},
             {name: "walk-left0", x: 35, y: 1, w: 32, h: 48},
@@ -182,6 +187,8 @@ export default class Sara {
             {name: "dying2", x: 70, y: 200, w: 32, h: 48},
             {name: "dying3", x: 104, y: 200, w: 32, h: 48}
         ]);
+
+        Sara.animations = [];
 
         Sara.animations[SaraDirection.LEFT] = new SaraAnimations();
         Sara.animations[SaraDirection.RIGHT] = new SaraAnimations();
@@ -259,6 +266,12 @@ export default class Sara {
             {name: "dying2", delay: 1000},
             {name: "dying3", delay: 1000}
         ]);
+    }
+
+    static Unload() {
+        Sara.animations = null;
+        Sara.bitmap.close();
+        Sara.bitmap = null;
     }
 
     constructor(x, y) {

@@ -46,12 +46,20 @@ export default class Fampire extends Enemy {
      */
     state;
 
-    static animations = new FampireAnimations();
+    /**
+     * @type FampireAnimations
+     */
+    static animations;
+
+    /**
+     * @type ImageBitmap
+     */
+    static bitmap;
 
     hoverDy = 0;
 
-    static async Preload() {
-        let witchBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/fampire.png");
+    static async Load() {
+        Fampire.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/fampire.png");
 
         let spriteset = Playnewton.GPU.CreateSpriteset(witchBitmap, [
             {name: "stand0", x: 2, y: 412, w: 126 , h: 79},
@@ -87,6 +95,8 @@ export default class Fampire extends Enemy {
             {name: "fireAttack2", x: 444, y: 152, w: 32 , h: 32},
             {name: "fireAttack3", x: 478, y: 152, w: 32 , h: 32}
         ]);
+
+        Fampire.animations = new FampireAnimations();
 
         Fampire.animations.stand = Playnewton.GPU.CreateAnimation(spriteset, [
             {name: "stand0", delay: 1000}
@@ -141,6 +151,12 @@ export default class Fampire extends Enemy {
             {name: "fireAttack3", delay: 100}
         ]);
 
+    }
+
+    static Unload() {
+        Fampire.animations = null;
+        Fampire.bitmap.close();
+        Fampire.bitmap = null;
     }
 
     constructor(x, y) {
