@@ -64,8 +64,7 @@ export default class MountainIntroLevel extends Scene {
         await Apple.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
-                if (object.tile) {
-                    switch (object.tile.properties.get("type")) {
+                    switch (object.type) {
                         case "sara":
                             if (!this.sara) {
                                 this.sara = new Sara(x, y);
@@ -81,7 +80,6 @@ export default class MountainIntroLevel extends Scene {
                             }
                             break;
                     }
-                }
             },
             map);
 

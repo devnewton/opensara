@@ -74,8 +74,7 @@ export default class TowerLevel extends Scene {
     async InitMapObjects(map) {
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
-                let type = object.type || (object.tile && object.tile.properties.get("type"));
-                switch (type) {
+                switch (object.type) {
                     case "sara":
                         if (!this.sara) {
                             this.sara = new Sara(x, y);

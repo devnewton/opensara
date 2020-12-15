@@ -63,23 +63,21 @@ export default class MountainOutroLevel extends Scene {
         await Flower.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
-                if (object.tile) {
-                    switch (object.tile.properties.get("type")) {
-                        case "sara":
-                            if (!this.sara) {
-                                this.sara = new Sara(x, y);
-                            }
-                            break;
-                        case "flower":
-                            let flower = new Flower(x, y);
-                            this.flowers.push(flower);
-                            break;
-                        case "witch":
-                            if (!this.witch) {
-                                this.witch = new Witch(x, y);
-                            }
-                            break;
-                    }
+                switch (object.type) {
+                    case "sara":
+                        if (!this.sara) {
+                            this.sara = new Sara(x, y);
+                        }
+                        break;
+                    case "flower":
+                        let flower = new Flower(x, y);
+                        this.flowers.push(flower);
+                        break;
+                    case "witch":
+                        if (!this.witch) {
+                            this.witch = new Witch(x, y);
+                        }
+                        break;
                 }
             },
             map);

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="87">
  <tileset firstgid="1" source="mountain.tsx"/>
- <tileset firstgid="50" source="collectibles.tsx"/>
- <tileset firstgid="114" source="icons.tsx"/>
+ <tileset firstgid="50" source="../collectibles/collectibles.tsx"/>
+ <tileset firstgid="114" source="../icons/icons.tsx"/>
  <layer id="4" name="bg0" width="32" height="18">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -50,7 +50,6 @@
  <objectgroup color="#00ff7f" id="2" name="platforms">
   <properties>
    <property name="immovable" value="true"/>
-   <property name="type" value="body"/>
   </properties>
   <object id="66" x="0" y="461" width="63" height="116"/>
   <object id="67" x="63.6667" y="494" width="95.6667" height="82.6667"/>

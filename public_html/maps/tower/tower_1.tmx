@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="152" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="335">
  <tileset firstgid="1" source="tower.tsx"/>
- <tileset firstgid="50" source="collectibles.tsx"/>
- <tileset firstgid="114" source="icons.tsx"/>
+ <tileset firstgid="50" source="../collectibles/collectibles.tsx"/>
+ <tileset firstgid="114" source="../icons/icons.tsx"/>
  <tileset firstgid="121" source="tower_bg.tsx"/>
  <objectgroup id="8" name="bg0_sky" locked="1">
   <object id="199" gid="125" x="0" y="1024" width="1024" height="1024"/>
@@ -271,7 +271,6 @@
  <objectgroup color="#00ff7f" id="2" name="platforms" locked="1">
   <properties>
    <property name="immovable" type="bool" value="true"/>
-   <property name="type" value="body"/>
   </properties>
   <object id="157" x="-8" y="4808" width="1040" height="312"/>
   <object id="158" x="640" y="4616" width="392" height="24"/>

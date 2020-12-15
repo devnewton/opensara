@@ -25,7 +25,7 @@ export default class MountainLevel extends Scene {
      * @type Heart[]
      */
     hearts = [];
-    
+
     /**
      * @type Key[]
      */
@@ -98,9 +98,8 @@ export default class MountainLevel extends Scene {
         await Heart.Preload();
         await Key.Preload();
         Playnewton.DRIVE.ForeachTmxMapObject(
-                (object, objectgroup, x, y) => {
-            if (object.tile) {
-                switch (object.tile.properties.get("type")) {
+            (object, objectgroup, x, y) => {
+                switch (object.type) {
                     case "exit":
                         let exit = new Exit();
                         Playnewton.GPU.SetSpritePosition(exit.sprite, x, y - exit.sprite.height);
@@ -129,14 +128,13 @@ export default class MountainLevel extends Scene {
                         this.enemies.push(vulture);
                         break;
                     case "sara":
-                        if(!this.sara) {
+                        if (!this.sara) {
                             this.sara = new Sara(x, y);
                         }
                         break;
                 }
-            }
-        },
-                map);
+            },
+            map);
 
     }
 
@@ -208,7 +206,7 @@ export default class MountainLevel extends Scene {
     }
 
     UpdateBodies() {
-        if(this.sara.dead && !this.fadeout) {
+        if (this.sara.dead && !this.fadeout) {
             let layers = [];
             for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
                 if (i !== Z_ORDER.SARA) {
@@ -231,7 +229,7 @@ export default class MountainLevel extends Scene {
         }
         this.sara.UpdateBody();
         this.enemies.forEach((enemy) => enemy.UpdateBody());
-        if(this.poison) {
+        if (this.poison) {
             this.poison.Update();
         }
     }
@@ -240,7 +238,7 @@ export default class MountainLevel extends Scene {
         this.sara.UpdateSprite();
         this.enemies.forEach((enemy) => enemy.UpdateSprite());
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
-        if(this.poison) {
+        if (this.poison) {
             Playnewton.GPU.HUD.SetLabelText(this.poisonCounterLabel, `${this.poison.countDown}💀`);
         }
         Playnewton.GPU.HUD.SetLabelText(this.itemsLabel, "🔑".repeat(this.sara.nbKeys));
@@ -249,7 +247,7 @@ export default class MountainLevel extends Scene {
             this.sara.Stomp(enemy);
             enemy.Pursue(this.sara);
         });
-        
+
         this.hearts = this.hearts.filter((heart) => {
             if (heart.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneHeart();
@@ -263,7 +261,7 @@ export default class MountainLevel extends Scene {
         this.keys = this.keys.filter((key) => {
             if (key.Pursue(this.sara.sprite)) {
                 this.sara.CollectOneKey();
-                this.exits.some((exit) => exit.OpenOneLock() )
+                this.exits.some((exit) => exit.OpenOneLock())
                 key.Free();
                 return false;
             } else {
@@ -274,7 +272,7 @@ export default class MountainLevel extends Scene {
         this.exits = this.exits.filter((exit) => {
             if (exit.Pursue(this.sara.sprite)) {
                 exit.Free();
-                if(!this.sara.dead && !this.fadeout) {
+                if (!this.sara.dead && !this.fadeout) {
                     let layers = [];
                     for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
                         layers.push(i);
@@ -291,7 +289,7 @@ export default class MountainLevel extends Scene {
             }
         });
 
-        if(this.fadeout) {
+        if (this.fadeout) {
             this.fadeout.Update();
         }
     }

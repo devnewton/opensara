@@ -1060,7 +1060,21 @@ class TMX_Object {
     /**
      * @type string
      */
-    type;
+    _type;
+
+    /**
+     * @param {string} type
+     */
+    set type(type) {
+        this._type = type;
+    }
+
+    /**
+     * @returns string
+     */
+    get type() {
+        return this._type || (this.tile && this.tile.type);
+    }
 }
 
 /**
@@ -1342,24 +1356,21 @@ class Playnewton_DRIVE {
             GPU.SetLayerOpacity(GPU.GetLayer(mapZ + objectgroup.z), objectgroup.opacity);
             for (let object of objectgroup.objects) {
                 let tile = object.tile;
-                if (tile) {
-                    let tileType = this._ParseStringProperty("type", object.properties, object.tile.properties);
-                    if (!tileType) {
-                        let picture = picturesByTile.get(tile);
-                        let animation = animationsByTile.get(tile);
-                        let sprite = GPU.CreateSprite();
-                        if (picture || animation) {
-                            if (picture) {
-                                picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
-                                GPU.SetSpritePicture(sprite, picture);
-                            }
-                            if (animation) {
-                                GPU.SetSpriteAnimation(sprite, animation);
-                            }
-                            GPU.SetSpritePosition(sprite, mapX + objectgroup.x + object.x, mapY + objectgroup.y + object.y - object.height);
-                            GPU.SetSpriteZ(sprite, mapZ + objectgroup.z);
-                            GPU.EnableSprite(sprite);
+                if (tile && !object.type) {
+                    let picture = picturesByTile.get(tile);
+                    let animation = animationsByTile.get(tile);
+                    let sprite = GPU.CreateSprite();
+                    if (picture || animation) {
+                        if (picture) {
+                            picture = GPU.CreatePicture(tile.bitmap, tile.sx, tile.sy, tile.w, tile.h);
+                            GPU.SetSpritePicture(sprite, picture);
                         }
+                        if (animation) {
+                            GPU.SetSpriteAnimation(sprite, animation);
+                        }
+                        GPU.SetSpritePosition(sprite, mapX + objectgroup.x + object.x, mapY + objectgroup.y + object.y - object.height);
+                        GPU.SetSpriteZ(sprite, mapZ + objectgroup.z);
+                        GPU.EnableSprite(sprite);
                     }
                 }
             }
@@ -1378,14 +1389,14 @@ class Playnewton_DRIVE {
             let groupX = mapX + objectgroup.x * map.tileWidth;
             let groupY = mapY + objectgroup.y * map.tileWidth;
             for (let object of objectgroup.objects) {
-                let type = this._ParseStringProperty("type", object.properties, objectgroup.properties);
-                if (type === "body") {
+                let immovable = this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties)
+                if (immovable) {
                     let body = PPU.CreateBody();
                     body.debugColor = objectgroup.color;
                     body.tag = this._ParseStringProperty('tag', object.properties, objectgroup.properties);
                     PPU.SetBodyPosition(body, groupX + object.x, groupY + object.y);
                     PPU.SetBodyRectangle(body, 0, 0, object.width, object.height);
-                    PPU.SetBodyImmovable(body, this._ParseBooleanProperty("immovable", object.properties, objectgroup.properties));
+                    PPU.SetBodyImmovable(body, true);
                     PPU.EnableBody(body);
                 }
             }
