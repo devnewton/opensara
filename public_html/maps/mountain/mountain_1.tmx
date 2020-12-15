@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="71">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="72">
  <tileset firstgid="1" source="mountain.tsx"/>
  <tileset firstgid="50" source="../collectibles/collectibles.tsx"/>
  <tileset firstgid="114" source="../icons/icons.tsx"/>
- <layer id="4" name="bg0" width="32" height="18">
+ <tileset firstgid="121" source="mountain_bg.tsx"/>
+ <objectgroup id="6" name="bg_0">
+  <object id="71" gid="121" x="0" y="576" width="1024" height="576"/>
+ </objectgroup>
+ <layer id="4" name="bg1" width="32" height="18" locked="1">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -25,7 +29,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,30,31,0
 </data>
  </layer>
- <layer id="1" name="bg1" width="32" height="18">
+ <layer id="1" name="bg2" width="32" height="18" locked="1">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -47,7 +51,7 @@
 2,2,2,2,9,9,9,9,2,2,2,2,2,2,2,2,9,9,9,9,2,2,2,2,2,2,2,2,2,2,2,2
 </data>
  </layer>
- <objectgroup color="#00ff7f" id="2" name="platforms">
+ <objectgroup color="#00ff7f" id="2" name="platforms" locked="1">
   <properties>
    <property name="immovable" value="true"/>
   </properties>
@@ -56,7 +60,7 @@
   <object id="69" x="515" y="205" width="123" height="350"/>
   <object id="70" x="898.5" y="332.25" width="92.5" height="18.75"/>
  </objectgroup>
- <objectgroup id="3" name="collectibles">
+ <objectgroup id="3" name="collectibles" locked="1">
   <object id="53" gid="66" x="928" y="544" width="32" height="32"/>
   <object id="56" gid="58" x="465" y="555" width="32" height="32"/>
   <object id="58" gid="50" x="352" y="224" width="32" height="32"/>
@@ -66,7 +70,7 @@
   <object id="62" gid="50" x="736" y="416" width="32" height="32"/>
   <object id="63" gid="50" x="736" y="384" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="5" name="enemies">
+ <objectgroup id="5" name="enemies" locked="1">
   <object id="54" gid="117" x="353" y="555" width="59" height="24"/>
   <object id="55" gid="117" x="788" y="555" width="59" height="24"/>
   <object id="65" gid="116" x="40" y="554" width="31" height="47"/>

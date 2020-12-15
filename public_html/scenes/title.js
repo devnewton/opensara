@@ -83,12 +83,12 @@ export default class Title extends Scene {
     /**
      * @type Array<Adventure>
      */
-    adventures = [];
+    adventures;
 
     /**
      * @type number
      */
-    adventureIndex = 0;
+    adventureIndex;
 
     async InitTitle() {
         let titleBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/title.png");
@@ -108,18 +108,19 @@ export default class Title extends Scene {
         Playnewton.GPU.HUD.SetLabelAlign(startLabel, "right");
         Playnewton.GPU.HUD.EnableLabel(startLabel);
 
-        this.adventures.push(new MountainAdventure());
-        this.adventures.push(new TowerAdventure);
-
         Playnewton.GPU.EnableHUD(true);
     }
 
     async Start() {
         await super.Start();
 
-        Playnewton.CTRL.MapKeyboardEventToPadButton = MenuMapKeyboardEventToPadButton;
+        this.adventures = [];
+        this.adventures.push(new MountainAdventure());
+        this.adventures.push(new TowerAdventure);
 
         this.adventureIndex = 0;
+
+        Playnewton.CTRL.MapKeyboardEventToPadButton = MenuMapKeyboardEventToPadButton;
 
         this.nextScene = this;
         for (let z = 0; z < 1; ++z) {

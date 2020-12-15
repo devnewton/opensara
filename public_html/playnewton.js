@@ -1167,8 +1167,8 @@ class TMX_Map {
 
 class Playnewton_DRIVE {
     /**
-     * Loads a spriteset from a png/json file pair.
-     * @param {string} baseURL Base url for png/json files
+     * Loads an image
+     * @param {string} baseURL Base url for png/jpg files
      * @return ImageBitmap
      * 
      */

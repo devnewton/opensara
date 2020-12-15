@@ -139,14 +139,7 @@ export default class MountainLevel extends Scene {
     }
 
     async InitMap() {
-        let skyBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sky.png");
-
         let map = await Playnewton.DRIVE.LoadTmxMap(this.mapPath);
-
-        let skySprite = Playnewton.GPU.CreateSprite();
-        Playnewton.GPU.SetSpritePicture(skySprite, Playnewton.GPU.CreatePicture(skyBitmap));
-        Playnewton.GPU.SetSpritePosition(skySprite, 0, 0);
-        Playnewton.GPU.EnableSprite(skySprite);
 
         Playnewton.PPU.SetWorldBounds(0, 0, 1024, 576);
         Playnewton.PPU.SetWorldGravity(0, 1);
