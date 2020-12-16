@@ -53,6 +53,7 @@ export default class MountainIntroLevel extends Scene {
         super();
         this.mapPath = mapPath;
         this.nextSceneOnExit = nextSceneOnExit;
+        this.pausable = false;
     }
 
     async InitCollectibles(map) {

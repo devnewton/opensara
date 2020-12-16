@@ -50,6 +50,7 @@ export default class TowerLevel extends Scene {
         super();
         this.mapPath = mapPath;
         this.nextSceneOnExit = nextSceneOnExit;
+        this.pausable = false;
     }
 
     async InitMap() {
@@ -98,6 +99,8 @@ export default class TowerLevel extends Scene {
     }
 
     async Start() {
+        this.pausable = false;
+
         await super.Start();
 
         Playnewton.CTRL.MapKeyboardEventToPadButton = IngameMapKeyboardEventToPadButton;
@@ -119,7 +122,7 @@ export default class TowerLevel extends Scene {
         await this.InitHUD();
         this.progress = 100;
 
-        this.IntroDialog();
+        await this.IntroDialog();
     }
 
     Stop() {
@@ -128,6 +131,7 @@ export default class TowerLevel extends Scene {
     }
 
     async IntroDialog() {
+        this.pausable = false;
         let skipLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelFont(skipLabel, "bold 12px monospace");
         Playnewton.GPU.HUD.SetLabelAlign(skipLabel, "right");
@@ -165,6 +169,7 @@ export default class TowerLevel extends Scene {
 
             this.sara.StopWaiting();
             this.lava.Erupt();
+            this.pausable = true;
         }
     }
 
@@ -198,6 +203,7 @@ export default class TowerLevel extends Scene {
     UpdateSprites() {
         let pad = Playnewton.CTRL.GetPad(0);
         if (pad.startWasNotPressed && pad.start) {
+            pad.startWasNotPressed = false;
             this.skipIntroController.skip();
         }
 

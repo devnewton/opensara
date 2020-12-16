@@ -12,6 +12,8 @@ export default class Scene {
      */
     progress = -1;
 
+    pausable = true;
+
     /**
      * 
      * @returns {boolean}

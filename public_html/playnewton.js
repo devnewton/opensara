@@ -87,16 +87,50 @@ class CLOCK_DELAY {
 export class Playnewton_CLOCK {
 
     /**
+     * @type DOMHighResTimeStamp
+     */
+    _pauseTime = null;
+
+    /**
+     * @type DOMHighResTimeStamp
+     */
+    _totalPausesDuration = 0;
+
+    /**
+     * @type DOMHighResTimeStamp
+     */
+    now = performance.now();
+
+    /**
      * @type Array<CLOCK_DELAY>
      */
     delays = [];
-    get now() {
-        return performance.now();
-    }
+
 
     Update() {
-        let now = CLOCK.now;
-        this.delays = this.delays.filter(delay => delay.Wait(now));
+        if(!this.paused) {
+            this.now = performance.now() - this._totalPausesDuration;
+            this.delays = this.delays.filter(delay => delay.Wait(this.now));
+        }
+    }
+
+    Pause() {
+        if(!this._pauseTime) {
+            this._pauseTime = performance.now();
+        }
+    }
+
+    Resume() {
+        if(this._pauseTime) {
+            let now = performance.now();
+            this._totalPausesDuration += now - this._pauseTime;
+            this.now = now - this._totalPausesDuration;
+            this._pauseTime = null;
+        }
+    }
+
+    get paused() {
+        return !!this._pauseTime;
     }
 
     /**
@@ -105,7 +139,7 @@ export class Playnewton_CLOCK {
      */
     Delay(ms, skipSignal = undefined) {
         return new Promise((resolve, reject) => {
-            this.delays.push(new CLOCK_DELAY(CLOCK.now + ms, resolve, reject, skipSignal));
+            this.delays.push(new CLOCK_DELAY(this.now + ms, resolve, reject, skipSignal));
     });
 }
 }
@@ -1922,6 +1956,11 @@ export class GPU_HUD {
      */
     loadingText;
 
+    /**
+     * @type string
+     */
+    pausedText;
+
     Reset() {
         this.bars = [];
         this.labels = [];
@@ -2105,6 +2144,19 @@ export class GPU_HUD {
             this.loadingText = null;
         }
     }
+
+    /**
+     * 
+     * @param {string} text 
+     */
+    SetPausedText(text) {
+        if (text) {
+            this.pausedText = text;
+        } else {
+            this.pausedText = null;
+        }
+    }
+    
 }
 
 export class Playnewton_GPU {
@@ -2585,6 +2637,7 @@ export class Playnewton_GPU {
             this.ctx.restore();
             this.ctx.save();
             this._DrawLoadingText(hud);
+            this._DrawPausedText(hud);
             this.ctx.restore();
         }
     }
@@ -2626,6 +2679,22 @@ export class Playnewton_GPU {
             this.ctx.textAlign = "right";
             this.ctx.textBaseline = "bottom";
             this.ctx.fillText(hud.loadingText, this.canvas.width, this.canvas.height);
+        }
+    }
+
+    /**
+     * 
+     * @param {GPU_HUD} hud 
+     */
+    _DrawPausedText(hud) {
+        if (hud.pausedText) {
+            this.ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            this.ctx.fillRect(0, this.canvas.height / 2 - 32, this.canvas.width, 64)
+            this.ctx.font = "bold 32px monospace";
+            this.ctx.fillStyle = "#ffffff";
+            this.ctx.textAlign = "center";
+            this.ctx.textBaseline = "middle";
+            this.ctx.fillText(hud.pausedText, this.canvas.width / 2, this.canvas.height / 2);
         }
     }
 

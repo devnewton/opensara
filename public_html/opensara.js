@@ -14,9 +14,24 @@ export default class OpenSara {
                 Playnewton.GPU.HUD.SetLoadingText("");
                 Playnewton.CTRL.Poll();
                 Playnewton.CLOCK.Update();
-                scene.UpdateBodies();
-                Playnewton.PPU.Update();
-                scene.UpdateSprites();
+                if(scene.pausable) {
+                    let pad = Playnewton.CTRL.GetPad(0);
+                    if(pad.startWasNotPressed && pad.start) {
+                        pad.startWasNotPressed = false;
+                        if(Playnewton.CLOCK.paused) {
+                            Playnewton.CLOCK.Resume();
+                            Playnewton.GPU.HUD.SetPausedText("");
+                        } else {
+                            Playnewton.CLOCK.Pause();
+                            Playnewton.GPU.HUD.SetPausedText("Paused: press ⌨️enter or 🎮start to resume");
+                        }
+                    }
+                }
+                if(!Playnewton.CLOCK.paused) {
+                    scene.UpdateBodies();
+                    Playnewton.PPU.Update();
+                    scene.UpdateSprites();
+                }
             } else {
                 Playnewton.GPU.HUD.SetLoadingText(`Loading ${scene.progress}%`);
             }

@@ -95,6 +95,11 @@ export default class Title extends Scene {
      */
     titleBitmap;
 
+    constructor() {
+        super();
+        this.pausable = false;
+    }
+
     async InitTitle() {
         this.titleBitmap = await Playnewton.DRIVE.LoadBitmap("sprites/title.png");
 
