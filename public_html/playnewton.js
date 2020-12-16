@@ -1166,6 +1166,19 @@ class TMX_Map {
 }
 
 class Playnewton_DRIVE {
+
+    /**
+     * @type Array<ImageBitmap>
+     */
+    bitmaps = [];
+
+    Reset() {
+        for(let bitmap of this.bitmaps) {
+            bitmap.close();
+        }
+        this.bitmaps = [];
+    }
+
     /**
      * Loads an image
      * @param {string} baseURL Base url for png/jpg files
@@ -1173,7 +1186,9 @@ class Playnewton_DRIVE {
      * 
      */
     async LoadBitmap(baseURL) {
-        return await createImageBitmap(await (await fetch(baseURL)).blob());
+        let bitmap = await createImageBitmap(await (await fetch(baseURL)).blob());
+        this.bitmaps.push(bitmap);
+        return bitmap;
     }
 
     /**
@@ -2221,16 +2236,6 @@ export class Playnewton_GPU {
         spritePicture.w = w || bitmap.width;
         spritePicture.h = h || bitmap.height;
         return spritePicture;
-    }
-
-    /**
-     * Deletes the specified spriteset and frees memory
-     * @param {GPU_Spriteset} spriteset
-     */
-    DeleteSpriteset(spriteset) {
-        for (let bitmap of spriteset.pictures) {
-            bitmap.close();
-        }
     }
 
     /**

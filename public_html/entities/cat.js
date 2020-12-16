@@ -81,15 +81,10 @@ export default class Cat extends Enemy {
      */
     static bulletAnimations;
 
-    /**
-     * @type ImageBitmap
-     */
-    static bitmap;
-
     static async Load() {
-        Cat.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/cat.png");
+        let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/cat.png");
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(Cat.bitmap, [
+        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
             { name: "idle00", x: 1, y: 1, w: 30, h: 59 },
             { name: "attack00", x: 1, y: 1, w: 30, h: 59 },
             { name: "attack01", x: 31, y: 1, w: 30, h: 59 },
@@ -204,8 +199,6 @@ export default class Cat extends Enemy {
     static Unload() {
         Cat.animations = null;
         Cat.bulletAnimations = null;
-        Cat.bitmap.close();
-        Cat.bitmap = null;
     }
 
     constructor(x, y) {

@@ -147,15 +147,10 @@ export default class Sara {
      */
     static animations;
 
-    /**
-     * @type ImageBitmap
-     */
-    static bitmap;
-
     static async Load() {
-        Sara.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
+        let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/sara.png");
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(Sara.bitmap, [
+        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
             {name: "stand-left", x: 1, y: 1, w: 32, h: 48},
             {name: "stand-right", x: 1, y: 50, w: 32, h: 48},
             {name: "walk-left0", x: 35, y: 1, w: 32, h: 48},
@@ -270,8 +265,6 @@ export default class Sara {
 
     static Unload() {
         Sara.animations = null;
-        Sara.bitmap.close();
-        Sara.bitmap = null;
     }
 
     constructor(x, y) {

@@ -51,17 +51,12 @@ export default class Fampire extends Enemy {
      */
     static animations;
 
-    /**
-     * @type ImageBitmap
-     */
-    static bitmap;
-
     hoverDy = 0;
 
     static async Load() {
-        Fampire.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/fampire.png");
+        let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/fampire.png");
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(witchBitmap, [
+        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
             {name: "stand0", x: 2, y: 412, w: 126 , h: 79},
             {name: "fly0", x: 2, y: 2, w: 126 , h: 79},
             {name: "fly1", x: 2, y: 84, w: 126 , h: 79},
@@ -155,8 +150,6 @@ export default class Fampire extends Enemy {
 
     static Unload() {
         Fampire.animations = null;
-        Fampire.bitmap.close();
-        Fampire.bitmap = null;
     }
 
     constructor(x, y) {

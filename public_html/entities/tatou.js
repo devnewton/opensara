@@ -107,15 +107,10 @@ export default class Tatou extends Enemy {
      */
     static animations;
 
-    /**
-     * @type ImageBitmap
-     */
-    static bitmap;
-
     static async Load() {
-        Tatou.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/tatou.png");
+        let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/tatou.png");
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(Tatou.bitmap, [
+        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
             {name: "walk-left0", x: 0, y: 0, w: 64, h: 32},
             {name: "walk-left1", x: 64, y: 0, w: 64, h: 32},
             {name: "walk-left2", x: 128, y: 0, w: 64, h: 32},
@@ -201,8 +196,6 @@ export default class Tatou extends Enemy {
 
     static Unload() {
         Tatou.animations = null;
-        Tatou.bitmap.close();
-        Tatou.bitmap = null;
     }
 
     constructor(x, y) {

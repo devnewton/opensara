@@ -43,6 +43,7 @@ export default class Scene {
         Playnewton.GPU.Reset();
         Playnewton.PPU.Reset();
         Playnewton.CTRL.Reset();
+        Playnewton.DRIVE.Reset();
     }
 
     /**

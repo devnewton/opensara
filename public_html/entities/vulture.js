@@ -87,15 +87,10 @@ export default class Vulture extends Enemy {
      */
     static animations;
 
-    /**
-     * @type ImageBitmap
-     */
-    static bitmap;
-
     static async Load() {
-        Vulture.bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/vulture.png");
+        let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/vulture.png");
 
-        let spriteset = Playnewton.GPU.CreateSpriteset(Vulture.bitmap, [
+        let spriteset = Playnewton.GPU.CreateSpriteset(bitmap, [
             {name: "idle-left0", x: 2, y: 45, w: 37, h: 54},
             {name: "idle-left1", x: 41, y: 45, w: 37, h: 54},
             {name: "idle-right0", x: 119, y: 45, w: 37, h: 54},
@@ -175,8 +170,6 @@ export default class Vulture extends Enemy {
 
     static Unload() {
         Vulture.animations = null;
-        Vulture.bitmap.close();
-        Vulture.bitmap = null;
     }
 
     constructor(x, y) {

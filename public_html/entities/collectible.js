@@ -12,7 +12,5 @@ export default class Collectible {
     }
 
     static Unload() {
-        Collectible.bitmap.close();
-        Collectible.bitmap = null;
     }
 }
