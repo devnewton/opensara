@@ -157,18 +157,17 @@ export default class Title extends Scene {
     }
 
     UpdateSprites() {
-        let pad = Playnewton.CTRL.GetPad(0);
-        if (pad.startWasNotPressed && pad.start && this.nextScene === this) {
+        let pad = Playnewton.CTRL.GetMasterPad();
+        if (pad.TestStartAndResetIfPressed() && this.nextScene === this) {
             this.Stop();
             this.nextScene = this.adventures[this.adventureIndex].build(this);
             this.nextScene.Start();
         }
 
-        if (pad.upWasNotPressed && pad.up) {
+        if (pad.TestUpAndResetIfPressed()) {
             --this.adventureIndex;
-            pad.upWasNotPressed = false;
         }
-        if (pad.downWasNotPressed && pad.down) {
+        if (pad.TestDownAndResetIfPressed()) {
             ++this.adventureIndex;
             pad.downWasNotPressed = false;
         }

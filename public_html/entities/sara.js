@@ -286,7 +286,7 @@ export default class Sara {
             return;
         }
 
-        let pad = Playnewton.CTRL.GetPad(0);
+        let pad = Playnewton.CTRL.GetMasterPad();
         this.isOnGround = false;
         let velocityX = this.body.velocity.x;
         let velocityY = this.body.velocity.y;

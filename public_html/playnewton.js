@@ -486,6 +486,15 @@ export class CTRL_Gamepad {
      */
     upWasNotPressed = false;
 
+    TestUpAndResetIfPressed() {
+        if(this.upWasNotPressed && this.up) {
+            this.upWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Is the down button being pressed?
      * @type boolean
@@ -497,6 +506,15 @@ export class CTRL_Gamepad {
      * @type boolean
      */
     downWasNotPressed = false;
+
+    TestDownAndResetIfPressed() {
+        if(this.downWasNotPressed && this.down) {
+            this.downWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Is the left button being pressed?
@@ -510,6 +528,15 @@ export class CTRL_Gamepad {
      */
     leftWasNotPressed = false;
 
+    TestLeftAndResetIfPressed() {
+        if(this.leftWasNotPressed && this.left) {
+            this.leftWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Is the right button being pressed?
      * @type boolean
@@ -521,6 +548,15 @@ export class CTRL_Gamepad {
      * @type boolean
      */
     rightWasNotPressed = false;
+
+    TestRightAndResetIfPressed() {
+        if(this.rightWasNotPressed && this.right) {
+            this.rightWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Is the bottom button in the right button cluster being pressed?
@@ -534,6 +570,15 @@ export class CTRL_Gamepad {
      */
     AWasNotPressed = false;
 
+    TestAAndResetIfPressed() {
+        if(this.AWasNotPressed && this.A) {
+            this.AWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Is the right button in the right button cluster being pressed?
      * @type boolean
@@ -544,7 +589,16 @@ export class CTRL_Gamepad {
      * True if the B button was NOT pressed once since last reset
      * @type boolean
      */
-    AWasNotPressed = false;
+    BWasNotPressed = false;
+
+    TestBAndResetIfPressed() {
+        if(this.BWasNotPressed && this.B) {
+            this.BWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Is the left button in the right button cluster being pressed?
@@ -558,6 +612,15 @@ export class CTRL_Gamepad {
      */
     XWasNotPressed = false;
 
+    TestXAndResetIfPressed() {
+        if(this.XWasNotPressed && this.X) {
+            this.XWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Is the top button in the right button cluster being pressed?
      * @type boolean
@@ -569,6 +632,15 @@ export class CTRL_Gamepad {
      * @type boolean
      */
     YWasNotPressed = false;
+
+    TestYAndResetIfPressed() {
+        if(this.YWasNotPressed && this.Y) {
+            this.YWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Is the left shoulder button being pressed?
@@ -582,6 +654,15 @@ export class CTRL_Gamepad {
      */
     LWasNotPressed = false;
 
+    TestLAndResetIfPressed() {
+        if(this.LWasNotPressed && this.L) {
+            this.LWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Is the right shoulder button being pressed?
      * @type boolean
@@ -594,6 +675,15 @@ export class CTRL_Gamepad {
      */
     RWasNotPressed = false;
 
+    TestRAndResetIfPressed() {
+        if(this.RWasNotPressed && this.R) {
+            this.RWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Is the start button being pressed?
      * @type boolean
@@ -605,6 +695,15 @@ export class CTRL_Gamepad {
      * @type boolean
      */
     startWasNotPressed = false;
+
+    TestStartAndResetIfPressed() {
+        if(this.startWasNotPressed && this.start) {
+            this.startWasNotPressed = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     _ResetWasNotPressed() {
         this.upWasNotPressed = false;
@@ -797,6 +896,13 @@ export class Playnewton_CTRL {
      */
     GetPad(player) {
         return this.pads[player];
+    }
+
+    /**
+     * @returns {CTRL_Gamepad}
+     */
+    GetMasterPad() {
+        return this.pads[0];
     }
 
     Reset() {

@@ -15,9 +15,8 @@ export default class OpenSara {
                 Playnewton.CTRL.Poll();
                 Playnewton.CLOCK.Update();
                 if(scene.pausable) {
-                    let pad = Playnewton.CTRL.GetPad(0);
-                    if(pad.startWasNotPressed && pad.start) {
-                        pad.startWasNotPressed = false;
+                    let pad = Playnewton.CTRL.GetMasterPad();
+                    if(pad.TestStartAndResetIfPressed()) {
                         if(Playnewton.CLOCK.paused) {
                             Playnewton.CLOCK.Resume();
                             Playnewton.GPU.HUD.SetPausedText("");

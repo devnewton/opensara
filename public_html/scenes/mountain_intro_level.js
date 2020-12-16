@@ -216,8 +216,8 @@ export default class MountainIntroLevel extends Scene {
             });
         }
 
-        let pad = Playnewton.CTRL.GetPad(0);
-        if (pad.startWasNotPressed && pad.start) {
+        let pad = Playnewton.CTRL.GetMasterPad();
+        if (pad.TestStartAndResetIfPressed()) {
             this.fadeoutToNextLevel();
             this.skipIntroController.skip();
         }

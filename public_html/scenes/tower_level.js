@@ -201,9 +201,8 @@ export default class TowerLevel extends Scene {
     }
 
     UpdateSprites() {
-        let pad = Playnewton.CTRL.GetPad(0);
-        if (pad.startWasNotPressed && pad.start) {
-            pad.startWasNotPressed = false;
+        let pad = Playnewton.CTRL.GetMasterPad();
+        if (pad.TestStartAndResetIfPressed()) {
             this.skipIntroController.skip();
         }
 

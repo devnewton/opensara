@@ -212,8 +212,8 @@ export default class MountainOutroLevel extends Scene {
             });
         }
 
-        let pad = Playnewton.CTRL.GetPad(0);
-        if (pad.startWasNotPressed && pad.start) {
+        let pad = Playnewton.CTRL.GetMasterPad();
+        if (pad.TestStartAndResetIfPressed()) {
             this.fadeoutToNextLevel();
             this.skipOutroController.skip();
         }
