@@ -177,34 +177,34 @@ export default class MountainIntroLevel extends Scene {
                 try {
                     Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You just ate my poisoned apples !", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What? Why do you poison apples ?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No time to explain. Do you want to live ?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Sure !", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] You need a magic flower to cure you.", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Where does this magic flower grow?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Find magic keys to open magic signs.", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] That's magic bullshit !", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Do you want to live ?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                     Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
                     await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Ok...", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.delay(2000, this.skipIntroController.signal);
+                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
                 } catch (e) {
                     if( !(e instanceof Playnewton.CLOCK_SkipException) ) {
                         throw e;

@@ -103,7 +103,7 @@ export class Playnewton_CLOCK {
      * @param {number} ms 
      * @param {CLOCK_SkipSignal} skipSignal
      */
-    delay(ms, skipSignal = undefined) {
+    Delay(ms, skipSignal = undefined) {
         return new Promise((resolve, reject) => {
             this.delays.push(new CLOCK_DELAY(CLOCK.now + ms, resolve, reject, skipSignal));
     });
