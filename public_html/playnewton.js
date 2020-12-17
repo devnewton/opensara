@@ -2267,6 +2267,14 @@ export class GPU_HUD {
 
 export class Playnewton_GPU {
 
+    get screenWidth() {
+        return this.canvas.width;
+    }
+
+    get screenHeight() {
+        return this.canvas.height;
+    }
+
     /**
      * 
      * @type GPU_Layer[]

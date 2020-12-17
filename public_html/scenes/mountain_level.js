@@ -13,6 +13,7 @@ import Cat from "../entities/cat.js"
 import Vulture from "../entities/vulture.js"
 import Fadeout from "../entities/fadeout.js"
 import { IngameMapKeyboardEventToPadButton } from "../utils/keyboard_mappings.js"
+import Announcement from "../entities/announcement.js"
 
 export default class MountainLevel extends Scene {
 
@@ -76,8 +77,19 @@ export default class MountainLevel extends Scene {
      */
     fadeout;
 
-    constructor(mapPath, nextSceneOnExit) {
+    /**
+     * @type Announcement
+     */
+    levelAnnouncement;
+
+    /**
+     * @type string
+     */
+    levelName;
+
+    constructor(levelName, mapPath, nextSceneOnExit) {
         super();
+        this.levelName = levelName;
         this.mapPath = mapPath;
         this.nextSceneOnExit = nextSceneOnExit;
     }
@@ -162,6 +174,11 @@ export default class MountainLevel extends Scene {
         Playnewton.GPU.EnableHUD(true);
     }
 
+    ShowLevelName() {
+        this.levelAnnouncement = new Announcement(this.levelName);
+        this.levelAnnouncement.Start();
+    }
+
     async Start() {
         await super.Start();
 
@@ -192,6 +209,8 @@ export default class MountainLevel extends Scene {
 
         await this.InitHUD();
         this.progress = 100;
+
+        this.ShowLevelName();
     }
 
     Stop() {
@@ -232,6 +251,7 @@ export default class MountainLevel extends Scene {
     }
 
     UpdateSprites() {
+        this.levelAnnouncement.Update();
         this.sara.UpdateSprite();
         this.enemies.forEach((enemy) => enemy.UpdateSprite());
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);

@@ -52,7 +52,7 @@ class MountainAdventure extends Adventure {
     build(nextScene) {
         let scene = new MountainOutroLevel("maps/mountain/mountain_outro.tmx", nextScene);
         for (let n = 5; n >= 1; --n) {
-            let level = new MountainLevel(`maps/mountain/mountain_${n}.tmx`, scene);
+            let level = new MountainLevel(`Mountain ${n}-5`, `maps/mountain/mountain_${n}.tmx`, scene);
             scene = level;
         }
         return new MountainIntroLevel("maps/mountain/mountain_intro.tmx", scene);
