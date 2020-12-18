@@ -82,6 +82,9 @@ class CLOCK_DELAY {
         return true;
     }
 
+    Skip() {
+        this.reject(new CLOCK_SkipException());
+    }
 }
 
 export class Playnewton_CLOCK {
@@ -106,6 +109,10 @@ export class Playnewton_CLOCK {
      */
     delays = [];
 
+    SkipAllDelays() {
+        this.delays.forEach(delay => delay.Skip());
+        this.delays = [];
+    }
 
     Update() {
         if(!this.paused) {
@@ -2015,10 +2022,7 @@ export class GPU_Label {
             this.typewriterEffectSignal = undefined;
             this.typewriterEffectStartTime = undefined;
             this.typewriterEffectResolve = undefined;
-            if (this.typewriterEffectReject) {
-                this.typewriterEffectReject(new CLOCK_SkipException());
-                this.typewriterEffectReject = undefined;
-            }
+            this._Skip();
         }
     }
 
@@ -2030,6 +2034,13 @@ export class GPU_Label {
         if (this.typewriterEffectResolve) {
             this.typewriterEffectResolve();
             this.typewriterEffectResolve = undefined;
+        }
+    }
+
+    _SkipTypewriterEffect() {
+        if (this.typewriterEffectReject) {
+            this.typewriterEffectReject(new CLOCK_SkipException());
+            this.typewriterEffectReject = undefined;
         }
     }
 }
@@ -2069,6 +2080,7 @@ export class GPU_HUD {
 
     Reset() {
         this.bars = [];
+        this.labels.forEach(label => label._SkipTypewriterEffect());
         this.labels = [];
     }
 

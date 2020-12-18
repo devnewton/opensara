@@ -23,10 +23,15 @@ export default class Announcement {
         Playnewton.GPU.HUD.SetLabelPosition(this.label, Playnewton.GPU.screenWidth / 2, Playnewton.GPU.screenHeight / 2);
         Playnewton.GPU.HUD.EnableLabel(this.label);
         this.dx = 0;
-        await Playnewton.GPU.HUD.StartLabelTypewriterEffect(this.label, this.text, 100);
-        await Playnewton.CLOCK.Delay(2000);
-        this.dx = 4;
-        //TODO handle skip
+        try {
+            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(this.label, this.text, 100);
+            await Playnewton.CLOCK.Delay(600 * 2000);
+            this.dx = 4;
+        } catch (e) {
+            if( !(e instanceof Playnewton.CLOCK_SkipException) ) {
+                throw e;
+            }
+        }        
     }
 
     Update() {

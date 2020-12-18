@@ -35,6 +35,7 @@ export default class Scene {
     }
 
     async Start() {
+        Playnewton.CLOCK.SkipAllDelays();
         Playnewton.GPU.Reset();
         Playnewton.PPU.Reset();
         Playnewton.CTRL.Reset();
@@ -42,6 +43,7 @@ export default class Scene {
     }
 
     Stop() {
+        Playnewton.CLOCK.SkipAllDelays();
         Playnewton.GPU.Reset();
         Playnewton.PPU.Reset();
         Playnewton.CTRL.Reset();
