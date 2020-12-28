@@ -109,10 +109,10 @@ export default class Title extends Scene {
         Playnewton.GPU.EnableSprite(titleSprite);
     }
 
-    async InitHUD() {
+    InitHUD() {
         let startLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelPosition(startLabel, 1024, 564);
-        Playnewton.GPU.HUD.StartLabelTypewriterEffect(startLabel, "Press ⌨️enter or 🎮start");
+        Playnewton.GPU.HUD.SetLabelText(startLabel, "Press ⌨️enter or 🎮start");
         Playnewton.GPU.HUD.SetLabelFont(startLabel, "bold 12px monospace");
         Playnewton.GPU.HUD.SetLabelColor(startLabel, "#eeeeee");
         Playnewton.GPU.HUD.SetLabelAlign(startLabel, "right");
@@ -143,7 +143,7 @@ export default class Title extends Scene {
         await this.InitTitle();
         this.progress = 50;
 
-        await this.InitHUD();
+        this.InitHUD();
         this.progress = 100;
     }
 

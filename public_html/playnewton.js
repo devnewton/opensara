@@ -1,92 +1,6 @@
 const PLAYNEWTON_DEFAULT_SCREEN_WIDTH = 1024;
 const PLAYNEWTON_DEFAULT_SCREEN_HEIGHT = 576;
 
-export class CLOCK_SkipSignal {
-    /**
-     * @type boolean
-     */
-    skipped = false;
-}
-
-export class CLOCK_SkipController {
-
-    signal = new CLOCK_SkipSignal();
-
-    skip() {
-        this.signal.skipped = true;
-    }
-}
-
-export class CLOCK_SkipException {
-}
-
-/**
- * @callback CLOCK_DELAY_ResolveCallback
- * 
- */
-
-/**
- * @callback CLOCK_DELAY_RejectCallback
- * @param {CLOCK_SkipException} exception
- * 
- */
-
-class CLOCK_DELAY {
-
-    /**
-     * @type CLOCK_DELAY_ResolveCallback
-     */
-    resolve;
-
-    /**
-     * @type CLOCK_DELAY_RejectCallback
-     */
-    reject;
-
-    /**
-     * @type number
-     */
-    waitUntilTime;
-
-    /**
-     * @type CLOCK_SkipSignal
-     */
-    signal;
-
-    /**
-     * 
-     * @param {number} waitUntilTime 
-     * @param {*} resolve 
-     * @param {*} reject 
-     * @param {CLOCK_SkipSignal} signal 
-     */
-    constructor(waitUntilTime, resolve, reject, signal) {
-        this.waitUntilTime = waitUntilTime;
-        this.resolve = resolve;
-        this.reject = reject;
-        this.signal = signal;
-    }
-
-    /**
-     * @type boolean
-     */
-    Wait(now) {
-        if(this.signal && this.signal.skipped) {
-            this.reject(new CLOCK_SkipException());
-            return false;
-        }
-        if(now >= this.waitUntilTime) {
-            this.resolve();
-            return false;
-        }
-        return true;
-    }
-
-    Skip() {
-        this.reject(new CLOCK_SkipException());
-    }
-}
-
 export class Playnewton_CLOCK {
 
     /**
@@ -104,20 +18,10 @@ export class Playnewton_CLOCK {
      */
     now = performance.now();
 
-    /**
-     * @type Array<CLOCK_DELAY>
-     */
-    delays = [];
-
-    SkipAllDelays() {
-        this.delays.forEach(delay => delay.Skip());
-        this.delays = [];
-    }
 
     Update() {
         if(!this.paused) {
             this.now = performance.now() - this._totalPausesDuration;
-            this.delays = this.delays.filter(delay => delay.Wait(this.now));
         }
     }
 
@@ -140,15 +44,6 @@ export class Playnewton_CLOCK {
         return !!this._pauseTime;
     }
 
-    /**
-     * @param {number} ms 
-     * @param {CLOCK_SkipSignal} skipSignal
-     */
-    Delay(ms, skipSignal = undefined) {
-        return new Promise((resolve, reject) => {
-            this.delays.push(new CLOCK_DELAY(this.now + ms, resolve, reject, skipSignal));
-    });
-}
 }
 
 /**
@@ -1949,47 +1844,11 @@ export class GPU_Bar {
     enabled = false;
 }
 
-/**
- * @callback TypewriterEffectResolveCallback
- * 
- */
-
-/**
- * @callback TypewriterEffectRejectCallback
- * @param {CLOCK_SkipException} exception
- * 
- */
-
 export class GPU_Label {
     /**
      * @type string
      */
     text;
-
-    /**
-     * @type number
-     */
-    typewriterEffectStartTime;
-
-    /**
-     * @type number
-     */
-    typewriterEffectDelayBetweenTwoCharacter;
-
-    /**
-     * @type TypewriterEffectResolveCallback
-     */
-    typewriterEffectResolve;
-
-    /**
-     * @type TypewriterEffectRejectCallback
-     */
-    typewriterEffectReject;
-
-    /**
-     * @type CLOCK_SkipSignal
-     */
-    typewriterEffectSignal;
 
     /**
      * @type number
@@ -2017,32 +1876,10 @@ export class GPU_Label {
      */
     align = "start";
 
-    _HandleTypewriterEffectSkip() {
-        if (this.typewriterEffectSignal && this.typewriterEffectSignal.skipped) {
-            this.typewriterEffectSignal = undefined;
-            this.typewriterEffectStartTime = undefined;
-            this.typewriterEffectResolve = undefined;
-            this._Skip();
-        }
-    }
-
-    _ResolveTypewriterEffect() {
-        this._HandleTypewriterEffectSkip();
-        this.typewriterEffectSignal = undefined;
-        this.typewriterEffectStartTime = undefined;
-        this.typewriterEffectReject = undefined;
-        if (this.typewriterEffectResolve) {
-            this.typewriterEffectResolve();
-            this.typewriterEffectResolve = undefined;
-        }
-    }
-
-    _SkipTypewriterEffect() {
-        if (this.typewriterEffectReject) {
-            this.typewriterEffectReject(new CLOCK_SkipException());
-            this.typewriterEffectReject = undefined;
-        }
-    }
+    /**
+     * @type GPU_Dialog
+     */
+    dialog;
 }
 
 /**
@@ -2080,7 +1917,6 @@ export class GPU_HUD {
 
     Reset() {
         this.bars = [];
-        this.labels.forEach(label => label._SkipTypewriterEffect());
         this.labels = [];
     }
 
@@ -2091,25 +1927,6 @@ export class GPU_HUD {
         let label = new GPU_Label();
         this.labels.push(label);
         return label;
-    }
-
-    /**
-     * 
-     * @param {GPU_Label} label
-     * @param {number} delayBetweenTwoCharacter
-     * @param {CLOCK_SkipSignal} signal
-     */
-    StartLabelTypewriterEffect(label, text, delayBetweenTwoCharacter = 50, signal = null) {
-        label.text = text;
-        label.typewriterEffectStartTime = CLOCK.now;
-        label.typewriterEffectDelayBetweenTwoCharacter = delayBetweenTwoCharacter;
-        let self = this;
-        return new Promise((resolve, reject) => {
-            label._HandleTypewriterEffectSkip();
-            label.typewriterEffectSignal = signal;
-            label.typewriterEffectResolve = resolve
-            label.typewriterEffectReject = reject
-        });
     }
 
     /**
@@ -2773,24 +2590,11 @@ export class Playnewton_GPU {
      * @param {GPU_Label} label
      */
     _DrawLabel(label) {
-        label._HandleTypewriterEffectSkip();
         if (label.enabled) {
             this.ctx.font = label.font;
-            this.ctx.fillStyle = label.color;
             this.ctx.textAlign = label.align;
-            let text = label.text;
-            if (label.typewriterEffectStartTime) {
-                let nbCharacter = (this.fpsLimiter.now - label.typewriterEffectStartTime) / label.typewriterEffectDelayBetweenTwoCharacter;
-                if (nbCharacter <= 0) {
-                    return;
-                }
-                if (nbCharacter < label.text.length) {
-                    text = text.slice(0, nbCharacter);
-                } else {
-                    label._ResolveTypewriterEffect();
-                }
-            }
-            this.ctx.fillText(text, label.x, label.y);
+            this.ctx.fillStyle = label.color;
+            this.ctx.fillText(label.text, label.x, label.y);
         }
     }
 

@@ -6,6 +6,7 @@ import Z_ORDER from "../utils/z_order.js"
 import Fadeout from "../entities/fadeout.js"
 import Lava from "../entities/lava.js"
 import { IngameMapKeyboardEventToPadButton } from "../utils/keyboard_mappings.js"
+import { Dialog } from "../entities/dialog.js"
 
 export default class TowerLevel extends Scene {
 
@@ -44,7 +45,17 @@ export default class TowerLevel extends Scene {
      */
     fadeout;
 
-    skipIntroController = new Playnewton.CLOCK_SkipController();
+    /**
+     * @type Playnewton.GPU_Label
+     */
+    skipLabel;
+
+    /**
+     * @type Playnewton.GPU_Label
+     */
+    dialogLabel;
+
+    dialog = new Dialog();
 
     constructor(mapPath, nextSceneOnExit) {
         super();
@@ -88,7 +99,7 @@ export default class TowerLevel extends Scene {
     }
 
 
-    async InitHUD() {
+    InitHUD() {
         this.healthBar = Playnewton.GPU.HUD.CreateBar();
         Playnewton.GPU.HUD.SetBarPosition(this.healthBar, 10, 10);
         Playnewton.GPU.HUD.SetBarSize(this.healthBar, this.sara.maxHealth);
@@ -119,10 +130,10 @@ export default class TowerLevel extends Scene {
         await this.InitMap();
         this.progress = 80;
 
-        await this.InitHUD();
+        this.InitHUD();
         this.progress = 100;
 
-        await this.IntroDialog();
+        this.IntroDialog();
     }
 
     Stop() {
@@ -130,47 +141,28 @@ export default class TowerLevel extends Scene {
         Sara.Unload();
     }
 
-    async IntroDialog() {
+    IntroDialog() {
         this.pausable = false;
-        let skipLabel = Playnewton.GPU.HUD.CreateLabel();
-        Playnewton.GPU.HUD.SetLabelFont(skipLabel, "bold 12px monospace");
-        Playnewton.GPU.HUD.SetLabelAlign(skipLabel, "right");
-        Playnewton.GPU.HUD.SetLabelPosition(skipLabel, 1024, 564);
-        Playnewton.GPU.HUD.SetLabelColor(skipLabel, "#eeeeee");
-        Playnewton.GPU.HUD.SetLabelText(skipLabel, "Skip with ⌨️enter or 🎮start");
-        Playnewton.GPU.HUD.EnableLabel(skipLabel);
+        this.skipLabel = Playnewton.GPU.HUD.CreateLabel();
+        Playnewton.GPU.HUD.SetLabelFont(this.skipLabel, "bold 12px monospace");
+        Playnewton.GPU.HUD.SetLabelAlign(this.skipLabel, "right");
+        Playnewton.GPU.HUD.SetLabelPosition(this.skipLabel, 1024, 564);
+        Playnewton.GPU.HUD.SetLabelColor(this.skipLabel, "#eeeeee");
+        Playnewton.GPU.HUD.SetLabelText(this.skipLabel, "Skip with ⌨️enter or 🎮start");
+        Playnewton.GPU.HUD.EnableLabel(this.skipLabel);
 
-        let label = Playnewton.GPU.HUD.CreateLabel();
-        Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
-        Playnewton.GPU.HUD.SetLabelAlign(label, "left");
-        Playnewton.GPU.HUD.SetLabelPosition(label, 8, 550);
-        Playnewton.GPU.HUD.EnableLabel(label);
+        this.dialogLabel = Playnewton.GPU.HUD.CreateLabel();
+        Playnewton.GPU.HUD.SetLabelFont(this.dialogLabel, "bold 32px monospace");
+        Playnewton.GPU.HUD.SetLabelAlign(this.dialogLabel, "left");
+        Playnewton.GPU.HUD.SetLabelPosition(this.dialogLabel, 8, 550);
+        Playnewton.GPU.HUD.EnableLabel(this.dialogLabel);
 
-        try {
-            Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Hello ? It's raining outside...", 50, this.skipIntroController.signal);
-            await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Can I stay here for the night ?", 50, this.skipIntroController.signal);
-            await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-            Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Drakul] Please do, the lava will warm up your body.", 50, this.skipIntroController.signal);
-            await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-            Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-            await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What lava ?", 50, this.skipIntroController.signal);
-            await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-        } catch (e) {
-            if( !(e instanceof Playnewton.CLOCK_SkipException) ) {
-                throw e;
-            }
-        }
-        finally {
-            Playnewton.GPU.HUD.DisableLabel(label);
-            Playnewton.GPU.HUD.DisableLabel(skipLabel);
-
-            this.sara.StopWaiting();
-            this.lava.Erupt();
-            this.pausable = true;
-        }
+        this.dialog.Start([
+            { color: "#8fffff", text: "[Sara] Hello ? It's raining outside..." },
+            { color: "#8fffff", text: "[Sara] Can I stay here for the night ?" },
+            { color: "#e0befb", text: "[Drakul] Please do, the lava will warm up your body." },
+            { color: "#8fffff", text: "[Sara] What lava ?" },
+        ]);
     }
 
     UpdateBodies() {
@@ -203,7 +195,16 @@ export default class TowerLevel extends Scene {
     UpdateSprites() {
         let pad = Playnewton.CTRL.GetMasterPad();
         if (pad.TestStartAndResetIfPressed()) {
-            this.skipIntroController.skip();
+            this.dialog.Skip();
+        }
+
+        this.dialog.Update(this.dialogLabel);
+        if(this.dialog.done) {
+            Playnewton.GPU.HUD.DisableLabel(this.dialogLabel);
+            Playnewton.GPU.HUD.DisableLabel(this.skipLabel);
+            this.sara.StopWaiting();
+            this.lava.Erupt();
+            this.pausable = true;
         }
 
         this.lava.UpdateSprite();

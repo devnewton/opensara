@@ -7,8 +7,8 @@ import Z_ORDER from "../utils/z_order.js"
 import Fadeout from "../entities/fadeout.js"
 import HueRotate from "../entities/huerotate.js"
 import Witch from "../entities/witch.js"
-import {IngameMapKeyboardEventToPadButton} from "../utils/keyboard_mappings.js";
-
+import { IngameMapKeyboardEventToPadButton } from "../utils/keyboard_mappings.js";
+import { Dialog } from "../entities/dialog.js"
 
 export default class MountainIntroLevel extends Scene {
 
@@ -47,7 +47,12 @@ export default class MountainIntroLevel extends Scene {
      */
     hueRotate;
 
-    skipIntroController = new Playnewton.CLOCK_SkipController();
+    /**
+     * @type Playnewton.GPU_Label
+     */
+    dialogLabel;
+
+    dialog = new Dialog();
 
     constructor(mapPath, nextSceneOnExit) {
         super();
@@ -59,22 +64,22 @@ export default class MountainIntroLevel extends Scene {
     async InitCollectibles(map) {
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
-                    switch (object.type) {
-                        case "sara":
-                            if (!this.sara) {
-                                this.sara = new Sara(x, y);
-                            }
-                            break;
-                        case "apple":
-                            let apple = new Apple(x, y);
-                            this.apples.push(apple);
-                            break;
-                        case "witch":
-                            if (!this.witch) {
-                                this.witch = new Witch(x, y);
-                            }
-                            break;
-                    }
+                switch (object.type) {
+                    case "sara":
+                        if (!this.sara) {
+                            this.sara = new Sara(x, y);
+                        }
+                        break;
+                    case "apple":
+                        let apple = new Apple(x, y);
+                        this.apples.push(apple);
+                        break;
+                    case "witch":
+                        if (!this.witch) {
+                            this.witch = new Witch(x, y);
+                        }
+                        break;
+                }
             },
             map);
 
@@ -120,7 +125,7 @@ export default class MountainIntroLevel extends Scene {
         await this.InitMountainIntroLevels();
         this.progress = 90;
 
-        this.InitSkipLabel();
+        this.InitLabels();
         this.progress = 100;
     }
 
@@ -132,14 +137,22 @@ export default class MountainIntroLevel extends Scene {
         Apple.Unload();
     }
 
-    InitSkipLabel() {
-        let label = Playnewton.GPU.HUD.CreateLabel();
-        Playnewton.GPU.HUD.SetLabelFont(label, "bold 12px monospace");
-        Playnewton.GPU.HUD.SetLabelAlign(label, "right");
-        Playnewton.GPU.HUD.SetLabelPosition(label, 1024, 564);
-        Playnewton.GPU.HUD.SetLabelColor(label, "#eeeeee");
-        Playnewton.GPU.HUD.SetLabelText(label, "Skip with ⌨️enter or 🎮start");
-        Playnewton.GPU.HUD.EnableLabel(label);
+    InitLabels() {
+        let skipLabel = Playnewton.GPU.HUD.CreateLabel();
+        Playnewton.GPU.HUD.SetLabelFont(skipLabel, "bold 12px monospace");
+        Playnewton.GPU.HUD.SetLabelAlign(skipLabel, "right");
+        Playnewton.GPU.HUD.SetLabelPosition(skipLabel, 1024, 564);
+        Playnewton.GPU.HUD.SetLabelColor(skipLabel, "#eeeeee");
+        Playnewton.GPU.HUD.SetLabelText(skipLabel, "Skip with ⌨️enter or 🎮start");
+        Playnewton.GPU.HUD.EnableLabel(skipLabel);
+
+        this.dialogLabel = Playnewton.GPU.HUD.CreateLabel();
+        Playnewton.GPU.HUD.SetLabelFont(this.dialogLabel, "bold 32px monospace");
+        Playnewton.GPU.HUD.SetLabelAlign(this.dialogLabel, "left");
+        Playnewton.GPU.HUD.SetLabelPosition(this.dialogLabel, 32, 532);
+        Playnewton.GPU.HUD.SetLabelText(this.dialogLabel, "");
+        Playnewton.GPU.HUD.EnableLabel(this.dialogLabel);
+
     }
 
     UpdateBodies() {
@@ -161,65 +174,38 @@ export default class MountainIntroLevel extends Scene {
                 return true;
             }
         });
+
+        this.dialog.Update(this.dialogLabel);
+
+        if(this.dialog.done) {
+            this.fadeoutToNextLevel();
+        }
+
         if (this.apples.length === 0 && !this.hueRotate) {
             let layers = [];
             for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
                 layers.push(i);
             }
-            this.hueRotate = new HueRotate(layers, async () => {
+            this.hueRotate = new HueRotate(layers, () => {
                 this.witch.fly();
-                let label = Playnewton.GPU.HUD.CreateLabel();
-                Playnewton.GPU.HUD.SetLabelFont(label, "bold 32px monospace");
-
-                Playnewton.GPU.HUD.SetLabelAlign(label, "left");
-                Playnewton.GPU.HUD.SetLabelPosition(label, 32, 532);
-                Playnewton.GPU.HUD.EnableLabel(label);
-
-                try {
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Sara ! You just ate my poisoned apples !", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] What? Why do you poison apples ?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] No time to explain. Do you want to live ?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Sure !", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] You need a magic flower to cure you.", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Where does this magic flower grow?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Find magic keys to open magic signs.", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] That's magic bullshit !", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#e0befb");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Witch] Do you want to live ?", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                    Playnewton.GPU.HUD.SetLabelColor(label, "#8fffff");
-                    await Playnewton.GPU.HUD.StartLabelTypewriterEffect(label, "[Sara] Ok...", 50, this.skipIntroController.signal);
-                    await Playnewton.CLOCK.Delay(2000, this.skipIntroController.signal);
-                } catch (e) {
-                    if( !(e instanceof Playnewton.CLOCK_SkipException) ) {
-                        throw e;
-                    }
-                } finally {
-                    this.fadeoutToNextLevel();
-                }
+                this.dialog.Start([
+                    { color: "#e0befb", text: "[Witch] Sara ! You just ate my poisoned apples !" },
+                    { color: "#8fffff", text: "[Sara] What? Why do you poison apples ?" },
+                    { color: "#e0befb", text: "[Witch] No time to explain. Do you want to live ?" },
+                    { color: "#8fffff", text: "[Sara] Sure !" },
+                    { color: "#e0befb", text: "[Witch] You need a magic flower to cure you." },
+                    { color: "#8fffff", text: "[Sara] Where does this magic flower grow?" },
+                    { color: "#e0befb", text: "[Witch] Find magic keys to open magic signs." },
+                    { color: "#8fffff", text: "[Sara] That's magic bullshit !" },
+                    { color: "#e0befb", text: "[Witch] Do you want to live ?" },
+                    { color: "#8fffff", text: "[Sara] Ok..." }
+                ]);
             });
         }
 
         let pad = Playnewton.CTRL.GetMasterPad();
         if (pad.TestStartAndResetIfPressed()) {
             this.fadeoutToNextLevel();
-            this.skipIntroController.skip();
         }
 
         if (this.hueRotate) {

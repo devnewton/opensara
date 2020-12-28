@@ -154,7 +154,7 @@ export default class MountainLevel extends Scene {
         this.poison = new Poison(this.sara);
     }
 
-    async InitHUD() {
+    InitHUD() {
         this.healthBar = Playnewton.GPU.HUD.CreateBar();
         Playnewton.GPU.HUD.SetBarPosition(this.healthBar, 10, 10);
         Playnewton.GPU.HUD.SetBarSize(this.healthBar, this.sara.maxHealth);
@@ -207,7 +207,7 @@ export default class MountainLevel extends Scene {
         await this.InitMap();
         this.progress = 80;
 
-        await this.InitHUD();
+        this.InitHUD();
         this.progress = 100;
 
         this.ShowLevelName();

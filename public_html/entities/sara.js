@@ -461,7 +461,9 @@ export default class Sara {
     }
 
     StopWaiting() {
-        this.state = SaraState.WALK;
+        if(this.state === SaraState.WAIT) {
+            this.state = SaraState.WALK;
+        }
     }
 
     /**
