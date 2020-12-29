@@ -1875,11 +1875,6 @@ export class GPU_Label {
      * @type string
      */
     align = "start";
-
-    /**
-     * @type GPU_Dialog
-     */
-    dialog;
 }
 
 /**
