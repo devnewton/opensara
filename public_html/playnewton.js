@@ -1844,7 +1844,40 @@ export class GPU_Bar {
     enabled = false;
 }
 
+export class GPU_LabelBackground {
+    /**
+     * @type number
+     */
+    x;
+
+    /**
+     * @type number
+     */
+    y;
+
+    /**
+     * @type number
+     */
+    width;
+
+    /**
+     * @type number
+     */
+    height;
+
+    /**
+     * type string
+     */
+    color;
+}
+
 export class GPU_Label {
+
+    /**
+     * @type GPU_LabelBackground
+     */
+    background;
+
     /**
      * @type string
      */
@@ -1922,6 +1955,27 @@ export class GPU_HUD {
         let label = new GPU_Label();
         this.labels.push(label);
         return label;
+    }
+
+
+    /**
+     * 
+     * @param {GPU_Label} label 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} w 
+     * @param {number} h 
+     * @param {string} color 
+     */
+    SetLabelBackground(label, x, y, w, h, color) {
+        if(!label.background) {
+            label.background = new GPU_LabelBackground();
+        }
+        label.background.x = x;
+        label.background.y = y;
+        label.background.width = w;
+        label.background.height = h;
+        label.background.color = color;
     }
 
     /**
@@ -2586,6 +2640,10 @@ export class Playnewton_GPU {
      */
     _DrawLabel(label) {
         if (label.enabled) {
+            if(label.background) {
+                this.ctx.fillStyle = label.background.color;
+                this.ctx.fillRect(label.background.x, label.background.y, label.background.width, label.background.height);
+            }
             this.ctx.font = label.font;
             this.ctx.textAlign = label.align;
             this.ctx.fillStyle = label.color;

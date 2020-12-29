@@ -13,6 +13,8 @@ export default class Announcement {
      */
     label;
 
+    backgroundAlpha;
+
     dialog = new Dialog();
 
     constructor(text) {
@@ -24,6 +26,7 @@ export default class Announcement {
         Playnewton.GPU.HUD.SetLabelPosition(this.label, Playnewton.GPU.screenWidth / 2, Playnewton.GPU.screenHeight / 2);
         Playnewton.GPU.HUD.EnableLabel(this.label);
         Playnewton.GPU.HUD.SetLabelText(this.label, "");
+        this.backgroundAlpha = 128;
         this.dx = 0;
         this.dialog.Start([{text: this.text}]);       
     }
@@ -32,6 +35,8 @@ export default class Announcement {
         if(this.label.enabled) {
             this.dialog.Update(this.label);
             let dx = (this.dialog.done && 4) || 0;
+            this.backgroundAlpha = Math.max(0, this.backgroundAlpha - dx);
+            Playnewton.GPU.HUD.SetLabelBackground(this.label, 0, this.label.y - 16, Playnewton.GPU.screenWidth, 24, `#000000${this.backgroundAlpha.toString(16).padStart(2, '0')}`);
             Playnewton.GPU.HUD.SetLabelPosition(this.label, this.label.x + dx, this.label.y);
             if(this.label.x > Playnewton.GPU.screenWidth) {
                 Playnewton.GPU.HUD.DisableLabel(this.label);
