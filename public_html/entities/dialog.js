@@ -173,7 +173,7 @@ export class Dialog {
     /**
      * 
      * @param {DOMHighResTimeStamp} now 
-     * @returns GPU_DialogLine
+     * @returns DialogLine
      */
     get currentLine() {
         if (!this.skipped) {
