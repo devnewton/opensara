@@ -1053,7 +1053,7 @@ class TMX_Layer {
  * 
  * @type TMX_Object
  */
-class TMX_Object {
+export class TMX_Object {
     /**
      * Name of the object
      * @type string
@@ -1123,7 +1123,7 @@ class TMX_Object {
  * 
  * @type TMX_ObjectGroup
  */
-class TMX_ObjectGroup {
+export class TMX_ObjectGroup {
 
     /**
      * Name of the object group
@@ -1165,7 +1165,7 @@ class TMX_ObjectGroup {
     opacity = 1;
 }
 
-class TMX_Map {
+export class TMX_Map {
 
     /**
      * Map width in tiles
@@ -1484,6 +1484,23 @@ class Playnewton_DRIVE {
                 callback(object, objectgroup, groupX + object.x, groupY + object.y);
             }
         }
+    }
+
+    /**
+     * Find first object of specified type
+     * @param {TMX_Map} map
+     * @param {string} type
+     * @returns
+     */
+    FindOneObject(map, type) {
+        for (let objectgroup of map.objectgroups) {
+            for (let object of objectgroup.objects) {
+                if(object.type === type) {
+                    return object;
+                }
+            }
+        }
+        return null;
     }
 
     async LoadTileset(tsxUrl) {
@@ -2860,6 +2877,29 @@ class PPU_Rectangle extends PPU_Shape {
     }
     get bottom() {
         return this.top + this.h;
+    }
+}
+
+export class PPU_Point {
+    /**
+     * 
+     * @type number
+     */
+    x;
+    /**
+     * 
+     * @type number
+     */
+    y;
+
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     */
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
     }
 }
 

@@ -1,6 +1,7 @@
 import Scene from "./scene.js"
 import * as Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
+import Fampire from "../entities/fampire.js"
 import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
 import Fadeout from "../entities/fadeout.js"
@@ -14,6 +15,11 @@ export default class TowerLevel extends Scene {
      * @type Sara
      */
     sara;
+
+    /**
+     * @type Fampire
+     */
+    fampire;
 
     /**
      * @type Lava
@@ -76,6 +82,10 @@ export default class TowerLevel extends Scene {
         await this.InitMapObjects(map);
     }
 
+    /**
+     * 
+     * @param {Playnewton.TMX_Map} map 
+     */
     async InitMapObjects(map) {
         Playnewton.DRIVE.ForeachTmxMapObject(
             (object, objectgroup, x, y) => {
@@ -90,6 +100,14 @@ export default class TowerLevel extends Scene {
                         if (!this.lava) {
                             this.lava = new Lava(Playnewton.GPU.GetLayer(objectgroup.z), object.y + objectgroup.y, object.y + object.height + objectgroup.y);
                         }
+                        break;
+                    case "fampire":
+                        if(!this.fampire) {
+                            this.fampire = new Fampire(x, y);
+                            let roofWaitPosition = Playnewton.DRIVE.FindOneObject(map, "fampire_roof_wait_position");                            
+                            this.fampire.roofWaitPosition = new Playnewton.PPU_Point(roofWaitPosition.x, roofWaitPosition.y )
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -127,6 +145,9 @@ export default class TowerLevel extends Scene {
         await Sara.Load();
         this.progress = 40;
 
+        await Fampire.Load();
+        this.progress = 50;
+
         await this.InitMap();
         this.progress = 80;
 
@@ -139,6 +160,7 @@ export default class TowerLevel extends Scene {
     Stop() {
         super.Stop();
         Sara.Unload();
+        Fampire.Unload();
     }
 
     IntroDialog() {
@@ -189,6 +211,7 @@ export default class TowerLevel extends Scene {
         this.lava.UpdateBody();
         this.lava.Pursue(this.sara);
         this.sara.UpdateBody();
+        this.fampire.UpdateBody();
         this.enemies.forEach((enemy) => enemy.UpdateBody());
     }
 
@@ -204,11 +227,13 @@ export default class TowerLevel extends Scene {
             Playnewton.GPU.HUD.DisableLabel(this.skipLabel);
             this.sara.StopWaiting();
             this.lava.Erupt();
+            this.fampire.FlyToTowerRoof();
             this.pausable = true;
         }
 
         this.lava.UpdateSprite();
         this.sara.UpdateSprite();
+        this.fampire.UpdateSprite();
 
         let scrollY = -this.sara.sprite.y + 288;
         scrollY = Math.max(scrollY, -152 * 32 + 576);
