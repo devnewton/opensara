@@ -321,7 +321,7 @@
   <object id="335" type="fampire_roof_wait_position" x="712" y="968">
    <point/>
   </object>
-  <object id="336" type="fampire_threaten_position" x="504" y="648">
+  <object id="336" type="fampire_threaten_position" x="504" y="712">
    <point/>
   </object>
  </objectgroup>

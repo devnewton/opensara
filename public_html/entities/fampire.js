@@ -199,6 +199,10 @@ export default class Fampire extends Enemy {
             case FampireState.THREATEN_SARA:
                 this._UpdateBodyThreatenSara();
                 break;
+            case FampireState.ELECTRIC_ATTACK:
+                Playnewton.PPU.SetBodyPosition(this.body, this.threatenPosition.x - this.body.width / 2, this.threatenPosition.y - this.body.height);
+                Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
+                break;
         }
     }
 
@@ -228,6 +232,9 @@ export default class Fampire extends Enemy {
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.stand);
                 break;
             case FampireState.THREATEN_SARA:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.fly);
+                break;
+            case FampireState.ELECTRIC_ATTACK:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.fly);
                 break;
         }
