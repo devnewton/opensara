@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="152" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="336">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="32" height="152" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="337">
  <tileset firstgid="1" source="tower.tsx"/>
  <tileset firstgid="50" source="../collectibles/collectibles.tsx"/>
  <tileset firstgid="114" source="../icons/icons.tsx"/>
@@ -316,9 +316,12 @@
  </objectgroup>
  <objectgroup id="3" name="collectibles" locked="1"/>
  <objectgroup id="5" name="enemies">
-  <object id="71" gid="116" x="536" y="896" width="31" height="47"/>
-  <object id="334" gid="120" x="600" y="4616" width="118" height="85"/>
+  <object id="71" gid="116" x="288" y="952" width="31" height="47"/>
+  <object id="334" gid="120" x="656" y="1272" width="118" height="85"/>
   <object id="335" type="fampire_roof_wait_position" x="712" y="968">
+   <point/>
+  </object>
+  <object id="336" type="fampire_threaten_position" x="504" y="648">
    <point/>
   </object>
  </objectgroup>

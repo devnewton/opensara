@@ -10,7 +10,9 @@ import Sara from "./sara.js";
 const FampireState = {
     WELCOME_SARA: 1,
     FLY_TO_TOWER_ROOF: 2,
-    WAIT_SARA_ON_ROOF: 3
+    WAIT_SARA_ON_ROOF: 3,
+    THREATEN_SARA: 4,
+    ELECTRIC_ATTACK: 5
 };
 
 /**
@@ -51,6 +53,11 @@ export default class Fampire extends Enemy {
      * @type Playnewton.PPU_Point
      */
     roofWaitPosition;
+
+    /**
+     * @type Playnewton.PPU_Point
+     */
+    threatenPosition;
 
     /**
      * @type FampireAnimations
@@ -183,22 +190,29 @@ export default class Fampire extends Enemy {
             case FampireState.WELCOME_SARA:
                 break;
             case FampireState.FLY_TO_TOWER_ROOF:
-                let dx = this.roofWaitPosition.x - this.body.centerX;
-                let dy = this.roofWaitPosition.y - this.body.bottom;
-                let distance = Math.sqrt(dx ** 2 + dy ** 2);
-                if (distance < this.body.height / 2) {
-                    this.state = FampireState.WAIT_SARA_ON_ROOF;
-                } else {
-                    let s = this.flySpeed / distance;
-                    dx *= s;
-                    dy *= s;
-                    Playnewton.PPU.SetBodyVelocity(this.body, dx, dy);
-                }
+                this._UpdateBodyFlyToTowerRoof();
                 break;
             case FampireState.WAIT_SARA_ON_ROOF:
                 Playnewton.PPU.SetBodyPosition(this.body, this.roofWaitPosition.x - this.body.width / 2, this.roofWaitPosition.y - this.body.height);
                 Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
                 break;
+            case FampireState.THREATEN_SARA:
+                this._UpdateBodyThreatenSara();
+                break;
+        }
+    }
+
+    _UpdateBodyFlyToTowerRoof() {
+        let dx = this.roofWaitPosition.x - this.body.centerX;
+        let dy = this.roofWaitPosition.y - this.body.bottom;
+        let distance = Math.sqrt(dx ** 2 + dy ** 2);
+        if (distance < this.body.height / 2) {
+            this.state = FampireState.WAIT_SARA_ON_ROOF;
+        } else {
+            let s = this.flySpeed / distance;
+            dx *= s;
+            dy *= s;
+            Playnewton.PPU.SetBodyVelocity(this.body, dx, dy);
         }
     }
 
@@ -213,6 +227,9 @@ export default class Fampire extends Enemy {
             case FampireState.WAIT_SARA_ON_ROOF:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.stand);
                 break;
+            case FampireState.THREATEN_SARA:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.fly);
+                break;
         }
 
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
@@ -223,12 +240,32 @@ export default class Fampire extends Enemy {
      * @param {Sara} sara 
      */
     Pursue(sara) {
-        //TODO
+        if(this.state === FampireState.WAIT_SARA_ON_ROOF && sara.body.top < this.roofWaitPosition.y) {
+            this.state = FampireState.THREATEN_SARA;
+        }
+    }
+
+    IsThreateningSara() {
+        return this.state === FampireState.THREATEN_SARA;
     }
 
     FlyToTowerRoof() {
         if(this.state === FampireState.WELCOME_SARA) {
             this.state = FampireState.FLY_TO_TOWER_ROOF;
+        }
+    }
+
+    _UpdateBodyThreatenSara() {
+        let dx = this.threatenPosition.x - this.body.centerX;
+        let dy = this.threatenPosition.y - this.body.bottom;
+        let distance = Math.sqrt(dx ** 2 + dy ** 2);
+        if (distance < this.body.height / 2) {
+            this.state = FampireState.ELECTRIC_ATTACK;
+        } else {
+            let s = this.flySpeed / distance;
+            dx *= s;
+            dy *= s;
+            Playnewton.PPU.SetBodyVelocity(this.body, dx, dy);
         }
     }
 }

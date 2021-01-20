@@ -32,11 +32,6 @@ export default class TowerLevel extends Scene {
     healthBar;
 
     /**
-     * @type Array<Enemy>
-     */
-    enemies = [];
-
-    /**
      * @type string
      */
     mapPath;
@@ -60,6 +55,11 @@ export default class TowerLevel extends Scene {
      * @type Playnewton.GPU_Label
      */
     dialogLabel;
+
+    /**
+     * @type boolean
+     */
+    threatenDialogStarted;
 
     dialog = new Dialog();
 
@@ -104,8 +104,10 @@ export default class TowerLevel extends Scene {
                     case "fampire":
                         if(!this.fampire) {
                             this.fampire = new Fampire(x, y);
-                            let roofWaitPosition = Playnewton.DRIVE.FindOneObject(map, "fampire_roof_wait_position");                            
-                            this.fampire.roofWaitPosition = new Playnewton.PPU_Point(roofWaitPosition.x, roofWaitPosition.y )
+                            let roofWaitPosition = Playnewton.DRIVE.FindOneObject(map, "fampire_roof_wait_position");
+                            this.fampire.roofWaitPosition = new Playnewton.PPU_Point(roofWaitPosition.x, roofWaitPosition.y );
+                            let threatenPosition = Playnewton.DRIVE.FindOneObject(map, "fampire_threaten_position");
+                            this.fampire.threatenPosition = new Playnewton.PPU_Point(threatenPosition.x, threatenPosition.y );
                         }
                         break;
                     default:
@@ -129,6 +131,7 @@ export default class TowerLevel extends Scene {
 
     async Start() {
         this.pausable = false;
+        this.threatenDialogStarted = false;
 
         await super.Start();
 
@@ -212,10 +215,19 @@ export default class TowerLevel extends Scene {
         this.lava.Pursue(this.sara);
         this.sara.UpdateBody();
         this.fampire.UpdateBody();
-        this.enemies.forEach((enemy) => enemy.UpdateBody());
-    }
 
-    UpdateSprites() {
+        this.sara.Stomp(this.fampire);
+        this.fampire.Pursue(this.sara);
+
+        if(this.fampire.IsThreateningSara() && !this.threatenDialogStarted) {
+            this.threatenDialogStarted = true;
+            this.dialog.Start([
+                { color: "#8fffff", text: "[Sara] What a horrible night to have a curse." },
+                { color: "#e0befb", text: "[Drakul] And so the shiver of the night has arrived !" },
+            ]);
+            Playnewton.GPU.HUD.EnableLabel(this.dialogLabel);
+        }
+
         let pad = Playnewton.CTRL.GetMasterPad();
         if (pad.TestStartAndResetIfPressed()) {
             this.dialog.Skip();
@@ -230,7 +242,9 @@ export default class TowerLevel extends Scene {
             this.fampire.FlyToTowerRoof();
             this.pausable = true;
         }
+    }
 
+    UpdateSprites() {
         this.lava.UpdateSprite();
         this.sara.UpdateSprite();
         this.fampire.UpdateSprite();
@@ -239,13 +253,7 @@ export default class TowerLevel extends Scene {
         scrollY = Math.max(scrollY, -152 * 32 + 576);
         Playnewton.GPU.SetScroll(0, scrollY);
 
-        this.enemies.forEach((enemy) => enemy.UpdateSprite());
         Playnewton.GPU.HUD.SetBarLevel(this.healthBar, this.sara.health);
-
-        this.enemies.forEach((enemy) => {
-            this.sara.Stomp(enemy);
-            enemy.Pursue(this.sara);
-        });
 
         if (this.fadeout) {
             this.fadeout.Update();
