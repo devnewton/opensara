@@ -13,7 +13,9 @@ const FampireState = {
     FLY_TO_TOWER_ROOF: 2,
     WAIT_SARA_ON_ROOF: 3,
     THREATEN_SARA: 4,
-    ELECTRIC_ATTACK: 5
+    DISAPPEAR: 5,
+    ELECTRIC_ATTACK: 6,
+    PHIRE_ATTACK: 7
 };
 
 /**
@@ -68,13 +70,61 @@ class FampireAnimations {
     fireAttack = new BulletAnimations();
 }
 
+class MiniBat {
+    /**
+     * 
+     * @type Playnewton.GPU_Sprite
+     */
+    sprite;
+
+    /**
+     * @type Playnewton.PPU_Body
+     */
+    body;
+
+    constructor() {
+        this.sprite = Playnewton.GPU.CreateSprite();
+        Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.miniBatFly);
+        Playnewton.GPU.SetSpriteZ(this.sprite, Z_ORDER.ENEMIES);
+
+        this.body = Playnewton.PPU.CreateBody();
+        Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 32, 23);
+        Playnewton.PPU.SetBodyCollideWorldBounds(this.body, false);
+        Playnewton.PPU.SetBodyVelocityBounds(this.body, -10, 10, -20, 10);
+        Playnewton.PPU.SetBodyAffectedByGravity(this.body, false);
+        Playnewton.PPU.SetBodyCollisionMask(this.body, 0);
+    }
+
+    StartFly(x, y) {
+        Playnewton.PPU.SetBodyPosition(this.body, x, y);
+        let angle = Math.random() * 2 * Math.PI;
+        Playnewton.PPU.SetBodyVelocity(this.body, Math.cos(angle), Math.sin(angle));
+        Playnewton.PPU.EnableBody(this.body);
+        Playnewton.GPU.EnableSprite(this.sprite);
+    }
+
+    StopFly() {
+        Playnewton.PPU.DisableBody(this.body);
+        Playnewton.GPU.DisableSprite(this.sprite);
+    }
+
+    UpdateSprite() {
+        Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
+    }
+}
+
 export default class Fampire extends Enemy {
 
     /**
      * 
-     * @type GPU_Sprite
+     * @type Playnewton.GPU_Sprite
      */
     sprite;
+
+    /**
+     * @type Playnewton.PPU_Body
+     */
+    body;
 
     /**
      *  @type number
@@ -97,11 +147,21 @@ export default class Fampire extends Enemy {
     threatenPosition;
 
     /**
+     * @type Playnewton.PPU_Point
+     */
+    floorPosition;
+
+    /**
      * @type FampireAnimations
      */
     static animations;
 
     hoverDy = 0;
+
+    /**
+     * @type Array<MiniBat>
+     */
+    miniBats = [];
 
     /**
      * @type Array<Bullet>
@@ -110,8 +170,34 @@ export default class Fampire extends Enemy {
 
     nextElectricBulletTime = 0;
 
+    /**
+     * @type Array<Bullet>
+     */
+    phireBullets = [];
+
+    nextPhireBulletTime = 0;
+
+    nextAttackTime = 0;
+
+    static ELECTRIC_ATTACK_DURATION = 20000;
     static DELAY_BETWEEN_TWO_ELECTRIC_BULLETS = 1000;
     static MAX_ELECTRIC_BULLETS = 10;
+
+    static PHIRE_ATTACK_DURATION = 10000;
+    static DELAY_BETWEEN_TWO_PHIRE_BULLETS = 1000;
+    static MAX_PHIRE_BULLETS = 6;
+    static PHIRE_BULLET_SPEED = 8;
+
+    /**
+     * @type FampireState
+     */
+    reappearState;
+
+    /**
+     * @type DOMHighResTimeStamp
+     */
+    reappearTime;
+    static DISAPPEAR_DURATION = 5000;
 
     static async Load() {
         let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/fampire.png");
@@ -148,7 +234,11 @@ export default class Fampire extends Enemy {
             { name: "fireAttack0", x: 376, y: 226, w: 32, h: 32 },
             { name: "fireAttack1", x: 410, y: 152, w: 32, h: 32 },
             { name: "fireAttack2", x: 444, y: 152, w: 32, h: 32 },
-            { name: "fireAttack3", x: 478, y: 152, w: 32, h: 32 }
+            { name: "fireAttack3", x: 478, y: 152, w: 32, h: 32 },
+            { name: "miniBatFly0", x: 130, y: 195, w: 32, h: 23 },
+            { name: "miniBatFly1", x: 130, y: 220, w: 32, h: 23 },
+            { name: "miniBatFly2", x: 130, y: 245, w: 32, h: 23 },
+            { name: "miniBatFly3", x: 130, y: 270, w: 32, h: 23 },
         ]);
 
         Fampire.animations = new FampireAnimations();
@@ -205,6 +295,13 @@ export default class Fampire extends Enemy {
             { name: "fireAttack2", delay: 100 },
             { name: "fireAttack3", delay: 100 }
         ]);
+
+        Fampire.animations.miniBatFly = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "miniBatFly0", delay: 100 },
+            { name: "miniBatFly1", delay: 100 },
+            { name: "miniBatFly2", delay: 100 },
+            { name: "miniBatFly3", delay: 100 }
+        ]);
     }
 
     static Unload() {
@@ -235,10 +332,24 @@ export default class Fampire extends Enemy {
             this.electricBullets.push(bullet);
             Playnewton.PPU.SetBodyRectangle(bullet, 8, 8, 32, 32)
         }
+
+        for(let i = 0; i<Fampire.MAX_PHIRE_BULLETS; ++i) {
+            let bullet = new Bullet(Fampire.animations.phireAttack);
+            this.phireBullets.push(bullet);
+            Playnewton.PPU.SetBodyRectangle(bullet, 5, 5, 40, 40)
+        }
+
+        for(let i = 0; i<10; ++i) {
+            let miniBat = new MiniBat();
+            this.miniBats.push(miniBat);
+        }
     }
 
     UpdateBody() {
         switch (this.state) {
+            case FampireState.DISAPPEAR:
+                this._UpdateBodyDisappear();
+                break;
             case FampireState.WELCOME_SARA:
                 break;
             case FampireState.FLY_TO_TOWER_ROOF:
@@ -252,11 +363,22 @@ export default class Fampire extends Enemy {
                 this._UpdateBodyThreatenSara();
                 break;
             case FampireState.ELECTRIC_ATTACK:
-                this._ElectricAttack();
+            case FampireState.PHIRE_ATTACK:
+                this._ChooseNextAttack();
                 break;
         }
 
         this.electricBullets.forEach(bullet => bullet.UpdateBody());
+        this.phireBullets.forEach(bullet => bullet.UpdateBody());
+    }
+
+    _UpdateBodyDisappear() {
+        if(Playnewton.CLOCK.now > this.reappearTime) {
+            this.miniBats.forEach((miniBat) => miniBat.StopFly());
+            Playnewton.PPU.EnableBody(this.body);
+            Playnewton.GPU.EnableSprite(this.sprite);
+            this._ChangeState(this.reappearState);
+        }
     }
 
     _ElectricAttack() {
@@ -269,6 +391,23 @@ export default class Fampire extends Enemy {
             if(bullet) {
                 let angle = Math.random() * Math.PI;
                 bullet.fire(this.body.centerX, this.body.centerY, Math.cos(angle), Math.sin(angle));
+            }
+        }
+    }
+
+    /**
+     * @param {Sara} sara 
+     */
+    _PhireAttack(sara) {
+        Playnewton.PPU.SetBodyPosition(this.body, this.roofWaitPosition.x - this.body.width / 2, this.roofWaitPosition.y - this.body.height);
+        Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
+
+        if(Playnewton.CLOCK.now > this.nextPhireBulletTime) {
+            this.nextPhireBulletTime = Playnewton.CLOCK.now + Fampire.DELAY_BETWEEN_TWO_PHIRE_BULLETS;
+            let bullet = this.phireBullets.find((bullet) => bullet.canBeFired);
+            if(bullet) {
+                let angle = Math.random() * -Math.PI;
+                bullet.fireAt(this.body.centerX, this.body.centerY, sara.body.centerX, sara.body.centerY, Fampire.PHIRE_BULLET_SPEED);
             }
         }
     }
@@ -301,6 +440,9 @@ export default class Fampire extends Enemy {
             case FampireState.THREATEN_SARA:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.fly);
                 break;
+            case FampireState.DISAPPEAR:
+                this.miniBats.forEach((miniBat) => miniBat.UpdateSprite());
+                break;
             case FampireState.ELECTRIC_ATTACK:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.fly);
                 break;
@@ -308,6 +450,7 @@ export default class Fampire extends Enemy {
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
 
         this.electricBullets.forEach(bullet => bullet.UpdateSprite());
+        this.phireBullets.forEach(bullet => bullet.UpdateSprite());
     }
 
     /**
@@ -315,11 +458,22 @@ export default class Fampire extends Enemy {
      * @param {Sara} sara 
      */
     Pursue(sara) {
-        if(this.state === FampireState.WAIT_SARA_ON_ROOF && sara.body.top < this.roofWaitPosition.y) {
-            this.state = FampireState.THREATEN_SARA;
+        switch (this.state) {
+            case FampireState.WAIT_SARA_ON_ROOF:
+                if(sara.body.top < this.roofWaitPosition.y) {
+                    this.state = FampireState.THREATEN_SARA;
+                }
+                break;
+            case FampireState.ELECTRIC_ATTACK:
+                this._ElectricAttack();
+                break;
+            case FampireState.PHIRE_ATTACK:
+                this._PhireAttack(sara);
+                break;
         }
 
         this.electricBullets.forEach(bullet => bullet.Pursue(sara));
+        this.phireBullets.forEach(bullet => bullet.Pursue(sara));
     }
 
     IsThreateningSara() {
@@ -337,12 +491,52 @@ export default class Fampire extends Enemy {
         let dy = this.threatenPosition.y - this.body.bottom;
         let distance = Math.sqrt(dx ** 2 + dy ** 2);
         if (distance < this.body.height / 2) {
-            this.state = FampireState.ELECTRIC_ATTACK;
+            this._Disappear(FampireState.PHIRE_ATTACK);
         } else {
             let s = this.flySpeed / distance;
             dx *= s;
             dy *= s;
             Playnewton.PPU.SetBodyVelocity(this.body, dx, dy);
+        }
+    }
+
+    /**
+     * 
+     * @param {FampireState} state 
+     */
+    _ChangeState(state) {
+        this.state = state;
+        switch(this.state) {
+            case FampireState.DISAPPEAR:
+                this.reappearTime = Playnewton.CLOCK.now + Fampire.DISAPPEAR_DURATION;
+                break;
+            case FampireState.ELECTRIC_ATTACK:
+                this.nextAttackTime = Playnewton.CLOCK.now + Fampire.ELECTRIC_ATTACK_DURATION;
+                break;
+            case FampireState.PHIRE_ATTACK:
+                this.nextAttackTime = Playnewton.CLOCK.now + Fampire.PHIRE_ATTACK_DURATION;
+                break;
+        }        
+    }
+
+    _Disappear(nextState) {
+        this.reappearState = nextState;
+        this._ChangeState(FampireState.DISAPPEAR);
+        Playnewton.PPU.DisableBody(this.body);
+        Playnewton.GPU.DisableSprite(this.sprite);
+        this.miniBats.forEach((miniBat) => miniBat.StartFly(this.body.centerX, this.body.centerY));
+    }
+
+    _ChooseNextAttack() {
+        if(Playnewton.CLOCK.now > this.nextAttackTime) {
+            switch(this.state) {
+                case FampireState.ELECTRIC_ATTACK:
+                    this._Disappear(FampireState.PHIRE_ATTACK);
+                    break;
+                case FampireState.PHIRE_ATTACK:
+                    this._Disappear(FampireState.ELECTRIC_ATTACK);
+                    break;
+            }
         }
     }
 }
