@@ -2,6 +2,7 @@ import Enemy from "./enemy.js"
 import * as Playnewton from "../playnewton.js"
 import Z_ORDER from "../utils/z_order.js";
 import Sara from "./sara.js";
+import { Bullet, BulletAnimations } from "./bullet.js";
 
 /**
  * @readonly
@@ -20,15 +21,51 @@ const FampireState = {
  * @type FampireAnimations
  */
 class FampireAnimations {
+
+    /**
+     * @type Playnewton.GPU_SpriteAnimation
+     */
     stand;
+
+    /**
+     * @type Playnewton.GPU_SpriteAnimation
+     */
     fly;
+
+    /**
+     * @type Playnewton.GPU_SpriteAnimation
+     */
     hurted;
+
+    /**
+     * @type Playnewton.GPU_SpriteAnimation
+     */
     batFly;
+
+    /**
+     * @type Playnewton.GPU_SpriteAnimation
+     */
     batHurted;
+
+    /**
+     * @type Playnewton.GPU_SpriteAnimation
+     */
     miniBatFly;
-    electricAttack;
-    phireAttack;
-    fireAttack;
+
+    /**
+     * @type BulletAnimations
+     */
+    electricAttack = new BulletAnimations();
+
+    /**
+     * @type BulletAnimations
+     */
+    phireAttack = new BulletAnimations();
+
+    /**
+     * @type BulletAnimations
+     */
+    fireAttack = new BulletAnimations();
 }
 
 export default class Fampire extends Enemy {
@@ -66,6 +103,16 @@ export default class Fampire extends Enemy {
 
     hoverDy = 0;
 
+    /**
+     * @type Array<Bullet>
+     */
+    electricBullets = [];
+
+    nextElectricBulletTime = 0;
+
+    static DELAY_BETWEEN_TWO_ELECTRIC_BULLETS = 1000;
+    static MAX_ELECTRIC_BULLETS = 10;
+
     static async Load() {
         let bitmap = await Playnewton.DRIVE.LoadBitmap("sprites/fampire.png");
 
@@ -93,7 +140,7 @@ export default class Fampire extends Enemy {
             { name: "electricAttack7", x: 362, y: 52, w: 48, h: 48 },
             { name: "electricAttack8", x: 412, y: 52, w: 48, h: 48 },
             { name: "electricAttack9", x: 462, y: 52, w: 48, h: 48 },
-            { name: "electricAttack10", x: 462, y: 102, w: 48, h: 48 },
+            { name: "electricAttack10", x: 262, y: 102, w: 48, h: 48 },
             { name: "phireAttack0", x: 262, y: 152, w: 60, h: 60 },
             { name: "phireAttack1", x: 324, y: 152, w: 60, h: 60 },
             { name: "phireAttack2", x: 386, y: 152, w: 60, h: 60 },
@@ -131,7 +178,7 @@ export default class Fampire extends Enemy {
             { name: "hurted3", delay: 100 }
         ]);
 
-        Fampire.animations.electricAttack = Playnewton.GPU.CreateAnimation(spriteset, [
+        Fampire.animations.electricAttack.grow = Fampire.animations.electricAttack.fly = Fampire.animations.electricAttack.explode = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "electricAttack0", delay: 100 },
             { name: "electricAttack1", delay: 100 },
             { name: "electricAttack2", delay: 100 },
@@ -145,20 +192,19 @@ export default class Fampire extends Enemy {
             { name: "electricAttack10", delay: 100 }
         ]);
 
-        Fampire.animations.phireAttack = Playnewton.GPU.CreateAnimation(spriteset, [
+        Fampire.animations.phireAttack.grow = Fampire.animations.phireAttack.fly = Fampire.animations.phireAttack.explode = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "phireAttack0", delay: 100 },
             { name: "phireAttack1", delay: 100 },
             { name: "phireAttack2", delay: 100 },
             { name: "phireAttack3", delay: 100 }
         ]);
 
-        Fampire.animations.fireAttack = Playnewton.GPU.CreateAnimation(spriteset, [
+        Fampire.animations.fireAttack.grow = Fampire.animations.fireAttack.fly = Fampire.animations.fireAttack.explode = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "fireAttack0", delay: 100 },
             { name: "fireAttack1", delay: 100 },
             { name: "fireAttack2", delay: 100 },
             { name: "fireAttack3", delay: 100 }
         ]);
-
     }
 
     static Unload() {
@@ -183,6 +229,12 @@ export default class Fampire extends Enemy {
         Playnewton.PPU.EnableBody(this.body);
 
         this.state = FampireState.WELCOME_SARA;
+
+        for(let i = 0; i<Fampire.MAX_ELECTRIC_BULLETS; ++i) {
+            let bullet = new Bullet(Fampire.animations.electricAttack);
+            this.electricBullets.push(bullet);
+            Playnewton.PPU.SetBodyRectangle(bullet, 8, 8, 32, 32)
+        }
     }
 
     UpdateBody() {
@@ -200,9 +252,24 @@ export default class Fampire extends Enemy {
                 this._UpdateBodyThreatenSara();
                 break;
             case FampireState.ELECTRIC_ATTACK:
-                Playnewton.PPU.SetBodyPosition(this.body, this.threatenPosition.x - this.body.width / 2, this.threatenPosition.y - this.body.height);
-                Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
+                this._ElectricAttack();
                 break;
+        }
+
+        this.electricBullets.forEach(bullet => bullet.UpdateBody());
+    }
+
+    _ElectricAttack() {
+        Playnewton.PPU.SetBodyPosition(this.body, this.threatenPosition.x - this.body.width / 2, this.threatenPosition.y - this.body.height);
+        Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
+
+        if(Playnewton.CLOCK.now > this.nextElectricBulletTime) {
+            this.nextElectricBulletTime = Playnewton.CLOCK.now + Fampire.DELAY_BETWEEN_TWO_ELECTRIC_BULLETS;
+            let bullet = this.electricBullets.find((bullet) => bullet.canBeFired);
+            if(bullet) {
+                let angle = Math.random() * Math.PI;
+                bullet.fire(this.body.centerX, this.body.centerY, Math.cos(angle), Math.sin(angle));
+            }
         }
     }
 
@@ -238,8 +305,9 @@ export default class Fampire extends Enemy {
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.fly);
                 break;
         }
-
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
+
+        this.electricBullets.forEach(bullet => bullet.UpdateSprite());
     }
 
     /**
@@ -250,6 +318,8 @@ export default class Fampire extends Enemy {
         if(this.state === FampireState.WAIT_SARA_ON_ROOF && sara.body.top < this.roofWaitPosition.y) {
             this.state = FampireState.THREATEN_SARA;
         }
+
+        this.electricBullets.forEach(bullet => bullet.Pursue(sara));
     }
 
     IsThreateningSara() {

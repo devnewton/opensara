@@ -104,7 +104,6 @@ export class Bullet extends Enemy{
 
     fire(x, y, vx, vy) {
         Playnewton.PPU.SetBodyPosition(this.body, x, y);
-        //TODO Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, this.initialSize, this.initialSize);
         this.size = this.initialSize;
         this.vx = vx;
         this.vy = vy;
