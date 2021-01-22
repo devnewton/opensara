@@ -260,7 +260,7 @@ export default class Cat extends Enemy {
         switch (this.state) {
             case CatState.IDLE:
                 if(this.bullet.canBeFired) {
-                    this.bullet.fireAt(this.body.centerX, this.body.centerY - 12, sara.body.centerX, sara.body.centerY, 2);
+                    this.bullet.fireAt(this.body.centerX - 15, this.body.centerY - 12 - 15, sara.body.centerX, sara.body.centerY, 2);
                     this.state = CatState.ATTACK;
                 }
                 break;

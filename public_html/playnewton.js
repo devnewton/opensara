@@ -2620,7 +2620,7 @@ export class Playnewton_GPU {
         }
         if (sprite.scale !== 1 || sprite.angle !== 0) {
             this.ctx.save();
-            this.ctx.translate(sprite.x, sprite.y);
+            this.ctx.translate(sprite.x + sprite.picture.w / 2, sprite.y + sprite.picture.h / 2);
             this.ctx.rotate(sprite.angle);
             this.ctx.scale(sprite.scale, sprite.scale);
             this.ctx.drawImage(sprite.picture.bitmap, sprite.picture.x, sprite.picture.y, sprite.picture.w, sprite.picture.h, -sprite.picture.w / 2, -sprite.picture.h / 2, sprite.picture.w, sprite.picture.h);

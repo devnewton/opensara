@@ -39,7 +39,7 @@ export class Bullet extends Enemy{
 
     /**
      * 
-     * @type PPU_Body
+     * @type Playnewton.PPU_Body
      */
     body;
 
@@ -103,7 +103,7 @@ export class Bullet extends Enemy{
     }
 
     fire(x, y, vx, vy) {
-        Playnewton.PPU.SetBodyPosition(this.body, x, y);
+        Playnewton.PPU.SetBodyPosition(this.body, x - this.body.width / 2, y - this.body.height / 2);
         this.vx = vx;
         this.vy = vy;
         this.state = BulletState.GROW;

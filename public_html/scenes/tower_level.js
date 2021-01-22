@@ -104,10 +104,15 @@ export default class TowerLevel extends Scene {
                     case "fampire":
                         if(!this.fampire) {
                             this.fampire = new Fampire(x, y);
-                            let roofWaitPosition = Playnewton.DRIVE.FindOneObject(map, "fampire_roof_wait_position");
-                            this.fampire.roofWaitPosition = new Playnewton.PPU_Point(roofWaitPosition.x, roofWaitPosition.y );
-                            let threatenPosition = Playnewton.DRIVE.FindOneObject(map, "fampire_threaten_position");
-                            this.fampire.threatenPosition = new Playnewton.PPU_Point(threatenPosition.x, threatenPosition.y );
+                            let findFampirePosition = (name) => {
+                                let pos = Playnewton.DRIVE.FindOneObject(map, name);
+                                return new Playnewton.PPU_Point(pos.x, pos.y );
+                            }
+                            this.fampire.roofWaitPosition = findFampirePosition("fampire_roof_wait_position");
+                            this.fampire.threatenPosition = findFampirePosition("fampire_threaten_position");
+                            this.fampire.electricAttackPosition = findFampirePosition("fampire_electric_attack_position");
+                            this.fampire.fireAttackPosition = findFampirePosition("fampire_fire_attack_position");
+                            this.fampire.phireAttackPosition = findFampirePosition("fampire_phire_attack_position");
                         }
                         break;
                     default:
@@ -220,6 +225,8 @@ export default class TowerLevel extends Scene {
         this.fampire.Pursue(this.sara);
 
         if(this.fampire.IsThreateningSara() && !this.threatenDialogStarted) {
+            //adjust world bounds for faster bullet culling
+            Playnewton.PPU.SetWorldBounds(0, 0, 32 * 32, 48 * 32);
             this.threatenDialogStarted = true;
             this.dialog.Start([
                 { color: "#8fffff", text: "[Sara] What a horrible night to have a curse." },
