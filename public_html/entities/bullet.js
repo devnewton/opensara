@@ -104,7 +104,6 @@ export class Bullet extends Enemy{
 
     fire(x, y, vx, vy) {
         Playnewton.PPU.SetBodyPosition(this.body, x, y);
-        this.size = this.initialSize;
         this.vx = vx;
         this.vy = vy;
         this.state = BulletState.GROW;
@@ -121,6 +120,7 @@ export class Bullet extends Enemy{
                 if(this.scale >= 1) {
                     this.scale = 1;
                     this.state = BulletState.FLY;
+                    Playnewton.GPU.SetSpriteRotozoom(this.sprite, 1);
                     Playnewton.PPU.SetBodyVelocityBounds(this.body, -10, 10, -10, 10);
                 }
                 break;
