@@ -15,4 +15,7 @@ export default class Enemy {
     get stompable() {
         return false;
     }
+
+    Hurt() {
+    }
 }

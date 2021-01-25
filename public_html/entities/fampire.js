@@ -16,7 +16,9 @@ const FampireState = {
     DISAPPEAR: 5,
     ELECTRIC_ATTACK: 6,
     FIRE_ATTACK: 7,
-    PHIRE_ATTACK: 8
+    PHIRE_ATTACK: 8,
+    HURTED: 9,
+    BAT_HURTED: 10
 };
 
 /**
@@ -364,9 +366,20 @@ export default class Fampire extends Enemy {
         Fampire.animations.hurted = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "hurted0", delay: 100 },
             { name: "hurted1", delay: 100 },
-            { name: "hurted2", delay: 100 },
-            { name: "hurted3", delay: 100 }
+            { name: "hurted0", delay: 100 },
+            { name: "hurted1", delay: 100 },
+            { name: "hurted0", delay: 100 },
+            { name: "hurted1", delay: 100 }
         ]);
+
+        Fampire.animations.batHurted = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "batHurted0", delay: 100 },
+            { name: "batHurted1", delay: 100 },
+            { name: "batHurted0", delay: 100 },
+            { name: "batHurted1", delay: 100 },
+            { name: "batHurted0", delay: 100 },
+            { name: "batHurted1", delay: 100 }
+        ]);        
 
         Fampire.animations.electricAttack.grow = Fampire.animations.electricAttack.fly = Fampire.animations.electricAttack.explode = Playnewton.GPU.CreateAnimation(spriteset, [
             { name: "electricAttack0", delay: 100 },
@@ -467,10 +480,10 @@ export default class Fampire extends Enemy {
                 this._UpdateBodyThreatenSara();
                 break;
             case FampireState.FIRE_ATTACK:
-                if(this.body.right > Playnewton.PPU.world.bounds.right) {
-                    Playnewton.PPU.SetBodyVelocity(this.body, -Fampire.flySpeed, 0);   
-                } else if(this.body.left < Playnewton.PPU.world.bounds.left) {
-                    Playnewton.PPU.SetBodyVelocity(this.body, Fampire.flySpeed, 0); 
+                if (this.body.right > Playnewton.PPU.world.bounds.right) {
+                    Playnewton.PPU.SetBodyVelocity(this.body, -Fampire.flySpeed, 0);
+                } else if (this.body.left < Playnewton.PPU.world.bounds.left) {
+                    Playnewton.PPU.SetBodyVelocity(this.body, Fampire.flySpeed, 0);
                 }
                 this._ChooseNextAttack();
                 break;
@@ -574,6 +587,18 @@ export default class Fampire extends Enemy {
                 break;
             case FampireState.PHIRE_ATTACK:
                 Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.stand);
+                break;
+            case FampireState.HURTED:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.hurted, Playnewton.GPU_AnimationMode.ONCE);
+                if(this.sprite.animationStopped) {
+                    this._ChooseNextAttack(true);
+                }
+                break;
+            case FampireState.BAT_HURTED:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.batHurted, Playnewton.GPU_AnimationMode.ONCE);
+                if(this.sprite.animationStopped) {
+                    this._ChooseNextAttack(true);
+                }
                 break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
@@ -692,8 +717,8 @@ export default class Fampire extends Enemy {
         }
     }
 
-    _ChooseNextAttack() {
-        if (Playnewton.CLOCK.now > this.nextAttackTime) {
+    _ChooseNextAttack(dontWait = false) {
+        if (dontWait || Playnewton.CLOCK.now > this.nextAttackTime) {
             switch (this.state) {
                 case FampireState.ELECTRIC_ATTACK:
                     this._Disappear(Math.random() > 0.5 ? FampireState.FIRE_ATTACK : FampireState.PHIRE_ATTACK);
@@ -704,7 +729,44 @@ export default class Fampire extends Enemy {
                 case FampireState.PHIRE_ATTACK:
                     this._Disappear(Math.random() > 0.5 ? FampireState.FIRE_ATTACK : FampireState.ELECTRIC_ATTACK);
                     break;
+                default:
+                    let r = Math.random();
+                    if(r < 0.33) {
+                        this._Disappear(FampireState.ELECTRIC_ATTACK);
+                    } else if(r < 0.66) {
+                        this._Disappear(FampireState.FIRE_ATTACK);
+                    } else {
+                        this._Disappear(FampireState.PHIRE_ATTACK);
+                    }
             }
+        }
+    }
+
+    get stompable() {
+        switch (this.state) {
+            case FampireState.ELECTRIC_ATTACK:
+            case FampireState.FIRE_ATTACK:
+            case FampireState.PHIRE_ATTACK:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    Hurt() {
+        switch (this.state) {
+            case FampireState.ELECTRIC_ATTACK:
+            case FampireState.PHIRE_ATTACK:
+                this.health = Math.max(this.health - 1, 0);
+                this._ChangeState(FampireState.HURTED);
+                break;
+            case FampireState.FIRE_ATTACK:
+                this.health = Math.max(this.health - 2, 0);
+                this._ChangeState(FampireState.BAT_HURTED);
+                break;
+        }
+        if (this.dead) {
+            this._ChangeState(FampireState.DEAD);
         }
     }
 }
