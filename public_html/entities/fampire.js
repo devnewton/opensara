@@ -18,7 +18,8 @@ const FampireState = {
     FIRE_ATTACK: 7,
     PHIRE_ATTACK: 8,
     HURTED: 9,
-    BAT_HURTED: 10
+    BAT_HURTED: 10,
+    DEAD: 11
 };
 
 /**
@@ -41,6 +42,11 @@ class FampireAnimations {
      * @type Playnewton.GPU_SpriteAnimation
      */
     hurted;
+
+    /**
+     * @type Playnewton.GPU_SpriteAnimation
+     */
+    death;
 
     /**
      * @type Playnewton.GPU_SpriteAnimation
@@ -223,6 +229,11 @@ export default class Fampire extends Enemy {
     state;
 
     /**
+     * @type number
+     */
+    health = 10;
+
+    /**
      * @type Playnewton.PPU_Point
      */
     roofWaitPosition;
@@ -312,6 +323,22 @@ export default class Fampire extends Enemy {
             { name: "fly3", x: 2, y: 248, w: 126, h: 79 },
             { name: "hurted0", x: 2, y: 330, w: 126, h: 79 },
             { name: "hurted1", x: 2, y: 412, w: 126, h: 79 },
+            { name: "death0", x: 191, y: 389, w:40, h: 60 },
+            { name: "death1", x: 231, y: 389, w:40, h: 60 },
+            { name: "death2", x: 271, y: 389, w:40, h: 60 },
+            { name: "death3", x: 311, y: 389, w:40, h: 60 },
+            { name: "death4", x: 351, y: 389, w:40, h: 60 },
+            { name: "death5", x: 391, y: 389, w:40, h: 60 },
+            { name: "death6", x: 431, y: 389, w:40, h: 60 },
+            { name: "death7", x: 471, y: 389, w:40, h: 60 },
+            { name: "death8", x: 191, y: 454, w:40, h: 60 },
+            { name: "death9", x: 231, y: 454, w:40, h: 60 },
+            { name: "death10", x: 271, y: 454, w:40, h: 60 },
+            { name: "death11", x: 311, y: 454, w:40, h: 60 },
+            { name: "death12", x: 351, y: 454, w:40, h: 60 },
+            { name: "death13", x: 391, y: 454, w:40, h: 60 },
+            { name: "death14", x: 431, y: 454, w:40, h: 60 },
+            { name: "death15", x: 471, y: 454, w:40, h: 60 },
             { name: "batFly0", x: 130, y: 2, w: 61, h: 46 },
             { name: "batFly1", x: 130, y: 50, w: 61, h: 46 },
             { name: "batFly2", x: 130, y: 98, w: 61, h: 46 },
@@ -370,6 +397,25 @@ export default class Fampire extends Enemy {
             { name: "hurted1", delay: 100 },
             { name: "hurted0", delay: 100 },
             { name: "hurted1", delay: 100 }
+        ]);
+
+        Fampire.animations.death = Playnewton.GPU.CreateAnimation(spriteset, [
+            { name: "death0", delay: 100 },
+            { name: "death1", delay: 100 },
+            { name: "death2", delay: 100 },
+            { name: "death3", delay: 100 },
+            { name: "death4", delay: 100 },
+            { name: "death5", delay: 100 },
+            { name: "death6", delay: 100 },
+            { name: "death7", delay: 100 },
+            { name: "death8", delay: 100 },
+            { name: "death9", delay: 100 },
+            { name: "death10", delay: 100 },
+            { name: "death11", delay: 100 },
+            { name: "death12", delay: 100 },
+            { name: "death13", delay: 100 },
+            { name: "death14", delay: 100 },
+            { name: "death15", delay: 100 }
         ]);
 
         Fampire.animations.batHurted = Playnewton.GPU.CreateAnimation(spriteset, [
@@ -491,6 +537,8 @@ export default class Fampire extends Enemy {
             case FampireState.PHIRE_ATTACK:
                 this._ChooseNextAttack();
                 break;
+            case FampireState.DEAD:
+                break;
         }
 
         this.electricBullets.forEach(bullet => bullet.UpdateBody());
@@ -600,6 +648,9 @@ export default class Fampire extends Enemy {
                     this._ChooseNextAttack(true);
                 }
                 break;
+            case FampireState.DEAD:
+                Playnewton.GPU.SetSpriteAnimation(this.sprite, Fampire.animations.death, Playnewton.GPU_AnimationMode.ONCE);
+                break;
         }
         Playnewton.GPU.SetSpritePosition(this.sprite, this.body.position.x, this.body.position.y);
 
@@ -684,6 +735,11 @@ export default class Fampire extends Enemy {
                 Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
                 this.nextAttackTime = Playnewton.CLOCK.now + Fampire.PHIRE_ATTACK_DURATION;
                 break;
+            case FampireState.DEAD:
+                Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 40, 60);
+                Playnewton.PPU.SetBodyPosition(this.body, this.roofWaitPosition.x - this.body.width / 2, this.roofWaitPosition.y - this.body.height);
+                Playnewton.PPU.SetBodyVelocity(this.body, 0, 0);
+                break;
             default:
                 Playnewton.PPU.SetBodyRectangle(this.body, 0, 0, 115, 80);
                 break;
@@ -753,20 +809,30 @@ export default class Fampire extends Enemy {
         }
     }
 
+    get dead() {
+        return this.health <= 0;
+    }
+
     Hurt() {
         switch (this.state) {
             case FampireState.ELECTRIC_ATTACK:
             case FampireState.PHIRE_ATTACK:
                 this.health = Math.max(this.health - 1, 0);
-                this._ChangeState(FampireState.HURTED);
+                if (this.dead) {
+                    this._Disappear(FampireState.DEAD);
+                } else {
+                    this._ChangeState(FampireState.HURTED);
+                }
                 break;
             case FampireState.FIRE_ATTACK:
                 this.health = Math.max(this.health - 2, 0);
-                this._ChangeState(FampireState.BAT_HURTED);
+                if (this.dead) {
+                    this._Disappear(FampireState.DEAD);
+                } else {
+                    this._ChangeState(FampireState.BAT_HURTED);
+                }
                 break;
         }
-        if (this.dead) {
-            this._ChangeState(FampireState.DEAD);
-        }
     }
+
 }
