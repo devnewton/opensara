@@ -231,7 +231,7 @@ export default class Fampire extends Enemy {
     /**
      * @type number
      */
-    health = 10;
+    health = 1;
 
     /**
      * @type Playnewton.PPU_Point

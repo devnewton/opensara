@@ -100,6 +100,9 @@ export default class MountainIntroLevel extends Scene {
     async Start() {
         await super.Start();
 
+        this.hueRotate = null;
+        this.fadeout = null;
+
         Playnewton.CTRL.MapKeyboardEventToPadButton = IngameMapKeyboardEventToPadButton;
 
         this.progress = 0;

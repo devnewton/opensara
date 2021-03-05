@@ -2,14 +2,31 @@ import Scene from "./scene.js"
 import * as Playnewton from "../playnewton.js"
 import Sara from "../entities/sara.js"
 import Fampire from "../entities/fampire.js"
-import Enemy from "../entities/enemy.js"
 import Z_ORDER from "../utils/z_order.js"
 import Fadeout from "../entities/fadeout.js"
 import Lava from "../entities/lava.js"
 import { IngameMapKeyboardEventToPadButton } from "../utils/keyboard_mappings.js"
 import { Dialog } from "../entities/dialog.js"
 
+/**
+ * Enum for level state
+ * @readonly
+ * @enum {number}
+ */
+const TowerLevelState = {
+    INTRO: 1,
+    LAVA: 2,
+    FAMPIRE_FIGHT: 3,
+    FAMPIRE_DEAD: 4,
+    END: 5
+};
+
 export default class TowerLevel extends Scene {
+
+    /**
+     * @type TowerLevelState
+     */
+    state;
 
     /**
      * @type Sara
@@ -56,11 +73,6 @@ export default class TowerLevel extends Scene {
      */
     dialogLabel;
 
-    /**
-     * @type boolean
-     */
-    threatenDialogStarted;
-
     dialog = new Dialog();
 
     constructor(mapPath, nextSceneOnExit) {
@@ -102,11 +114,11 @@ export default class TowerLevel extends Scene {
                         }
                         break;
                     case "fampire":
-                        if(!this.fampire) {
+                        if (!this.fampire) {
                             this.fampire = new Fampire(x, y);
                             let findFampirePosition = (name) => {
                                 let pos = Playnewton.DRIVE.FindOneObject(map, name);
-                                return new Playnewton.PPU_Point(pos.x, pos.y );
+                                return new Playnewton.PPU_Point(pos.x, pos.y);
                             }
                             this.fampire.roofWaitPosition = findFampirePosition("fampire_roof_wait_position");
                             this.fampire.threatenPosition = findFampirePosition("fampire_threaten_position");
@@ -136,7 +148,9 @@ export default class TowerLevel extends Scene {
 
     async Start() {
         this.pausable = false;
-        this.threatenDialogStarted = false;
+        this.state = TowerLevelState.INTRO;
+
+        this.fadeout = null;
 
         await super.Start();
 
@@ -172,7 +186,6 @@ export default class TowerLevel extends Scene {
     }
 
     IntroDialog() {
-        this.pausable = false;
         this.skipLabel = Playnewton.GPU.HUD.CreateLabel();
         Playnewton.GPU.HUD.SetLabelFont(this.skipLabel, "bold 12px monospace");
         Playnewton.GPU.HUD.SetLabelAlign(this.skipLabel, "right");
@@ -191,7 +204,7 @@ export default class TowerLevel extends Scene {
             { color: "#8fffff", text: "[Sara] Hello ? It's raining outside..." },
             { color: "#8fffff", text: "[Sara] Can I stay here for the night ?" },
             { color: "#e0befb", text: "[Drakul] Please do, the lava will warm up your body." },
-            { color: "#8fffff", text: "[Sara] What lava ?" },
+            { color: "#8fffff", text: "[Sara] What lava ?" }
         ]);
     }
 
@@ -224,30 +237,70 @@ export default class TowerLevel extends Scene {
         this.sara.Stomp(this.fampire);
         this.fampire.Pursue(this.sara);
 
-        if(this.fampire.IsThreateningSara() && !this.threatenDialogStarted) {
-            //adjust world bounds for faster bullet culling
-            Playnewton.PPU.SetWorldBounds(0, 0, 32 * 32, 48 * 32);
-            this.threatenDialogStarted = true;
-            this.dialog.Start([
-                { color: "#8fffff", text: "[Sara] What a horrible night to have a curse." },
-                { color: "#e0befb", text: "[Drakul] And so the shiver of the night has arrived !" },
-            ]);
-            Playnewton.GPU.HUD.EnableLabel(this.dialogLabel);
-        }
-
         let pad = Playnewton.CTRL.GetMasterPad();
         if (pad.TestStartAndResetIfPressed()) {
             this.dialog.Skip();
         }
 
         this.dialog.Update(this.dialogLabel);
-        if(this.dialog.done) {
-            Playnewton.GPU.HUD.DisableLabel(this.dialogLabel);
-            Playnewton.GPU.HUD.DisableLabel(this.skipLabel);
-            this.sara.StopWaiting();
-            this.lava.Erupt();
-            this.fampire.FlyToTowerRoof();
-            this.pausable = true;
+        switch (this.state) {
+            case TowerLevelState.INTRO:
+                if (this.dialog.done) {
+                    Playnewton.GPU.HUD.DisableLabel(this.dialogLabel);
+                    Playnewton.GPU.HUD.DisableLabel(this.skipLabel);
+                    this.sara.StopWaiting();
+                    this.lava.Erupt();
+                    this.fampire.FlyToTowerRoof();
+                    this.pausable = true;
+                    this.state = TowerLevelState.LAVA;
+                }
+                break;
+            case TowerLevelState.LAVA:
+                if (this.fampire.IsThreateningSara()) {
+                    //adjust world bounds for faster bullet culling
+                    Playnewton.PPU.SetWorldBounds(0, 0, 32 * 32, 48 * 32);
+                    this.threatenDialogStarted = true;
+                    this.dialog.Start([
+                        { color: "#e0befb", text: "[Drakul] I will have your blood for dinner, Sara !" }
+                    ]);
+                    Playnewton.GPU.HUD.EnableLabel(this.dialogLabel);
+                    this.state = TowerLevelState.FAMPIRE_FIGHT;
+                }
+                break;
+            case TowerLevelState.FAMPIRE_FIGHT:
+                if (this.fampire.dead) {
+                    this.dialog.Start([
+                        { color: "#e0befb", text: "[Drakul] Noooooooooooooooooo !", speed: 200 },
+                        { color: "#8fffff", text: "[Sara] You will need some nurse now, fampire !" },
+                        { color: "#e0befb", text: "[Drakul] What a horrible night to have a nurse.", delay: 5000 },
+                        { color: "#ffffff", text: "THE END", speed: 200, align: "center", x: 512, y: 532, delay: 10000 }
+                    ]);
+                    this.pausable = false;
+                    Playnewton.GPU.HUD.EnableLabel(this.skipLabel);
+                    Playnewton.GPU.HUD.EnableLabel(this.dialogLabel);
+                    this.state = TowerLevelState.FAMPIRE_DEAD;
+                }
+                break;
+            case TowerLevelState.FAMPIRE_DEAD:
+                if (this.dialog.done) {
+                    this.state = TowerLevelState.END;
+                    this.fadeoutToNextScene();
+                }
+                break;
+        }
+    }
+
+    fadeoutToNextScene() {
+        if (!this.fadeout) {
+            let layers = [];
+            for (let i = Z_ORDER.MIN; i <= Z_ORDER.MAX; ++i) {
+                layers.push(i);
+            }
+            this.fadeout = new Fadeout(1000, layers, () => {
+                this.Stop();
+                this.nextScene = this.nextSceneOnExit;
+                this.nextSceneOnExit.Start();
+            });
         }
     }
 

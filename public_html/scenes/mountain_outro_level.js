@@ -103,6 +103,8 @@ export default class MountainOutroLevel extends Scene {
         Playnewton.CTRL.MapKeyboardEventToPadButton = IngameMapKeyboardEventToPadButton;
 
         this.progress = 0;
+        this.hueRotate = null;
+        this.fadeout = null;
 
         for (let z = Z_ORDER.MIN; z <= Z_ORDER.MAX; ++z) {
             let layer = Playnewton.GPU.GetLayer(z);
@@ -194,7 +196,7 @@ export default class MountainOutroLevel extends Scene {
                         { color: "#e0befb", text: "[Witch] No, but I can disappear." },
                         { color: "#8fffff", text: "[Sara] By running away ?" },
                         { color: "#e0befb", text: "[Witch] Oh you know the trick..." },
-                        { color: "#ffffff", text: "THE END", speed: 200, align: "center", x: 512, y: 532 }
+                        { color: "#ffffff", text: "THE END", speed: 200, align: "center", x: 512, y: 532, delay: 10000 }
                     ]);
                 });
         }

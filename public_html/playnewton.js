@@ -2661,10 +2661,12 @@ export class Playnewton_GPU {
                 this.ctx.fillStyle = label.background.color;
                 this.ctx.fillRect(label.background.x, label.background.y, label.background.width, label.background.height);
             }
-            this.ctx.font = label.font;
-            this.ctx.textAlign = label.align;
-            this.ctx.fillStyle = label.color;
-            this.ctx.fillText(label.text, label.x, label.y);
+            if(label.text) {
+                this.ctx.font = label.font;
+                this.ctx.textAlign = label.align;
+                this.ctx.fillStyle = label.color;
+                this.ctx.fillText(label.text, label.x, label.y);
+            }
         }
     }
 

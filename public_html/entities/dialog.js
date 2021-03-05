@@ -176,7 +176,7 @@ export class Dialog {
      * @returns DialogLine
      */
     get currentLine() {
-        if (!this.skipped) {
+        if (!this.done) {
             for (let i = this.lines.length - 1; i >= 0; --i) {
                 let line = this.lines[i];
                 if (Playnewton.CLOCK.now >= line.startTime) {
