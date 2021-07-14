@@ -5,7 +5,9 @@
     left: 0px;
     right: 0px;
     margin: auto;
-    height: 100%;
-    width: 100%;
-    image-rendering: crisp-edges;
+    height: 56.25vw;
+    width: 100vw;
+    max-height: 100vh;
+    max-width: 177.78vh;
+    image-rendering: pixelated;
 }
